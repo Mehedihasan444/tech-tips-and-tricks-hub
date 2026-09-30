@@ -11,6 +11,8 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",
+    "lint:api": "npm run lint --workspace=@tech-tips-hub/api",
+    "lint:web": "npm run lint --workspace=@tech-tips-hub/web",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules .turbo apps/*/.next apps/*/dist",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md}\"",
