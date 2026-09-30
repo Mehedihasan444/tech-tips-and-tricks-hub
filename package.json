@@ -2,7 +2,7 @@
   "name": "tech-tips-and-tricks-hub",
   "version": "1.0.0",
   "private": true,
-  "description": "Tech Tips & Tricks Hub - Turborepo monorepo containing the Next.js web client and the Express API server.",
+  "description": "Tech Tips & Tricks Hub - Turborepo monorepo containing the Next.js web app and the Express API.",
   "workspaces": [
     "apps/*"
   ],
