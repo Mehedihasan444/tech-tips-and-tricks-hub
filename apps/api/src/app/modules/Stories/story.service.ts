@@ -40,22 +40,25 @@ const getAllStories = async (user: JwtPayload) => {
   // Get user's following list
   const userFriend = await User.findById(user._id).populate("following");
 
-  const userFriendIds = userFriend?.following?.map((friend) => friend);
+  const userFriendIds: Types.ObjectId[] = ((userFriend?.following as unknown as any[]) ?? [])
+    .map((friend: any) => friend?._id ?? friend)
+    .filter(Boolean)
+    .map((id: any) => new Types.ObjectId(id.toString()));
 
   // Get stories from friends in a single query
   const friendStories =
-    userFriendIds && userFriendIds.length > 0
+    userFriendIds.length > 0
       ? await Story.find({
           userId: { $in: userFriendIds },
           isActive: true,
-        }).lean()
+        } as any).lean()
       : [];
 
   // Get user's own stories
   const userStories = await Story.find({
-    userId: new Types.ObjectId(user._id),
+    userId: new Types.ObjectId(user._id as string),
     isActive: true,
-  }).lean();
+  } as any).lean();
 
   // Combine both sets of stories
   const filteredStories = [...userStories, ...friendStories];
@@ -94,7 +97,7 @@ const getStoriesByUserId = async (userId: string) => {
   const stories = await Story.find({
     userId: new Types.ObjectId(userId),
     isActive: true,
-  })
+  } as any)
     .sort({ createdAt: -1 })
     .lean();
 

@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { TImageFiles } from "../../interfaces/image.interface";
 import { catchAsync } from "../../utils/catchAsync";
+import { getRouteParam } from "../../utils/getRouteParam";
 import sendResponse from "../../utils/sendResponse";
 import { PostServices } from "./post.service";
 
@@ -21,7 +22,7 @@ const createPost = catchAsync(async (req, res) => {
   });
 });
 const updatePost = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const id = getRouteParam(req.params.id, "id");
 
   const updatedPost = await PostServices.updatePostInDB(id, req.body, req.files as TImageFiles);
 
@@ -44,7 +45,7 @@ const getAllPosts = catchAsync(async (req, res) => {
 });
 
 const getPost = catchAsync(async (req, res) => {
-  const postId = req.params.id;
+  const postId = getRouteParam(req.params.id, "id");
   const post = await PostServices.getPostFromDB(postId);
 
   sendResponse(res, {
@@ -56,7 +57,7 @@ const getPost = catchAsync(async (req, res) => {
 });
 
 const deletePost = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const id = getRouteParam(req.params.id, "id");
   await PostServices.deletePostFromDB(id);
 
   sendResponse(res, {

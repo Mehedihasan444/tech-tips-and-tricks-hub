@@ -86,20 +86,18 @@ const userSchema = new Schema<TUser, IUserModel>(
   },
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
   // hashing password and save into DB
   if (user.password) {
     user.password = await bcryptjs.hash(user.password, Number(config.bcrypt_salt_rounds));
   }
-  next();
 });
 
 // set '' after saving password
-userSchema.post("save", function (doc, next) {
+userSchema.post("save", function (doc) {
   doc.password = "";
-  next();
 });
 
 userSchema.statics.isUserExistsByEmail = async function (email: string) {

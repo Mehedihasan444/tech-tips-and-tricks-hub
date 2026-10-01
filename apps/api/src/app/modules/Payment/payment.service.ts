@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import { Types } from "mongoose";
 import AppError from "../../errors/AppError";
 import { Payment } from "./payment.model";
 import {
@@ -38,7 +39,10 @@ const paymentConfirmation = async ({
   let payment;
   const verifyResponse = await verifyPayment(transactionId);
   if (verifyResponse && verifyResponse.pay_status === "Successful") {
-    payment = await Payment.create({ userId, transactionId });
+    payment = await Payment.create({
+      userId: new Types.ObjectId(userId),
+      transactionId,
+    } as any);
     await User.findByIdAndUpdate(
       userId,
       {
@@ -47,7 +51,7 @@ const paymentConfirmation = async ({
           subscriptionStartDate: new Date(),
         },
       },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 

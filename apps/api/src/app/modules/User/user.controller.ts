@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
+import { getRouteParam } from "../../utils/getRouteParam";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 import AppError from "../../errors/AppError";
@@ -16,7 +17,7 @@ const userRegister = catchAsync(async (req, res) => {
   });
 });
 const updateUserFollowListAndFollowersList = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const id = getRouteParam(req.params.id, "id");
   if (!id && !req.body) {
     throw new AppError(400, "Something went wrong");
   }
@@ -41,7 +42,8 @@ const getAllUsers = catchAsync(async (req, res) => {
 });
 
 const getSingleUser = catchAsync(async (req, res) => {
-  const user = await UserServices.getSingleUserFromDB(req.params.nickName);
+  const nickName = getRouteParam(req.params.nickName, "nickName");
+  const user = await UserServices.getSingleUserFromDB(nickName);
 
   sendResponse(res, {
     success: true,
@@ -51,7 +53,7 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 const deleteUser = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const id = getRouteParam(req.params.id, "id");
   await UserServices.deleteUserFromDB(id);
 
   sendResponse(res, {

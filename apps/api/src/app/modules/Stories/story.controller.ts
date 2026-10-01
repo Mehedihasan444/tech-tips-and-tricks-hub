@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
+import { getRouteParam } from "../../utils/getRouteParam";
 import sendResponse from "../../utils/sendResponse";
 import { StoryService } from "./story.service";
 import { RequestHandler } from "express";
@@ -34,7 +35,7 @@ const getAllStories = catchAsync(async (req, res) => {
 
 // Get stories by user ID
 const getStoriesByUserId: RequestHandler = catchAsync(async (req, res) => {
-  const { userId } = req.params;
+  const userId = getRouteParam(req.params.userId, "userId");
   const result = await StoryService.getStoriesByUserId(userId);
 
   sendResponse(res, {
@@ -47,7 +48,7 @@ const getStoriesByUserId: RequestHandler = catchAsync(async (req, res) => {
 
 // Delete a story
 const deleteStory = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const id = getRouteParam(req.params.id, "id");
   const result = await StoryService.deleteStory(id, req.user);
 
   sendResponse(res, {

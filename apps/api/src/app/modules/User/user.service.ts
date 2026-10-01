@@ -42,7 +42,7 @@ const updateUserFollowListAndFollowersListInDB = async (userId: string, payload:
       isAlreadyFollowing
         ? { $pull: { followers: loggedInUserObjectId } } // Remove loggedInUserId from followers
         : { $addToSet: { followers: loggedInUserObjectId } }, // Add loggedInUserId to followers
-      { new: true },
+      { returnDocument: "after" },
     );
 
     // Similarly, check if userId is in the loggedInUser's following list
@@ -57,7 +57,7 @@ const updateUserFollowListAndFollowersListInDB = async (userId: string, payload:
       isUserInFollowingList
         ? { $pull: { following: userObjectId } } // Remove userId from following
         : { $addToSet: { following: userObjectId } }, // Add userId to following
-      { new: true },
+      { returnDocument: "after" },
     );
 
     // Send follow notification if this is a new follow (not unfollow)
@@ -79,7 +79,7 @@ const updateUserFollowListAndFollowersListInDB = async (userId: string, payload:
 
     return { userToUpdate, loggedInUserToUpdate };
   } else {
-    const result = await User.findByIdAndUpdate(userId, payload, { new: true });
+    const result = await User.findByIdAndUpdate(userId, payload, { returnDocument: "after" });
 
     return result;
   }
@@ -138,7 +138,7 @@ const updateProfilePhoto = async (payload: Record<string, unknown>, image: TImag
   const result = await User.findByIdAndUpdate(
     payload?.userId,
     { profilePhoto: image.image[0].path },
-    { new: true },
+    { returnDocument: "after" },
   );
   return result;
 };

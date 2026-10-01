@@ -57,7 +57,7 @@ const socialLoginUser = async (payload: {
   email: string;
   profilePhoto: string;
   nickName: string;
-  role?: string;
+  role?: "ADMIN" | "USER";
 }) => {
   // checking if the user is exist
   const user = await User.isUserExistsByEmail(payload?.email);

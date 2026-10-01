@@ -10,17 +10,16 @@ const createCommentIntoDB = async (payload: any) => {
     const { commentId, data } = payload; // `data` contains new comment details
 
     // Step 1: Find the root comment or immediate parent comment using the postId or commentId
-    const rootComment = await Comment.findOne({ postId: data.postId }).exec();
+    const rootComment: any = await Comment.findOne({
+      postId: data.postId,
+    } as any).exec();
 
     if (!rootComment) {
       throw new Error("Root comment (post) not found");
     }
 
     // Step 2: Recursive function to find immediate parent comment
-    const findImmediateParent = (
-      parentComment: typeof rootComment,
-      targetCommentId: Types.ObjectId,
-    ): typeof rootComment | null => {
+    const findImmediateParent = (parentComment: any, targetCommentId: Types.ObjectId): any => {
       // Check if current comment is the immediate parent
       if (parentComment._id.toString() === targetCommentId.toString()) {
         return parentComment;
@@ -121,7 +120,7 @@ const createCommentIntoDB = async (payload: any) => {
 
 const getAllCommentsOfASinglePostFromDB = async (postId: string) => {
   try {
-    const result = await Comment.find({ postId })
+    const result = await Comment.find({ postId } as any)
       .populate("commentUser")
       .populate({
         path: "children",
@@ -150,24 +149,21 @@ const updateCommentInDB = async (payload: any) => {
 
   if (isExist) {
     const result = await Comment.findByIdAndUpdate(commentId, commentData, {
-      new: true, // Return the updated comment
+      returnDocument: "after", // Return the updated comment
     });
     return result;
   } else {
     // Step 2: Find the root comment based on the postId if it's not a root-level comment
-    const rootComment = await Comment.findOne({
+    const rootComment: any = await Comment.findOne({
       postId: commentData?.postId,
-    }).exec();
+    } as any).exec();
 
     if (!rootComment) {
       throw new Error("Root comment (post) not found");
     }
 
     // Step 3: Recursive function to find and update the target comment
-    const findAndUpdateComment = (
-      parentComment: typeof rootComment,
-      targetCommentId: string,
-    ): boolean => {
+    const findAndUpdateComment = (parentComment: any, targetCommentId: string): boolean => {
       if (parentComment.children && parentComment.children.length > 0) {
         for (let i = 0; i < parentComment.children.length; i++) {
           const child = parentComment.children[i];
@@ -215,16 +211,13 @@ const deleteCommentFromDB = async (payload: {
     return result;
   } else {
     // Step 1: Find the root comment based on the postId
-    const rootComment = await Comment.findOne({ postId }).exec();
+    const rootComment: any = await Comment.findOne({ postId } as any).exec();
 
     if (!rootComment) {
       throw new Error("Root comment (post) not found");
     }
     // Step 2: Recursive function to find and delete the target comment
-    const findAndDeleteComment = (
-      parentComment: typeof rootComment,
-      targetCommentId: string,
-    ): boolean => {
+    const findAndDeleteComment = (parentComment: any, targetCommentId: string): boolean => {
       // Traverse through the children to find the target comment
       if (parentComment.children && parentComment.children.length > 0) {
         for (let i = 0; i < parentComment.children.length; i++) {

@@ -34,7 +34,7 @@ const updatePostInDB = async (postId: string, payload: TPost, images: TImageFile
     payload.images = [...previousImages, ...newImages];
   }
 
-  const result = await Post.findByIdAndUpdate(postId, payload, { new: true });
+  const result = await Post.findByIdAndUpdate(postId, payload, { returnDocument: "after" });
   if (result) {
     await addDocumentToIndex(result, "posts");
   } else {

@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
+import { getRouteParam } from "../../utils/getRouteParam";
 import sendResponse from "../../utils/sendResponse";
 import { CommentServices } from "./comment.service";
 
@@ -49,7 +50,8 @@ const updateComment = catchAsync(async (req, res) => {
 });
 
 const getSingleComment = catchAsync(async (req, res) => {
-  const comment = await CommentServices.getSingleCommentFromDB(req.params.id); // Use req.params.id instead of nickName
+  const id = getRouteParam(req.params.id, "id");
+  const comment = await CommentServices.getSingleCommentFromDB(id); // Use req.params.id instead of nickName
 
   sendResponse(res, {
     success: true,

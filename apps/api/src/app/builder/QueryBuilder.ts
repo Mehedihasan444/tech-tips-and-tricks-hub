@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { FilterQuery, Query } from "mongoose";
+import { Query, QueryFilter } from "mongoose";
 
 export class QueryBuilder<T> {
   public query: Record<string, unknown>; //payload
@@ -22,7 +22,7 @@ export class QueryBuilder<T> {
         (field) =>
           ({
             [field]: new RegExp(searchTerm, "i"),
-          }) as FilterQuery<T>,
+          }) as QueryFilter<T>,
       ),
     });
     return this;
@@ -72,7 +72,7 @@ export class QueryBuilder<T> {
 
     excludeFields.forEach((e) => delete queryObj[e]);
 
-    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+    this.modelQuery = this.modelQuery.find(queryObj as QueryFilter<T>);
 
     return this;
   }
