@@ -36,7 +36,7 @@ let commentSchema = new Schema<TComment>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 // // Export the model
 export const Comment = model<TComment>("Comment", commentSchema);

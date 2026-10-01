@@ -3,7 +3,6 @@ import Image from "next/image";
 import photo from "@/assets/authenticationIMG.svg";
 import RegisterForm from "@/app/(commonLayout)/components/RegisterForm";
 
-
 const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-default-100">
@@ -13,15 +12,15 @@ const LoginPage = () => {
           <div className="relative w-full h-3/4 max-w-2xl">
             {/* Decorative background elements */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-3xl opacity-20 blur-3xl"></div>
-            
+
             {/* Image container */}
             <div className="relative w-full h-full flex items-center justify-center">
-              <Image 
-                src={photo} 
-                alt="Login illustration" 
+              <Image
+                src={photo}
+                alt="Login illustration"
                 width={600}
                 height={600}
-                priority 
+                priority
                 className="object-contain drop-shadow-2xl"
               />
             </div>

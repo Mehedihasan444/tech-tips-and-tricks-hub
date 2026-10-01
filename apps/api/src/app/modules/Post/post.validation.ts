@@ -24,10 +24,10 @@ const createPostValidationSchema = z.object({
     tags: z.array(
       z.string({
         required_error: "Tags is required",
-      })
+      }),
     ),
     images: z.array(z.string()).optional(),
-    isPremium: z.boolean()
+    isPremium: z.boolean(),
   }),
 });
 
@@ -61,14 +61,13 @@ const updatePostValidationSchema = z.object({
       .array(
         z.string({
           required_error: "Tags is required",
-        })
+        }),
       )
       .optional(),
     images: z.array(z.string()).optional(),
     likes: z.number().optional(),
     dislikes: z.number().optional(),
     isPremium: z.boolean().optional(),
-   
   }),
 });
 

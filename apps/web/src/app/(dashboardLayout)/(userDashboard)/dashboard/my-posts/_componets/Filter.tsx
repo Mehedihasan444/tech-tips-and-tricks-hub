@@ -1,20 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from "react";
-import {
-  Select,
-  SelectItem,
-  TimeInput,
-  DateInput,
-  Input,
-} from "@nextui-org/react";
+import { Select, SelectItem, TimeInput, DateInput, Input } from "@nextui-org/react";
 import { CalendarDate, parseDate, Time } from "@internationalized/date";
 import { TPost } from "@/types/TPost";
-const Filter = ({ allPosts }:{allPosts:TPost[]}) => {
+const Filter = ({ allPosts }: { allPosts: TPost[] }) => {
   const [filteredPosts, setFilteredPosts] = useState(allPosts);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("");
-
 
   // Filter posts based on selected category and date
   const filterPosts = () => {

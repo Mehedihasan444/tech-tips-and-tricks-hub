@@ -9,12 +9,9 @@ import { User } from "../User/user.model";
 import { USER_ROLE } from "../User/user.constant";
 import { EmailHelper } from "../../utils/emailSender";
 
-
 const registerUser = async (payload: TRegisterUser) => {
-
   // checking if the user is exist
   const user = await User.isUserExistsByEmail(payload?.email);
-
 
   if (user) {
     throw new AppError(httpStatus.NOT_FOUND, "This user is already exist!");
@@ -41,13 +38,13 @@ const registerUser = async (payload: TRegisterUser) => {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
+    config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
     jwtPayload,
     config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string
+    config.jwt_refresh_expires_in as string,
   );
 
   return {
@@ -89,13 +86,13 @@ const socialLoginUser = async (payload: {
     const accessToken = createToken(
       jwtPayload,
       config.jwt_access_secret as string,
-      config.jwt_access_expires_in as string
+      config.jwt_access_expires_in as string,
     );
 
     const refreshToken = createToken(
       jwtPayload,
       config.jwt_refresh_secret as string,
-      config.jwt_refresh_expires_in as string
+      config.jwt_refresh_expires_in as string,
     );
 
     return {
@@ -125,13 +122,13 @@ const socialLoginUser = async (payload: {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
+    config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
     jwtPayload,
     config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string
+    config.jwt_refresh_expires_in as string,
   );
 
   return {
@@ -176,13 +173,13 @@ const loginUser = async (payload: TLoginUser) => {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
+    config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
     jwtPayload,
     config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string
+    config.jwt_refresh_expires_in as string,
   );
 
   return {
@@ -191,11 +188,7 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
-const resetPassword = async (
-  userId: string,
-  oldPassword: string,
-  newPassword: string
-) => {
+const resetPassword = async (userId: string, oldPassword: string, newPassword: string) => {
   // checking if the user is exist
   const result = await User.findById(userId);
   // checking if the user is exist
@@ -220,10 +213,7 @@ const resetPassword = async (
     throw new AppError(httpStatus.FORBIDDEN, "Password do not matched");
 
   //hash new password
-  const newHashedPassword = await bcrypt.hash(
-    newPassword,
-    Number(config.bcrypt_salt_rounds)
-  );
+  const newHashedPassword = await bcrypt.hash(newPassword, Number(config.bcrypt_salt_rounds));
 
   await User.findOneAndUpdate(
     {
@@ -233,7 +223,7 @@ const resetPassword = async (
     {
       password: newHashedPassword,
       passwordChangedAt: new Date(),
-    }
+    },
   );
 
   return null;
@@ -241,10 +231,7 @@ const resetPassword = async (
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string
-  ) as JwtPayload;
+  const decoded = jwt.verify(token, config.jwt_refresh_secret as string) as JwtPayload;
 
   const { email, iat } = decoded;
 
@@ -283,7 +270,7 @@ const refreshToken = async (token: string) => {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
+    config.jwt_access_expires_in as string,
   );
 
   return {
@@ -314,11 +301,7 @@ const forgetPassword = async (email: string) => {
     status: user.status,
     nickName: user.nickName,
   };
-  const resetToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    "10m"
-  );
+  const resetToken = createToken(jwtPayload, config.jwt_access_secret as string, "10m");
 
   const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken} `;
 

@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback } from "react";
 import LiveChat from "./LiveChat";
-import { 
-  Button, 
-  Avatar, 
+import {
+  Button,
+  Avatar,
   Badge,
   Card,
   CardBody,
@@ -62,9 +62,11 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ChatManagerContext.Provider value={{ openChat, closeChat, activeChats, toggleChatList, isChatListOpen }}>
+    <ChatManagerContext.Provider
+      value={{ openChat, closeChat, activeChats, toggleChatList, isChatListOpen }}
+    >
       {children}
-      
+
       {/* Chat List Panel */}
       {isChatListOpen && (
         <Card className="fixed bottom-4 right-20 z-50 w-80 shadow-2xl">
@@ -94,9 +96,7 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
                 <div className="p-4 text-center text-default-500">
                   <MessageSquare size={32} className="mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No users online</p>
-                  <p className="text-xs text-default-400 mt-1">
-                    Online users will appear here
-                  </p>
+                  <p className="text-xs text-default-400 mt-1">Online users will appear here</p>
                 </div>
               ) : (
                 <div className="p-2">
@@ -108,18 +108,15 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
                     <div
                       key={userId}
                       className="flex items-center gap-3 p-2 hover:bg-default-100 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => openChat({
-                        _id: userId,
-                        name: `User ${userId.slice(-4)}`,
-                        profilePhoto: "",
-                      })}
+                      onClick={() =>
+                        openChat({
+                          _id: userId,
+                          name: `User ${userId.slice(-4)}`,
+                          profilePhoto: "",
+                        })
+                      }
                     >
-                      <Badge
-                        content=""
-                        color="success"
-                        size="sm"
-                        placement="bottom-right"
-                      >
+                      <Badge content="" color="success" size="sm" placement="bottom-right">
                         <Avatar
                           size="sm"
                           name={userId.slice(-2).toUpperCase()}
@@ -127,9 +124,7 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
                         />
                       </Badge>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          User {userId.slice(-4)}
-                        </p>
+                        <p className="text-sm font-medium truncate">User {userId.slice(-4)}</p>
                         <p className="text-xs text-success">Online</p>
                       </div>
                     </div>
@@ -150,11 +145,7 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
               transform: `translateX(-${index * 340}px)`,
             }}
           >
-            <LiveChat
-              recipient={chat}
-              isOpen={true}
-              onClose={() => closeChat(chat._id)}
-            />
+            <LiveChat recipient={chat} isOpen={true} onClose={() => closeChat(chat._id)} />
           </div>
         ))}
       </div>

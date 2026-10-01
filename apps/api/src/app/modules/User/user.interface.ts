@@ -35,7 +35,7 @@ export type TUser = {
   followers?: ObjectId[];
   following?: ObjectId[];
   isPremium?: boolean;
-  subscriptionStartDate?:string
+  subscriptionStartDate?: string;
 };
 export interface TUserData {
   loggedInUserId?: string;
@@ -59,17 +59,14 @@ export interface TUserData {
   createdAt?: string;
   updatedAt?: string;
   isPremium?: boolean;
-  subscriptionStartDate?:string
+  subscriptionStartDate?: string;
   __v?: number;
 }
 export interface IUserModel extends Model<TUser> {
   isUserExistsByEmail(id: string): Promise<TUser>;
-  isPasswordMatched(
-    plainTextPassword: string,
-    hashedPassword: string
-  ): Promise<boolean>;
+  isPasswordMatched(plainTextPassword: string, hashedPassword: string): Promise<boolean>;
   isJWTIssuedBeforePasswordChanged(
     passwordChangedTimestamp: Date,
-    jwtIssuedTimestamp: number
+    jwtIssuedTimestamp: number,
   ): boolean;
 }

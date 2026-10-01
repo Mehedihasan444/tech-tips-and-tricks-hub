@@ -10,16 +10,7 @@ import {
   Avatar,
   ScrollShadow,
 } from "@nextui-org/react";
-import {
-  Bell,
-  Heart,
-  MessageCircle,
-  UserPlus,
-  AtSign,
-  Reply,
-  Check,
-  Trash2,
-} from "lucide-react";
+import { Bell, Heart, MessageCircle, UserPlus, AtSign, Reply, Check, Trash2 } from "lucide-react";
 import { useSocket, Notification } from "@/context/socket.provider";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -153,7 +144,7 @@ export default function NotificationsDropdown() {
                       />
                       <div
                         className={`absolute -bottom-1 -right-1 p-0.5 rounded-full ${getNotificationBg(
-                          notification.type
+                          notification.type,
                         )}`}
                       >
                         {getNotificationIcon(notification.type)}
@@ -161,9 +152,7 @@ export default function NotificationsDropdown() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">
-                        <span className="font-semibold">
-                          {notification.fromUser?.name}
-                        </span>{" "}
+                        <span className="font-semibold">{notification.fromUser?.name}</span>{" "}
                         {notification.message}
                       </p>
                       <p className="text-xs text-default-400 mt-1">
@@ -182,11 +171,7 @@ export default function NotificationsDropdown() {
           {/* Footer */}
           {notifications.length > 0 && (
             <div className="flex items-center justify-between p-3 border-t border-divider">
-              <Button
-                size="sm"
-                variant="light"
-                onPress={() => router.push("/notifications")}
-              >
+              <Button size="sm" variant="light" onPress={() => router.push("/notifications")}>
                 View all
               </Button>
               <Button

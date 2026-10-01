@@ -13,12 +13,12 @@ const router = express.Router();
 
 router.post(
   "/",
-    auth(USER_ROLE.USER),
-  multerUpload.fields([{ name: "postImages",maxCount: 3 }]),
+  auth(USER_ROLE.USER),
+  multerUpload.fields([{ name: "postImages", maxCount: 3 }]),
   validateImageFileRequest(ImageFilesArrayZodSchema),
   parseBody,
   validateRequest(PostValidation.createPostValidationSchema),
-  postControllers.createPost
+  postControllers.createPost,
 );
 
 router.get("/", postControllers.getAllPosts);
@@ -28,11 +28,11 @@ router.get("/:id", postControllers.getPost);
 router.put(
   "/:id",
   auth(USER_ROLE.USER),
-  multerUpload.fields([{ name: "postImages",maxCount: 3 }]),
+  multerUpload.fields([{ name: "postImages", maxCount: 3 }]),
   validateImageFileRequest(ImageFilesArrayZodSchema),
   parseBody,
   validateRequest(PostValidation.updatePostValidationSchema),
-  postControllers.updatePost
+  postControllers.updatePost,
 );
 
 router.delete("/:id", auth(USER_ROLE.USER), postControllers.deletePost);

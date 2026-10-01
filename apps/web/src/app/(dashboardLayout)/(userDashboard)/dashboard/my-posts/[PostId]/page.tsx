@@ -21,18 +21,16 @@ const PostDetailPage = async ({ params: { PostId } }: IProps) => {
           <User
             avatarProps={{ src: post.author.profilePhoto, radius: "lg" }}
             name={post.author.name}
-            description={`Posted on: ${new Date(
-              post.createdAt
-            ).toLocaleDateString()}`}
+            description={`Posted on: ${new Date(post.createdAt).toLocaleDateString()}`}
           />
-            <h1 className="text-2xl font-semibold">Title : {post.title}</h1>
+          <h1 className="text-2xl font-semibold">Title : {post.title}</h1>
         </div>
       </header>
 
       {/* Images Section */}
       {post.images.length > 0 && (
         <div className="flex">
-          {post.images.slice(0,2).map((image: string, index: number) => (
+          {post.images.slice(0, 2).map((image: string, index: number) => (
             <Image
               key={index}
               src={image}
@@ -117,7 +115,6 @@ const PostDetailPage = async ({ params: { PostId } }: IProps) => {
         </div>
       </section>
       {/* Comments Section */}
- 
     </div>
   );
 };

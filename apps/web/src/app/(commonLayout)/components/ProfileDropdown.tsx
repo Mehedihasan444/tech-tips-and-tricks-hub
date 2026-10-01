@@ -11,16 +11,16 @@ import {
   Avatar,
   Chip,
 } from "@nextui-org/react";
-import { 
-  CrownIcon, 
-  SquareUser, 
+import {
+  CrownIcon,
+  SquareUser,
   LayoutDashboard,
   FileText,
   Info,
   Mail,
   HelpCircle,
   LogOut,
-  ChevronRight 
+  ChevronRight,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -81,11 +81,7 @@ export default function ProfileDropdown() {
       >
         {/* User Profile Section */}
         <DropdownSection aria-label="Profile" showDivider>
-          <DropdownItem
-            isReadOnly
-            key="profile"
-            className="h-auto gap-2 opacity-100 pb-3"
-          >
+          <DropdownItem isReadOnly key="profile" className="h-auto gap-2 opacity-100 pb-3">
             <User
               name={
                 <div className="flex items-center gap-2">
@@ -97,9 +93,7 @@ export default function ProfileDropdown() {
                   )}
                 </div>
               }
-              description={
-                <span className="text-xs text-default-500">{user?.email}</span>
-              }
+              description={<span className="text-xs text-default-500">{user?.email}</span>}
               classNames={{
                 name: "text-sm",
                 description: "text-xs",
@@ -130,9 +124,7 @@ export default function ProfileDropdown() {
             startContent={<LayoutDashboard size={18} className="text-secondary" />}
             endContent={<ChevronRight size={16} className="text-default-400" />}
             onClick={() =>
-              handleNavigation(
-                user?.role === "USER" ? "/dashboard" : "/admin-dashboard"
-              )
+              handleNavigation(user?.role === "USER" ? "/dashboard" : "/admin-dashboard")
             }
             className="py-3"
           >

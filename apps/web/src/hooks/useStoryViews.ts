@@ -24,14 +24,20 @@ export const useStoryViews = (storyId?: string) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Get views for a specific story
-  const getStoryViews = useCallback((id: string) => {
-    return viewsData[id] || { count: 0, viewers: [] };
-  }, [viewsData]);
+  const getStoryViews = useCallback(
+    (id: string) => {
+      return viewsData[id] || { count: 0, viewers: [] };
+    },
+    [viewsData],
+  );
 
   // Mark story as viewed
-  const markAsViewed = useCallback((id: string) => {
-    viewStory(id);
-  }, [viewStory]);
+  const markAsViewed = useCallback(
+    (id: string) => {
+      viewStory(id);
+    },
+    [viewStory],
+  );
 
   // Listen for story view updates
   useEffect(() => {
@@ -48,9 +54,7 @@ export const useStoryViews = (storyId?: string) => {
           ...prev,
           [data.storyId]: {
             count: data.viewCount,
-            viewers: data.newViewer
-              ? [...existing.viewers, data.newViewer]
-              : existing.viewers,
+            viewers: data.newViewer ? [...existing.viewers, data.newViewer] : existing.viewers,
           },
         };
       });

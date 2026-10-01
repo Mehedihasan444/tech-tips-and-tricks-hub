@@ -14,17 +14,17 @@ interface SubmitBtnProps {
   className?: string;
 }
 
-const SubmitBtn: React.FC<SubmitBtnProps> = ({ 
-  text, 
+const SubmitBtn: React.FC<SubmitBtnProps> = ({
+  text,
   loadingText,
-  isLoading, 
+  isLoading,
   icon: Icon,
   color = "primary",
   variant = "solid",
   fullWidth = true,
-  className = ""
+  className = "",
 }) => {
-  const displayText = isLoading ? (loadingText || "Please wait...") : text;
+  const displayText = isLoading ? loadingText || "Please wait..." : text;
 
   return (
     <Button

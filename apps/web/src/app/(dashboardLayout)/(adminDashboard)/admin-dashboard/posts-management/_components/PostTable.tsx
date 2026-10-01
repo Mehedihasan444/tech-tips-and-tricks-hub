@@ -28,7 +28,7 @@ const PostTable = () => {
   const fetchData = async (page: number) => {
     try {
       const { data } = await getPosts(page, rowsPerPage);
-      const { data:fetchedPosts, pageCount } = data || {};
+      const { data: fetchedPosts, pageCount } = data || {};
       setNumberOfPages(pageCount); // Set the number of pages
       setPosts(fetchedPosts || []); // Set the fetched posts
     } catch (error) {
@@ -40,16 +40,13 @@ const PostTable = () => {
     fetchData(page); // Fetch data when the page changes
   }, [page]);
 
-
-
-
   type OmittedKeys = "content" | "images" | "tags" | "updatedAt" | "_v";
   type TPostWithoutContentAndImages = Omit<TPost, OmittedKeys>;
 
   const renderCell = useCallback(
     (
       post: TPostWithoutContentAndImages,
-      columnKey: keyof TPostWithoutContentAndImages | "actions"
+      columnKey: keyof TPostWithoutContentAndImages | "actions",
     ) => {
       const cellValue = post[columnKey as keyof TPostWithoutContentAndImages];
 
@@ -66,22 +63,16 @@ const PostTable = () => {
 
         case "category":
           return (
-            <div className="text-primary">
-              {typeof cellValue === "string" ? cellValue : null}
-            </div>
+            <div className="text-primary">{typeof cellValue === "string" ? cellValue : null}</div>
           );
         case "likes":
           return (
-            <div className="text-primary">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <div className="text-primary">{typeof cellValue === "number" ? cellValue : null}</div>
           );
 
         case "dislikes":
           return (
-            <div className="text-secondary">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <div className="text-secondary">{typeof cellValue === "number" ? cellValue : null}</div>
           );
         case "author":
           return (
@@ -123,9 +114,8 @@ const PostTable = () => {
           return null;
       }
     },
-    []
+    [],
   );
-
 
   return (
     <div>
@@ -155,10 +145,8 @@ const PostTable = () => {
               key={column.uid}
               align={column.uid === "actions" ? "center" : "start"}
               allowsSorting
-             
             >
               {column.name}
-             
             </TableColumn>
           )}
         </TableHeader>
@@ -167,10 +155,7 @@ const PostTable = () => {
             <TableRow key={item._id}>
               {(columnKey) => (
                 <TableCell>
-                  {renderCell(
-                    item,
-                    columnKey as keyof TPostWithoutContentAndImages | "actions"
-                  )}
+                  {renderCell(item, columnKey as keyof TPostWithoutContentAndImages | "actions")}
                 </TableCell>
               )}
             </TableRow>

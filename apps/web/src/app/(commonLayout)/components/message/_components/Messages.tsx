@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { getAllCommentsOfASinglePost } from "@/services/CommentService";
 import React, { Dispatch, useEffect, useState } from "react";
 import { TPost } from "@/types/TPost";

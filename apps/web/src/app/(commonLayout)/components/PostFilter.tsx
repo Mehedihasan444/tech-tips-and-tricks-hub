@@ -1,9 +1,6 @@
 "use client";
 import { postCategories } from "@/app/(dashboardLayout)/(userDashboard)/dashboard/create-post/constant";
-import {
-  useGetFilteredPosts,
-  useGetFilteredPostsByCategory,
-} from "@/hooks/search.hook";
+import { useGetFilteredPosts, useGetFilteredPostsByCategory } from "@/hooks/search.hook";
 import { TPost } from "@/types/TPost";
 import { Select, SelectItem, Chip } from "@nextui-org/react";
 import { Filter, TrendingUp } from "lucide-react";
@@ -116,22 +113,12 @@ const PostFilter = ({ setData }: { setData: Dispatch<TPost[]> }) => {
       {(category || sort) && (
         <div className="flex items-center gap-2">
           {category && (
-            <Chip
-              size="sm"
-              variant="flat"
-              color="primary"
-              onClose={() => setCategory("")}
-            >
+            <Chip size="sm" variant="flat" color="primary" onClose={() => setCategory("")}>
               {category}
             </Chip>
           )}
           {sort && (
-            <Chip
-              size="sm"
-              variant="flat"
-              color="secondary"
-              onClose={() => setSort("")}
-            >
+            <Chip size="sm" variant="flat" color="secondary" onClose={() => setSort("")}>
               {sort === "latest" ? "Latest" : sort === "-likes" ? "Most Upvoted" : "Most Downvoted"}
             </Chip>
           )}

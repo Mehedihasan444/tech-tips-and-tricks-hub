@@ -1,7 +1,16 @@
 "use client";
 import { TPost } from "@/types/TPost";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Avatar, Button, Card, CardBody, CardHeader, Divider, Chip, Skeleton } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Divider,
+  Chip,
+  Skeleton,
+} from "@nextui-org/react";
 import { getPosts } from "@/services/PostService";
 import CreatePost from "./components/modal/CreatePost";
 import PostFilter from "./components/PostFilter";
@@ -36,13 +45,13 @@ const NewsFeed = () => {
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
-  
+
   // Dynamic data states
   const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
   const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
   const [loadingTrending, setLoadingTrending] = useState(true);
-  
+
   const { user: loggedInUser } = useUser();
   const { mutate: handleUserUpdate } = useUpdateUser();
 
@@ -55,13 +64,16 @@ const NewsFeed = () => {
         const result = await response.json();
         const users = result?.data?.data || result?.data || [];
         // Filter out the logged-in user and users already followed
-        const filteredUsers = users.filter((u: SuggestedUser) => 
-          u._id !== loggedInUser?._id && 
-          !loggedInUser?.following?.some((f: IUser) => f._id === u._id)
-        ).slice(0, 3);
+        const filteredUsers = users
+          .filter(
+            (u: SuggestedUser) =>
+              u._id !== loggedInUser?._id &&
+              !loggedInUser?.following?.some((f: IUser) => f._id === u._id),
+          )
+          .slice(0, 3);
         setSuggestedUsers(filteredUsers);
       } catch (error) {
-        console.error('Error fetching suggested users:', error);
+        console.error("Error fetching suggested users:", error);
         setSuggestedUsers([]);
       } finally {
         setLoadingSuggestions(false);
@@ -78,17 +90,17 @@ const NewsFeed = () => {
       try {
         // Count tags from loaded posts
         const tagCounts = new Map<string, number>();
-        
+
         data.forEach((post: TPost) => {
           if (post.tags && Array.isArray(post.tags)) {
             post.tags.forEach((tag: string) => {
-              const normalizedTag = tag.startsWith('#') ? tag : `#${tag}`;
+              const normalizedTag = tag.startsWith("#") ? tag : `#${tag}`;
               tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
             });
           }
           // Also count categories
           if (post.category) {
-            const categoryTag = `#${post.category.replace(/\s+/g, '')}`;
+            const categoryTag = `#${post.category.replace(/\s+/g, "")}`;
             tagCounts.set(categoryTag, (tagCounts.get(categoryTag) || 0) + 1);
           }
         });
@@ -100,23 +112,29 @@ const NewsFeed = () => {
           .map(([tag, count]) => ({ tag, count }));
 
         // If we have less than 5, add some defaults
-        const defaultTopics = ['#WebDevelopment', '#JavaScript', '#React', '#TypeScript', '#Programming'];
+        const defaultTopics = [
+          "#WebDevelopment",
+          "#JavaScript",
+          "#React",
+          "#TypeScript",
+          "#Programming",
+        ];
         while (sortedTopics.length < 5) {
           const defaultTag = defaultTopics[sortedTopics.length];
-          if (!sortedTopics.find(t => t.tag === defaultTag)) {
+          if (!sortedTopics.find((t) => t.tag === defaultTag)) {
             sortedTopics.push({ tag: defaultTag, count: Math.floor(Math.random() * 5000) + 1000 });
           }
         }
 
         setTrendingTopics(sortedTopics);
       } catch (error) {
-        console.error('Error calculating trending topics:', error);
+        console.error("Error calculating trending topics:", error);
         setTrendingTopics([
-          { tag: '#WebDevelopment', count: 10200 },
-          { tag: '#JavaScript', count: 9400 },
-          { tag: '#React', count: 8100 },
-          { tag: '#TypeScript', count: 6500 },
-          { tag: '#Programming', count: 4200 },
+          { tag: "#WebDevelopment", count: 10200 },
+          { tag: "#JavaScript", count: 9400 },
+          { tag: "#React", count: 8100 },
+          { tag: "#TypeScript", count: 6500 },
+          { tag: "#Programming", count: 4200 },
         ]);
       } finally {
         setLoadingTrending(false);
@@ -135,7 +153,7 @@ const NewsFeed = () => {
     };
     handleUserUpdate({ userId, userData });
     // Remove from suggestions after following
-    setSuggestedUsers(prev => prev.filter(u => u._id !== userId));
+    setSuggestedUsers((prev) => prev.filter((u) => u._id !== userId));
   };
 
   // Initial fetch on mount
@@ -151,7 +169,7 @@ const NewsFeed = () => {
         setPage(2);
         setHasMore(newPosts.length >= limit);
       } catch (error) {
-        console.error('Error fetching initial posts:', error);
+        console.error("Error fetching initial posts:", error);
         setData([]);
       } finally {
         setInitialLoading(false);
@@ -176,7 +194,7 @@ const NewsFeed = () => {
       }
       setHasMore(newPosts.length >= limit);
     } catch (error) {
-      console.error('Error loading more posts:', error);
+      console.error("Error loading more posts:", error);
     } finally {
       setLoading(false);
     }
@@ -244,12 +262,10 @@ const NewsFeed = () => {
               ) : (
                 <>
                   {data?.length > 0 ? (
-                    data?.map((post: TPost) => (
-                      <PostCard key={post._id} post={post} />
-                    ))
+                    data?.map((post: TPost) => <PostCard key={post._id} post={post} />)
                   ) : (
                     <div className="bg-content1 rounded-2xl border border-divider">
-                      <EmptyState 
+                      <EmptyState
                         type="posts"
                         title="No Posts Found"
                         description="Be the first to share something amazing with the community! Your insights could help others."
@@ -358,39 +374,38 @@ const NewsFeed = () => {
               </CardHeader>
               <Divider />
               <CardBody className="gap-3 p-4">
-                {loadingTrending ? (
-                  // Loading skeleton for trending
-                  [...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center justify-between p-2">
-                      <div className="space-y-2">
-                        <Skeleton className="h-3 w-28 rounded" />
-                        <Skeleton className="h-2 w-16 rounded" />
+                {loadingTrending
+                  ? // Loading skeleton for trending
+                    [...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center justify-between p-2">
+                        <div className="space-y-2">
+                          <Skeleton className="h-3 w-28 rounded" />
+                          <Skeleton className="h-2 w-16 rounded" />
+                        </div>
+                        <Skeleton className="h-6 w-8 rounded" />
                       </div>
-                      <Skeleton className="h-6 w-8 rounded" />
-                    </div>
-                  ))
-                ) : (
-                  trendingTopics.map((topic, index) => (
-                    <button
-                      key={topic.tag}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors text-left group w-full"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold group-hover:text-primary transition-colors">
-                          {topic.tag}
-                        </p>
-                        <p className="text-xs text-default-400">
-                          {topic.count >= 1000 
-                            ? `${(topic.count / 1000).toFixed(1)}K` 
-                            : topic.count} posts
-                        </p>
-                      </div>
-                      <Chip size="sm" variant="flat" color="warning">
-                        #{index + 1}
-                      </Chip>
-                    </button>
-                  ))
-                )}
+                    ))
+                  : trendingTopics.map((topic, index) => (
+                      <button
+                        key={topic.tag}
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors text-left group w-full"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold group-hover:text-primary transition-colors">
+                            {topic.tag}
+                          </p>
+                          <p className="text-xs text-default-400">
+                            {topic.count >= 1000
+                              ? `${(topic.count / 1000).toFixed(1)}K`
+                              : topic.count}{" "}
+                            posts
+                          </p>
+                        </div>
+                        <Chip size="sm" variant="flat" color="warning">
+                          #{index + 1}
+                        </Chip>
+                      </button>
+                    ))}
               </CardBody>
             </Card>
           </aside>

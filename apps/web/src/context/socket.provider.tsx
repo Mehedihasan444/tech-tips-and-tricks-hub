@@ -51,22 +51,22 @@ interface SocketContextValue {
   unreadCount: number;
   onlineUsers: string[];
   typingUsers: Map<string, TypingIndicator>;
-  
+
   // Notification actions
   markNotificationAsRead: (notificationId: string) => void;
   markAllNotificationsAsRead: () => void;
   clearNotifications: () => void;
-  
+
   // Chat actions
   sendChatMessage: (receiverId: string, message: string) => void;
-  
+
   // Typing indicator
   startTyping: (postId?: string) => void;
   stopTyping: (postId?: string) => void;
-  
+
   // Story views
   viewStory: (storyId: string) => void;
-  
+
   // Room management
   joinPostRoom: (postId: string) => void;
   leavePostRoom: (postId: string) => void;
@@ -85,9 +85,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-  const [typingUsers, setTypingUsers] = useState<Map<string, TypingIndicator>>(
-    new Map()
-  );
+  const [typingUsers, setTypingUsers] = useState<Map<string, TypingIndicator>>(new Map());
 
   // Calculate unread count
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -112,7 +110,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     socketInstance.on("connect", () => {
       console.log("Socket connected:", socketInstance.id);
       setIsConnected(true);
-      
+
       // Join user's personal room for notifications
       socketInstance.emit("join-user-room", user._id);
     });
@@ -174,11 +172,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const markNotificationAsRead = useCallback(
     (notificationId: string) => {
       setNotifications((prev) =>
-        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
       );
       socket?.emit("mark-notification-read", notificationId);
     },
-    [socket]
+    [socket],
   );
 
   const markAllNotificationsAsRead = useCallback(() => {
@@ -207,7 +205,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
       socket.emit("chat-message", chatMessage);
     },
-    [socket, user]
+    [socket, user],
   );
 
   // Typing indicator
@@ -216,7 +214,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       if (!socket || !user) return;
       socket.emit("typing-start", { userId: user._id, userName: user.name, postId });
     },
-    [socket, user]
+    [socket, user],
   );
 
   const stopTyping = useCallback(
@@ -224,7 +222,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       if (!socket || !user) return;
       socket.emit("typing-stop", { userId: user._id, postId });
     },
-    [socket, user]
+    [socket, user],
   );
 
   // Story views
@@ -233,7 +231,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       if (!socket || !user) return;
       socket.emit("view-story", { storyId, userId: user._id });
     },
-    [socket, user]
+    [socket, user],
   );
 
   // Room management for posts
@@ -242,7 +240,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       if (!socket) return;
       socket.emit("join-post-room", postId);
     },
-    [socket]
+    [socket],
   );
 
   const leavePostRoom = useCallback(
@@ -250,7 +248,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       if (!socket) return;
       socket.emit("leave-post-room", postId);
     },
-    [socket]
+    [socket],
   );
 
   const value: SocketContextValue = {
@@ -271,9 +269,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     leavePostRoom,
   };
 
-  return (
-    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 };
 
 export const useSocket = () => {

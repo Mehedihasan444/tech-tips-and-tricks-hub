@@ -32,18 +32,18 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
           <NotificationsDropdown />
 
           {/* Messages */}
-          <Badge 
-            content="" 
-            color="primary" 
+          <Badge
+            content=""
+            color="primary"
             size="sm"
             placement="top-right"
             className="border-2 border-background"
             isInvisible={!isConnected}
             isDot
           >
-            <Button 
-              isIconOnly 
-              variant="light" 
+            <Button
+              isIconOnly
+              variant="light"
               radius="full"
               className="hover:bg-default-100 transition-colors"
               aria-label="Messages"

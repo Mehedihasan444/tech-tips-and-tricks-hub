@@ -32,9 +32,9 @@ This repository is a **[Turborepo](https://turborepo.com) monorepo** using **pnp
 
 ## Packages
 
-| Package | Path | Description |
-|---|---|---|
-| `@tech-tips-hub/web` | `apps/web` | Next.js 14 (App Router) web client |
+| Package              | Path       | Description                                         |
+| -------------------- | ---------- | --------------------------------------------------- |
+| `@tech-tips-hub/web` | `apps/web` | Next.js 14 (App Router) web client                  |
 | `@tech-tips-hub/api` | `apps/api` | Express + TypeScript REST API and Socket.IO gateway |
 
 ### Tech stack
@@ -81,10 +81,10 @@ pnpm --filter @tech-tips-hub/api dev   # API on  :5000
 pnpm --filter @tech-tips-hub/web dev   # Web  on  :3000
 ```
 
-| App | Dev URL |
-|---|---|
-| Client | http://localhost:3000 |
-| Server | http://localhost:5000 |
+| App      | Dev URL                      |
+| -------- | ---------------------------- |
+| Client   | http://localhost:3000        |
+| Server   | http://localhost:5000        |
 | API base | http://localhost:5000/api/v1 |
 
 > **Note** — the server seeds an admin user on startup from `ADMIN_EMAIL` / `ADMIN_PASSWORD`
@@ -93,54 +93,55 @@ pnpm --filter @tech-tips-hub/web dev   # Web  on  :3000
 ---
 
 <!-- SECTION:ENV -->
+
 ## Environment Variables
 
 Copy the example files; every variable below is read by the running app.
 
 ### `apps/api/.env`
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `NODE_ENV` | Yes | `development` / `production` (drives SMTP `secure` flag) |
-| `PORT` | Yes | HTTP port, defaults to `5000` in the example |
-| `CLIENT_URL` | Yes | Web origin; used for the CORS allow-list and email links |
-| `SERVER_URL` | Yes | Public API URL; used to build payment redirect URLs |
-| `DB_URL` | Yes | MongoDB connection string |
-| `BCRYPT_SALT_ROUNDS` | Yes | Password hashing cost |
-| `JWT_ACCESS_SECRET` | Yes | Access-token signing secret |
-| `JWT_ACCESS_EXPIRES_IN` | Yes | e.g. `1d` (parsed by `ms`) |
-| `JWT_REFRESH_SECRET` | Yes | Refresh-token signing secret |
-| `JWT_REFRESH_EXPIRES_IN` | Yes | e.g. `7d` |
-| `ADMIN_EMAIL` | Yes | Admin account seeded on boot |
-| `ADMIN_PASSWORD` | Yes | Admin password |
-| `ADMIN_PROFILE_PHOTO` | No | Admin avatar URL |
-| `ADMIN_MOBILE_NUMBER` | No | Admin mobile number |
-| `CLOUDINARY_CLOUD_NAME` | Feature | Cloudinary image storage |
-| `CLOUDINARY_API_KEY` | Feature | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Feature | Cloudinary API secret |
-| `MEILISEARCH_HOST` | No | Meilisearch host |
-| `MEILISEARCH_MASTER_KEY` | No | Meilisearch API key |
-| `SENDER_EMAIL` | Feature | Gmail sender address |
-| `SENDER_APP_PASS` | Feature | Gmail **App Password**, not the account password |
-| `RESET_PASS_UI_LINK` | Yes | Path appended to `CLIENT_URL` for reset emails |
-| `STORE_ID` | Feature | AamarPay store id |
-| `SIGNATURE_KEY` | Feature | AamarPay signature key |
-| `PAYMENT_URL` | Feature | AamarPay checkout endpoint |
-| `PAYMENT_VERIFY_URL` | Feature | AamarPay verification endpoint |
+| Variable                 | Required | Purpose                                                  |
+| ------------------------ | -------- | -------------------------------------------------------- |
+| `NODE_ENV`               | Yes      | `development` / `production` (drives SMTP `secure` flag) |
+| `PORT`                   | Yes      | HTTP port, defaults to `5000` in the example             |
+| `CLIENT_URL`             | Yes      | Web origin; used for the CORS allow-list and email links |
+| `SERVER_URL`             | Yes      | Public API URL; used to build payment redirect URLs      |
+| `DB_URL`                 | Yes      | MongoDB connection string                                |
+| `BCRYPT_SALT_ROUNDS`     | Yes      | Password hashing cost                                    |
+| `JWT_ACCESS_SECRET`      | Yes      | Access-token signing secret                              |
+| `JWT_ACCESS_EXPIRES_IN`  | Yes      | e.g. `1d` (parsed by `ms`)                               |
+| `JWT_REFRESH_SECRET`     | Yes      | Refresh-token signing secret                             |
+| `JWT_REFRESH_EXPIRES_IN` | Yes      | e.g. `7d`                                                |
+| `ADMIN_EMAIL`            | Yes      | Admin account seeded on boot                             |
+| `ADMIN_PASSWORD`         | Yes      | Admin password                                           |
+| `ADMIN_PROFILE_PHOTO`    | No       | Admin avatar URL                                         |
+| `ADMIN_MOBILE_NUMBER`    | No       | Admin mobile number                                      |
+| `CLOUDINARY_CLOUD_NAME`  | Feature  | Cloudinary image storage                                 |
+| `CLOUDINARY_API_KEY`     | Feature  | Cloudinary API key                                       |
+| `CLOUDINARY_API_SECRET`  | Feature  | Cloudinary API secret                                    |
+| `MEILISEARCH_HOST`       | No       | Meilisearch host                                         |
+| `MEILISEARCH_MASTER_KEY` | No       | Meilisearch API key                                      |
+| `SENDER_EMAIL`           | Feature  | Gmail sender address                                     |
+| `SENDER_APP_PASS`        | Feature  | Gmail **App Password**, not the account password         |
+| `RESET_PASS_UI_LINK`     | Yes      | Path appended to `CLIENT_URL` for reset emails           |
+| `STORE_ID`               | Feature  | AamarPay store id                                        |
+| `SIGNATURE_KEY`          | Feature  | AamarPay signature key                                   |
+| `PAYMENT_URL`            | Feature  | AamarPay checkout endpoint                               |
+| `PAYMENT_VERIFY_URL`     | Feature  | AamarPay verification endpoint                           |
 
-Variables marked *Feature* are only needed when that feature is used (uploads, email, payments).
+Variables marked _Feature_ are only needed when that feature is used (uploads, email, payments).
 
 ### `apps/web/.env.local`
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `NEXT_PUBLIC_SERVER_URL` | Yes | API origin; the client appends `/api/v1` |
-| `SERVER_URL` | No | Fallback origin on the server |
-| `NEXTAUTH_SECRET` | Yes | NextAuth signing secret |
-| `NEXTAUTH_URL` | Yes | e.g. `http://localhost:3000` |
-| `GOOGLE_ID` | Feature | Google OAuth client id |
-| `GOOGLE_SECRET` | Feature | Google OAuth client secret |
-| `JWT_ACCESS_SECRET` | Yes | **Must match the server value** |
+| Variable                 | Required | Purpose                                  |
+| ------------------------ | -------- | ---------------------------------------- |
+| `NEXT_PUBLIC_SERVER_URL` | Yes      | API origin; the client appends `/api/v1` |
+| `SERVER_URL`             | No       | Fallback origin on the server            |
+| `NEXTAUTH_SECRET`        | Yes      | NextAuth signing secret                  |
+| `NEXTAUTH_URL`           | Yes      | e.g. `http://localhost:3000`             |
+| `GOOGLE_ID`              | Feature  | Google OAuth client id                   |
+| `GOOGLE_SECRET`          | Feature  | Google OAuth client secret               |
+| `JWT_ACCESS_SECRET`      | Yes      | **Must match the server value**          |
 
 > **`JWT_ACCESS_SECRET` must be identical in both apps.** `apps/web/src/middleware.ts` decodes
 > the access-token cookie with it to enforce role-based routing.
@@ -153,17 +154,17 @@ Variables marked *Feature* are only needed when that feature is used (uploads, e
 
 ## Root Scripts
 
-| Script | Description |
-|---|---|
-| `pnpm dev` | Run client + server dev servers in parallel |
-| `pnpm build` | Build both packages (Turbo caches the output) |
-| `pnpm start` | Start production servers for both packages |
-| `pnpm lint` | Lint both packages (API currently fails on pre-existing errors) |
-| `pnpm lint:web` | Lint the web app only (currently clean) |
-| `pnpm lint:api` | Lint the API app only |
-| `pnpm type-check` | Type-check both packages without emitting |
-| `pnpm clean` | Remove build output, caches, and `node_modules` |
-| `pnpm format` | Format the repo with Prettier |
+| Script            | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| `pnpm dev`        | Run client + server dev servers in parallel                     |
+| `pnpm build`      | Build both packages (Turbo caches the output)                   |
+| `pnpm start`      | Start production servers for both packages                      |
+| `pnpm lint`       | Lint both packages (API currently fails on pre-existing errors) |
+| `pnpm lint:web`   | Lint the web app only (currently clean)                         |
+| `pnpm lint:api`   | Lint the API app only                                           |
+| `pnpm type-check` | Type-check both packages without emitting                       |
+| `pnpm clean`      | Remove build output, caches, and `node_modules`                 |
+| `pnpm format`     | Format the repo with Prettier                                   |
 
 Tasks are defined in `turbo.json`. `build` caches to `.next/` and `dist/`; `dev` and `start` are
 persistent and never cached.
@@ -224,70 +225,71 @@ All routes are mounted under **`/api/v1`**. `USER` / `ADMIN` denote role-protect
 
 ### Auth — `/auth`
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/register` | — | Register with email + password |
-| POST | `/login` | — | Login, returns access + refresh tokens |
-| POST | `/social-login` | — | Google OAuth sign-in |
-| POST | `/forget-password` | — | Request a password reset email |
-| POST | `/reset-password` | USER, ADMIN | Reset password |
-| POST | `/refresh-token` | — | Exchange refresh token for a new access token |
+| Method | Path               | Auth        | Description                                   |
+| ------ | ------------------ | ----------- | --------------------------------------------- |
+| POST   | `/register`        | —           | Register with email + password                |
+| POST   | `/login`           | —           | Login, returns access + refresh tokens        |
+| POST   | `/social-login`    | —           | Google OAuth sign-in                          |
+| POST   | `/forget-password` | —           | Request a password reset email                |
+| POST   | `/reset-password`  | USER, ADMIN | Reset password                                |
+| POST   | `/refresh-token`   | —           | Exchange refresh token for a new access token |
 
 ### Posts — `/posts`
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/` | USER | Create post (max 3 images) |
-| GET | `/` | — | List posts (query, filter, sort, paginate) |
-| GET | `/:id` | — | Single post |
-| PUT | `/:id` | USER | Update post (max 3 images) |
-| DELETE | `/:id` | USER | Delete post |
+| Method | Path   | Auth | Description                                |
+| ------ | ------ | ---- | ------------------------------------------ |
+| POST   | `/`    | USER | Create post (max 3 images)                 |
+| GET    | `/`    | —    | List posts (query, filter, sort, paginate) |
+| GET    | `/:id` | —    | Single post                                |
+| PUT    | `/:id` | USER | Update post (max 3 images)                 |
+| DELETE | `/:id` | USER | Delete post                                |
 
 ### Users — `/users`
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/create-user` | ADMIN | Create a user |
-| GET | `/` | — | List users |
-| GET | `/:nickName` | — | Single user by nickname |
-| PUT | `/update-profile-photo` | — | Upload profile photo (Multer) |
-| PUT | `/:id` | — | Update follow / follower lists |
-| DELETE | `/:id` | ADMIN | Delete user |
+| Method | Path                    | Auth  | Description                    |
+| ------ | ----------------------- | ----- | ------------------------------ |
+| POST   | `/create-user`          | ADMIN | Create a user                  |
+| GET    | `/`                     | —     | List users                     |
+| GET    | `/:nickName`            | —     | Single user by nickname        |
+| PUT    | `/update-profile-photo` | —     | Upload profile photo (Multer)  |
+| PUT    | `/:id`                  | —     | Update follow / follower lists |
+| DELETE | `/:id`                  | ADMIN | Delete user                    |
 
 ### Comments — `/comments`
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/` | USER | Create comment |
-| GET | `/` | — | Comments for a post |
-| PUT | `/` | USER | Update comment |
-| DELETE | `/` | USER | Delete comment |
-| GET | `/:id` | — | Single comment |
+| Method | Path   | Auth | Description         |
+| ------ | ------ | ---- | ------------------- |
+| POST   | `/`    | USER | Create comment      |
+| GET    | `/`    | —    | Comments for a post |
+| PUT    | `/`    | USER | Update comment      |
+| DELETE | `/`    | USER | Delete comment      |
+| GET    | `/:id` | —    | Single comment      |
 
 ### Stories — `/stories`
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/` | — | Create story |
-| GET | `/` | USER, ADMIN | All stories |
-| GET | `/user/:userId` | — | Stories by user |
-| DELETE | `/:id` | USER, ADMIN | Delete story |
+| Method | Path            | Auth        | Description     |
+| ------ | --------------- | ----------- | --------------- |
+| POST   | `/`             | —           | Create story    |
+| GET    | `/`             | USER, ADMIN | All stories     |
+| GET    | `/user/:userId` | —           | Stories by user |
+| DELETE | `/:id`          | USER, ADMIN | Delete story    |
 
 ### Friends, Search, Payments, Uploads
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/friends` | USER | List friends |
-| GET | `/search-posts` | — | Search posts via Meilisearch |
-| POST | `/payment` | — | Create AamarPay session |
-| GET | `/payment` | — | List payments |
-| POST | `/payment/confirmation` | — | Gateway success callback |
-| POST | `/payment/failed` | — | Gateway failure callback |
-| POST | `/image-upload` | — | Upload an image to Cloudinary |
+| Method | Path                    | Auth | Description                   |
+| ------ | ----------------------- | ---- | ----------------------------- |
+| GET    | `/friends`              | USER | List friends                  |
+| GET    | `/search-posts`         | —    | Search posts via Meilisearch  |
+| POST   | `/payment`              | —    | Create AamarPay session       |
+| GET    | `/payment`              | —    | List payments                 |
+| POST   | `/payment/confirmation` | —    | Gateway success callback      |
+| POST   | `/payment/failed`       | —    | Gateway failure callback      |
+| POST   | `/image-upload`         | —    | Upload an image to Cloudinary |
 
 `GET /` on the server returns a health-check payload.
 
 ---
+
 ## Socket.IO Events
 
 Defined in `apps/api/src/app/socket/socket.ts`.
@@ -393,5 +395,3 @@ Use conventional commit prefixes (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:
 
 No `LICENSE` file exists in this repository. The earlier per-app READMEs referenced MIT and linked
 to a file that was never committed — add a `LICENSE` file before distributing this code.
-
-

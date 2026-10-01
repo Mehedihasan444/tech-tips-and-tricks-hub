@@ -14,8 +14,8 @@ const OurFleet = () => {
         <div className="text-center space-y-3">
           <h2 className="text-4xl font-bold  ">Our Mission</h2>
           <p className="">
-            Empower tech enthusiasts by providing high-quality, up-to-date, and
-            easy-to-understand tutorials, tips, and industry insights.
+            Empower tech enthusiasts by providing high-quality, up-to-date, and easy-to-understand
+            tutorials, tips, and industry insights.
           </p>
         </div>
         <div className="lg:flex justify-between items-center gap-10">
@@ -28,9 +28,8 @@ const OurFleet = () => {
           </div>
           <div className="flex-1">
             <p className="">
-              Whether you&lsquo;re looking to enhance your coding skills, learn about
-              the latest tech trends, or connect with fellow tech enthusiasts,
-              we’ve got you covered.
+              Whether you&lsquo;re looking to enhance your coding skills, learn about the latest
+              tech trends, or connect with fellow tech enthusiasts, we’ve got you covered.
             </p>
           </div>
         </div>

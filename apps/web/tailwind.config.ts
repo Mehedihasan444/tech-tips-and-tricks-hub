@@ -1,4 +1,4 @@
-import {nextui} from "@nextui-org/react";
+import { nextui } from "@nextui-org/react";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -11,8 +11,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#00B3A6',
-        secondary: '#FF6F61' // Set your primary color here (e.g., blue)
+        primary: "#00B3A6",
+        secondary: "#FF6F61", // Set your primary color here (e.g., blue)
       },
     },
   },

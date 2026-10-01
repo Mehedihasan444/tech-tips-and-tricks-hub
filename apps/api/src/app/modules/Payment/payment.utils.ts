@@ -19,10 +19,7 @@ type paymentData = {
   customerEmail: string;
 };
 
-export const initiatePayment = async (
-  paymentData: paymentData,
-  userId: string
-) => {
+export const initiatePayment = async (paymentData: paymentData, userId: string) => {
   const { customerName, customerEmail } = paymentData;
   const transactionId = generateTransactionId();
   const response = await axios.post(process.env.PAYMENT_URL!, {
@@ -62,13 +59,9 @@ export const verifyPayment = async (transactionId: string) => {
   return response.data;
 };
 
-export const SearchPaymentByUserQueryMaker = async (
-  query: Record<string, unknown>
-) => {
+export const SearchPaymentByUserQueryMaker = async (query: Record<string, unknown>) => {
   if (query?.searchTerm) {
-    const userQuery = new QueryBuilder(Payment.find(), query).search(
-      paymentSearchableFields
-    );
+    const userQuery = new QueryBuilder(Payment.find(), query).search(paymentSearchableFields);
 
     const payments = await userQuery.modelQuery;
 
@@ -89,9 +82,7 @@ export const SearchPaymentByUserQueryMaker = async (
   }
 };
 
-export const SearchPaymentByDateRangeQueryMaker = async (
-  query: Record<string, unknown>
-) => {
+export const SearchPaymentByDateRangeQueryMaker = async (query: Record<string, unknown>) => {
   if (query?.from || query?.to) {
     const dateQuery: Record<string, unknown> = {};
 

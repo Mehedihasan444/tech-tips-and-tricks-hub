@@ -20,13 +20,7 @@ const LoginForm = () => {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const { setIsLoading: userLoading } = useUser();
-  const {
-    mutate: handleUserLogin,
-    isPending,
-    isSuccess,
-    isError,
-    error,
-  } = useUserLogin();
+  const { mutate: handleUserLogin, isPending, isSuccess, isError, error } = useUserLogin();
 
   useEffect(() => {
     userLoading(isPending);
@@ -56,12 +50,8 @@ const LoginForm = () => {
     <div className="w-full max-w-md space-y-6">
       {/* Header Section */}
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          Welcome Back
-        </h1>
-        <p className="text-default-500 text-sm">
-          Sign in to your account to continue
-        </p>
+        <h1 className="text-4xl font-bold tracking-tight text-foreground">Welcome Back</h1>
+        <p className="text-default-500 text-sm">Sign in to your account to continue</p>
       </div>
 
       {/* Demo Credentials - More subtle */}
@@ -109,7 +99,7 @@ const LoginForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
 
@@ -139,7 +129,7 @@ const LoginForm = () => {
           onChange={(e) => setPassword(e.target.value)}
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
 

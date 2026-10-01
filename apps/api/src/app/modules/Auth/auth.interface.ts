@@ -1,6 +1,3 @@
-
-
-
 export type TLoginUser = {
   email: string;
   password: string;
@@ -11,6 +8,6 @@ export type TRegisterUser = {
   email: string;
   mobileNumber?: string;
   password: string;
-  role: "ADMIN"|"USER";
+  role: "ADMIN" | "USER";
   nickName: string;
 };

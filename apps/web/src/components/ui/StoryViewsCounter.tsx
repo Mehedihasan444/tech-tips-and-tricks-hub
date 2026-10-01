@@ -27,9 +27,7 @@ export default function StoryViewsCounter({
   showViewers = true,
 }: StoryViewsCounterProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { getStoryViews, markAsViewed, isLoading } = useStoryViews(
-    isOpen ? storyId : undefined
-  );
+  const { getStoryViews, markAsViewed, isLoading } = useStoryViews(isOpen ? storyId : undefined);
 
   const { count, viewers } = getStoryViews(storyId);
   const displayCount = count || initialCount;
@@ -67,9 +65,7 @@ export default function StoryViewsCounter({
                 <ModalHeader className="flex items-center gap-2">
                   <Users size={20} className="text-primary" />
                   <span>Story Views</span>
-                  <span className="text-default-400 text-sm font-normal">
-                    ({displayCount})
-                  </span>
+                  <span className="text-default-400 text-sm font-normal">({displayCount})</span>
                 </ModalHeader>
                 <ModalBody className="pb-6">
                   {isLoading ? (
@@ -88,15 +84,9 @@ export default function StoryViewsCounter({
                           key={`${viewer.viewerId}-${index}`}
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-default-100 transition-colors"
                         >
-                          <Avatar
-                            src={viewer.viewerPhoto}
-                            name={viewer.viewerName}
-                            size="sm"
-                          />
+                          <Avatar src={viewer.viewerPhoto} name={viewer.viewerName} size="sm" />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">
-                              {viewer.viewerName}
-                            </p>
+                            <p className="font-medium truncate">{viewer.viewerName}</p>
                             <p className="text-xs text-default-400">
                               {formatTime(viewer.viewedAt)}
                             </p>

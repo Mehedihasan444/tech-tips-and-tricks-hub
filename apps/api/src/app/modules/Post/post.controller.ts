@@ -8,18 +8,10 @@ import { PostServices } from "./post.service";
 const createPost = catchAsync(async (req, res) => {
   let post;
   if (!req.files) {
-
-     post = await PostServices.createPostIntoDB(
-      req.body,null
-    );
-  }else{
-
-     post = await PostServices.createPostIntoDB(
-      req.body,
-      req.files as TImageFiles
-    );
+    post = await PostServices.createPostIntoDB(req.body, null);
+  } else {
+    post = await PostServices.createPostIntoDB(req.body, req.files as TImageFiles);
   }
-
 
   sendResponse(res, {
     success: true,
@@ -31,11 +23,7 @@ const createPost = catchAsync(async (req, res) => {
 const updatePost = catchAsync(async (req, res) => {
   const { id } = req.params;
 
-  const updatedPost = await PostServices.updatePostInDB(
-    id,
-    req.body,
-    req.files as TImageFiles
-  );
+  const updatedPost = await PostServices.updatePostInDB(id, req.body, req.files as TImageFiles);
 
   sendResponse(res, {
     success: true,

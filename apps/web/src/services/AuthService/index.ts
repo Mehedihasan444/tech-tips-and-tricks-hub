@@ -8,7 +8,6 @@ import axiosInstance from "@/config/axios.config";
 import { revalidateTag } from "next/cache";
 import { getUser } from "../UserService";
 
-
 export const registerUser = async (userData: Record<string, unknown>) => {
   try {
     const { data } = await axiosInstance.post("/auth/register", userData);
@@ -22,10 +21,8 @@ export const registerUser = async (userData: Record<string, unknown>) => {
     return data;
   } catch (error: any) {
     if (error?.response?.data?.success === false) {
-
-      return (error?.response?.data);
+      return error?.response?.data;
     } else {
-
       throw new Error(error);
     }
   }
@@ -43,10 +40,8 @@ export const loginUser = async (userData: Record<string, unknown>) => {
     return data;
   } catch (error: any) {
     if (error?.response?.data?.success === false) {
-
-      return (error?.response?.data);
+      return error?.response?.data;
     } else {
-
       throw new Error(error);
     }
   }
@@ -68,7 +63,7 @@ export const forgetPassword = async (userData: Record<string, unknown>) => {
 export const resetPassword = async (userData: Record<string, unknown>) => {
   try {
     const { token, ...newData } = userData;
-    if (typeof token === 'string') {
+    if (typeof token === "string") {
       cookies().set("accessToken", token);
     }
 
@@ -79,7 +74,6 @@ export const resetPassword = async (userData: Record<string, unknown>) => {
     throw new Error(error);
   }
 };
-
 
 export const logout = () => {
   cookies().delete("accessToken");
@@ -97,7 +91,6 @@ export const getCurrentUser = async () => {
       const user = await getUser(decodedToken?.nickName);
       return user?.data;
     }
-
   }
 
   return decodedToken;

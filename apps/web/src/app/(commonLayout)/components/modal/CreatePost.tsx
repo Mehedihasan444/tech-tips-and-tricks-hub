@@ -76,13 +76,13 @@ function QuillEditor({
       quill.enable(!isDisabled);
 
       // Set initial content if provided
-      if (initialContent && quill.root.innerHTML === '<p><br></p>') {
+      if (initialContent && quill.root.innerHTML === "<p><br></p>") {
         quill.root.innerHTML = initialContent;
       }
 
       // Listen for content changes
       if (onContentChange) {
-        quill.on('text-change', () => {
+        quill.on("text-change", () => {
           onContentChange(quill.root.innerHTML);
         });
       }
@@ -114,12 +114,7 @@ export default function CreatePost() {
   const [initialEditorContent, setInitialEditorContent] = useState("");
   const quillInstanceRef = useRef<any>(null);
   const { user } = useUser();
-  const {
-    mutate: handleCreatePost,
-    isSuccess,
-    isPending,
-    reset: resetMutation,
-  } = useCreatePost();
+  const { mutate: handleCreatePost, isSuccess, isPending, reset: resetMutation } = useCreatePost();
 
   // Draft auto-save hook
   const {
@@ -167,7 +162,7 @@ export default function CreatePost() {
   // Force remount editor when modal opens
   useEffect(() => {
     if (isOpen) {
-      setEditorKey(prev => prev + 1);
+      setEditorKey((prev) => prev + 1);
     }
   }, [isOpen]);
 
@@ -262,62 +257,65 @@ export default function CreatePost() {
   }, [title, selectedCategory, selectedTags]);
 
   // Handle form submission
-  const handleSubmit = useCallback(async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
 
-    // Prevent multiple simultaneous submissions
-    if (isSubmitting || isPending) {
-      toast.info("Please wait, your post is being created...");
-      return;
-    }
-
-    // Validate form
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const quillContent = quillInstanceRef.current.root.innerHTML;
-      const { cleanedContent } = extractAndProcessImages(quillContent);
-
-      const postData = {
-        content: cleanedContent,
-        title: title.trim(),
-        category: selectedCategory,
-        isPremium,
-        tags: Array.from(selectedTags),
-        author: user?._id,
-      };
-
-      const formData = new FormData();
-      formData.append("data", JSON.stringify(postData));
-
-      if (pictures.length > 0) {
-        pictures.forEach((file) => {
-          formData.append("postImages", file);
-        });
+      // Prevent multiple simultaneous submissions
+      if (isSubmitting || isPending) {
+        toast.info("Please wait, your post is being created...");
+        return;
       }
 
-      handleCreatePost(formData);
-    } catch (error) {
-      console.error("Error creating post:", error);
-      toast.error("Failed to create post. Please try again.");
-      setIsSubmitting(false);
-    }
-  }, [
-    isSubmitting,
-    isPending,
-    validateForm,
-    title,
-    selectedCategory,
-    isPremium,
-    selectedTags,
-    user,
-    pictures,
-    handleCreatePost,
-  ]);
+      // Validate form
+      if (!validateForm()) {
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      try {
+        const quillContent = quillInstanceRef.current.root.innerHTML;
+        const { cleanedContent } = extractAndProcessImages(quillContent);
+
+        const postData = {
+          content: cleanedContent,
+          title: title.trim(),
+          category: selectedCategory,
+          isPremium,
+          tags: Array.from(selectedTags),
+          author: user?._id,
+        };
+
+        const formData = new FormData();
+        formData.append("data", JSON.stringify(postData));
+
+        if (pictures.length > 0) {
+          pictures.forEach((file) => {
+            formData.append("postImages", file);
+          });
+        }
+
+        handleCreatePost(formData);
+      } catch (error) {
+        console.error("Error creating post:", error);
+        toast.error("Failed to create post. Please try again.");
+        setIsSubmitting(false);
+      }
+    },
+    [
+      isSubmitting,
+      isPending,
+      validateForm,
+      title,
+      selectedCategory,
+      isPremium,
+      selectedTags,
+      user,
+      pictures,
+      handleCreatePost,
+    ],
+  );
 
   // Handle modal close
   const handleModalClose = useCallback(() => {
@@ -384,7 +382,7 @@ export default function CreatePost() {
                     onContentImprove={(improved) => {
                       setInitialEditorContent(improved);
                       setEditorContent(improved);
-                      setEditorKey(prev => prev + 1);
+                      setEditorKey((prev) => prev + 1);
                     }}
                   />
                   {(isSubmitting || isPending) && (
@@ -408,7 +406,8 @@ export default function CreatePost() {
                       isDisabled={isSubmitting || isPending}
                       classNames={{
                         input: "text-base font-medium",
-                        inputWrapper: "border-2 border-default-200 hover:border-primary focus-within:border-primary",
+                        inputWrapper:
+                          "border-2 border-default-200 hover:border-primary focus-within:border-primary",
                       }}
                     />
                   </div>
@@ -438,7 +437,10 @@ export default function CreatePost() {
                       ))}
                     </Select>
                     <div className="flex items-center gap-2 h-14 px-4 border-2 border-default-200 rounded-xl hover:border-warning transition-colors">
-                      <Crown size={18} className={isPremium ? "text-warning" : "text-default-400"} />
+                      <Crown
+                        size={18}
+                        className={isPremium ? "text-warning" : "text-default-400"}
+                      />
                       <Checkbox
                         isSelected={isPremium}
                         onValueChange={setIsPremium}
@@ -486,8 +488,11 @@ export default function CreatePost() {
 
                   {/* Rich Text Editor */}
                   <div className="min-h-[280px]">
-                    <div className={`border-2 border-default-200 rounded-xl overflow-hidden hover:border-primary transition-colors ${(isSubmitting || isPending) ? 'opacity-50 pointer-events-none' : ''
-                      }`}>
+                    <div
+                      className={`border-2 border-default-200 rounded-xl overflow-hidden hover:border-primary transition-colors ${
+                        isSubmitting || isPending ? "opacity-50 pointer-events-none" : ""
+                      }`}
+                    >
                       {isOpen && (
                         <QuillEditor
                           key={editorKey}
@@ -512,7 +517,7 @@ export default function CreatePost() {
                   >
                     Cancel
                   </Button>
-                  
+
                   {/* Image Previews */}
                   {pictures.length > 0 && (
                     <div className="flex gap-2 flex-wrap max-w-md">
@@ -539,21 +544,23 @@ export default function CreatePost() {
                       ))}
                     </div>
                   )}
-                  
+
                   <Button
                     color="primary"
                     type="submit"
                     size="lg"
                     className="font-semibold shadow-lg shadow-primary/30"
                     startContent={
-                      (isSubmitting || isPending) ?
-                        <Loader2 size={18} className="animate-spin" /> :
+                      isSubmitting || isPending ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
                         <PenSquare size={18} />
+                      )
                     }
                     isLoading={isSubmitting || isPending}
                     isDisabled={isSubmitting || isPending}
                   >
-                    {(isSubmitting || isPending) ? "Publishing..." : "Publish Post"}
+                    {isSubmitting || isPending ? "Publishing..." : "Publish Post"}
                   </Button>
                 </ModalFooter>
               </form>

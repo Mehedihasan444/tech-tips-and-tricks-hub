@@ -28,10 +28,7 @@ export const AuthOptions: NextAuthOptions = {
             nickName: generateNickname(profile.name),
           });
 
-          if (
-            response.data.data.accessToken ||
-            response.data.data.refreshToken
-          ) {
+          if (response.data.data.accessToken || response.data.data.refreshToken) {
             cookies().set("accessToken", response.data.data.accessToken);
             cookies().set("refreshToken", response.data.data.refreshToken);
             return true;

@@ -11,11 +11,10 @@ router.post(
   "/",
   auth(USER_ROLE.USER),
   validateRequest(PaymentValidation.createPaymentValidationSchema),
-  PaymentControllers.createPayment
+  PaymentControllers.createPayment,
 );
 router.get("/", PaymentControllers.getAllPayments);
 router.post("/confirmation", PaymentControllers.paymentConfirmation);
 router.post("/failed", PaymentControllers.paymentFailed);
-
 
 export const PaymentRoutes = router;

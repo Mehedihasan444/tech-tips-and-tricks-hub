@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Button, Tooltip } from '@nextui-org/react';
+import { useState } from "react";
+import Link from "next/link";
+import { Button, Tooltip } from "@nextui-org/react";
 import {
   Home,
   Users,
@@ -14,18 +14,18 @@ import {
   Store,
   Handshake,
   Bookmark,
-  ChevronRight
-} from 'lucide-react';
-import { usePathname } from 'next/navigation';
+  ChevronRight,
+} from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { icon: Home, label: 'Home', href: '/' },
-  { icon: Handshake, label: 'Friends', href: '/my-friends' },
-  { icon: Bookmark, label: 'Saved Posts', href: '/saved-posts' },
-  { icon: Users, label: 'Community', href: '/community' },
-  { icon: Star, label: 'Premium', href: '/subscription', isPremium: true },
-  { icon: Store, label: 'About Us', href: '/about-us' },
-  { icon: NotebookTabs, label: 'Contact Us', href: '/contact-us' },
+  { icon: Home, label: "Home", href: "/" },
+  { icon: Handshake, label: "Friends", href: "/my-friends" },
+  { icon: Bookmark, label: "Saved Posts", href: "/saved-posts" },
+  { icon: Users, label: "Community", href: "/community" },
+  { icon: Star, label: "Premium", href: "/subscription", isPremium: true },
+  { icon: Store, label: "About Us", href: "/about-us" },
+  { icon: NotebookTabs, label: "Contact Us", href: "/contact-us" },
 ];
 
 export default function Sidebar() {
@@ -37,7 +37,7 @@ export default function Sidebar() {
   return (
     <aside
       className={`bg-content1 h-screen sticky top-0 border-r border-divider transition-all duration-300 ease-in-out ${
-        collapsed ? 'w-20' : 'w-72'
+        collapsed ? "w-20" : "w-72"
       } flex flex-col`}
     >
       {/* Header */}
@@ -77,36 +77,32 @@ export default function Sidebar() {
                 transition-all duration-200 group relative overflow-hidden
                 ${
                   active
-                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                    : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+                    ? "bg-primary text-white shadow-lg shadow-primary/30"
+                    : "text-default-600 hover:bg-default-100 hover:text-foreground"
                 }
-                ${item.isPremium && !active ? 'hover:bg-warning/10 hover:text-warning' : ''}
+                ${item.isPremium && !active ? "hover:bg-warning/10 hover:text-warning" : ""}
               `}
             >
               {/* Active indicator */}
               {active && !collapsed && (
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full" />
               )}
-              
+
               {/* Icon */}
-              <item.icon 
-                size={20} 
+              <item.icon
+                size={20}
                 className={`
                   flex-shrink-0 transition-transform duration-200
-                  ${active ? '' : 'group-hover:scale-110'}
-                  ${item.isPremium && !active ? 'text-warning' : ''}
+                  ${active ? "" : "group-hover:scale-110"}
+                  ${item.isPremium && !active ? "text-warning" : ""}
                 `}
               />
-              
+
               {/* Label */}
-              {!collapsed && (
-                <span className="flex-1">{item.label}</span>
-              )}
-              
+              {!collapsed && <span className="flex-1">{item.label}</span>}
+
               {/* Arrow indicator for active state */}
-              {!collapsed && active && (
-                <ChevronRight size={16} className="opacity-70" />
-              )}
+              {!collapsed && active && <ChevronRight size={16} className="opacity-70" />}
             </Link>
           );
 
@@ -135,14 +131,13 @@ export default function Sidebar() {
           </Tooltip>
         ) : (
           <Link href={"/settings"}>
-
-          <Button
-            variant="flat"
-            startContent={<Settings size={20} />}
-            className="w-full justify-start hover:bg-default-100"
-          >
-            Settings
-          </Button>
+            <Button
+              variant="flat"
+              startContent={<Settings size={20} />}
+              className="w-full justify-start hover:bg-default-100"
+            >
+              Settings
+            </Button>
           </Link>
         )}
       </div>

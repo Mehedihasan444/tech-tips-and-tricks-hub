@@ -3,15 +3,15 @@ import { getCurrentUser } from "@/services/AuthService";
 import { getPayments } from "@/services/PaymentService";
 import { IUser } from "@/types/IUser";
 import React from "react";
-type TPayment={
-  userId:IUser,
-  transactionId:string;
-  createdAt:string;
-  updatedAt:string;
-}
+type TPayment = {
+  userId: IUser;
+  transactionId: string;
+  createdAt: string;
+  updatedAt: string;
+};
 const PaymentInfoPage = async () => {
-  const user=await getCurrentUser()
-  const userId=user?._id
+  const user = await getCurrentUser();
+  const userId = user?._id;
   const { data: payments } = await getPayments(userId);
   return (
     <div className="min-h-screen bg-gray-50 flex  justify-center p-8">
@@ -35,13 +35,9 @@ const PaymentInfoPage = async () => {
               {payments && payments.length > 0 ? (
                 payments.map((payment: TPayment, index: number) => (
                   <tr key={index} className="text-default-700">
-                    <td className="border px-4 py-2">
-                      {payment.transactionId}
-                    </td>
+                    <td className="border px-4 py-2">{payment.transactionId}</td>
                     <td className="border px-4 py-2">N/A</td>
-                    <td className="border px-4 py-2">
-                      {payment?.userId?.name}
-                    </td>
+                    <td className="border px-4 py-2">{payment?.userId?.name}</td>
                     <td className="border px-4 py-2">
                       {new Date(payment.createdAt).toLocaleDateString()}
                     </td>
@@ -50,10 +46,7 @@ const PaymentInfoPage = async () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="text-center px-4 py-2 text-default-500"
-                  >
+                  <td colSpan={6} className="text-center px-4 py-2 text-default-500">
                     No payment data available.
                   </td>
                 </tr>
@@ -65,10 +58,7 @@ const PaymentInfoPage = async () => {
         {/* Footer Information */}
         <div className="text-center mt-6 text-sm text-default-500">
           If you have any issues with payments, please contact support at{" "}
-          <a
-            href="mailto:support@technest.com"
-            className="text-teal-600 underline"
-          >
+          <a href="mailto:support@technest.com" className="text-teal-600 underline">
             support@technest.com
           </a>
           .

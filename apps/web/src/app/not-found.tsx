@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { Button } from '@nextui-org/react';
+import Link from "next/link";
+import { Button } from "@nextui-org/react";
 
 const NotFoundPage = () => {
   return (
@@ -10,7 +10,7 @@ const NotFoundPage = () => {
         Oops! The page you are looking for does not exist or has been moved.
       </p>
       <Link href="/" passHref>
-        <Button  className="bg-teal-500 text-default-50 px-6 py-3 rounded-md shadow hover:bg-teal-600">
+        <Button className="bg-teal-500 text-default-50 px-6 py-3 rounded-md shadow hover:bg-teal-600">
           Back to Homepage
         </Button>
       </Link>

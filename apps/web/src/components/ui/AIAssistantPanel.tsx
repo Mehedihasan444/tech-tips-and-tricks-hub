@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Input,
@@ -17,7 +17,7 @@ import {
   useDisclosure,
   Chip,
   Spinner,
-} from '@nextui-org/react';
+} from "@nextui-org/react";
 import {
   Sparkles,
   Wand2,
@@ -29,9 +29,9 @@ import {
   AlertCircle,
   Copy,
   Settings,
-} from 'lucide-react';
-import { useAIAssistant, removeApiKey } from '@/hooks/useAIAssistant';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { useAIAssistant, removeApiKey } from "@/hooks/useAIAssistant";
+import { toast } from "sonner";
 
 interface AIAssistantPanelProps {
   content: string;
@@ -66,13 +66,13 @@ export default function AIAssistantPanel({
   } = useAIAssistant();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [apiKeyInput, setApiKeyInput] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
-  
+
   // Results state
   const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
   const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
-  const [outline, setOutline] = useState('');
+  const [outline, setOutline] = useState("");
   const [qualityResult, setQualityResult] = useState<{
     issues: string[];
     score: number;
@@ -85,15 +85,15 @@ export default function AIAssistantPanel({
     onOpen: onResultsOpen,
     onOpenChange: onResultsOpenChange,
   } = useDisclosure();
-  const [resultType, setResultType] = useState<'titles' | 'tags' | 'outline' | 'quality'>('titles');
+  const [resultType, setResultType] = useState<"titles" | "tags" | "outline" | "quality">("titles");
 
   const handleSaveApiKey = () => {
     if (apiKeyInput.trim()) {
       setApiKey(apiKeyInput.trim());
-      setApiKeyInput('');
+      setApiKeyInput("");
       onOpenChange();
     } else {
-      toast.error('Please enter a valid API key');
+      toast.error("Please enter a valid API key");
     }
   };
 
@@ -104,13 +104,13 @@ export default function AIAssistantPanel({
 
   const handleGenerateTitles = async () => {
     if (!content.trim()) {
-      toast.warning('Please write some content first');
+      toast.warning("Please write some content first");
       return;
     }
     try {
-      const suggestions = await suggestTitles(content, category || 'Technology');
+      const suggestions = await suggestTitles(content, category || "Technology");
       setTitleSuggestions(suggestions);
-      setResultType('titles');
+      setResultType("titles");
       onResultsOpen();
     } catch {
       // Error handled in hook
@@ -119,13 +119,13 @@ export default function AIAssistantPanel({
 
   const handleSuggestTags = async () => {
     if (!content.trim() && !title.trim()) {
-      toast.warning('Please write a title or some content first');
+      toast.warning("Please write a title or some content first");
       return;
     }
     try {
       const suggestions = await suggestPostTags(content, title, availableTags);
       setTagSuggestions(suggestions);
-      setResultType('tags');
+      setResultType("tags");
       onResultsOpen();
     } catch {
       // Error handled in hook
@@ -134,14 +134,14 @@ export default function AIAssistantPanel({
 
   const handleImproveContent = async () => {
     if (!content.trim()) {
-      toast.warning('Please write some content first');
+      toast.warning("Please write some content first");
       return;
     }
     try {
       const improved = await improveContent(content);
       if (onContentImprove) {
         onContentImprove(improved);
-        toast.success('Content improved and applied!');
+        toast.success("Content improved and applied!");
       }
     } catch {
       // Error handled in hook
@@ -150,13 +150,16 @@ export default function AIAssistantPanel({
 
   const handleGenerateOutline = async () => {
     if (!title.trim() && !category) {
-      toast.warning('Please enter a title or select a category first');
+      toast.warning("Please enter a title or select a category first");
       return;
     }
     try {
-      const generatedOutline = await getContentOutline(title || 'Tech Tips', category || 'Technology');
+      const generatedOutline = await getContentOutline(
+        title || "Tech Tips",
+        category || "Technology",
+      );
       setOutline(generatedOutline);
-      setResultType('outline');
+      setResultType("outline");
       onResultsOpen();
     } catch {
       // Error handled in hook
@@ -165,13 +168,13 @@ export default function AIAssistantPanel({
 
   const handleAnalyzeQuality = async () => {
     if (!content.trim()) {
-      toast.warning('Please write some content first');
+      toast.warning("Please write some content first");
       return;
     }
     try {
       const result = await analyzeQuality(content);
       setQualityResult(result);
-      setResultType('quality');
+      setResultType("quality");
       onResultsOpen();
     } catch {
       // Error handled in hook
@@ -180,7 +183,7 @@ export default function AIAssistantPanel({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard!');
+    toast.success("Copied to clipboard!");
   };
 
   if (!hasKey) {
@@ -208,13 +211,13 @@ export default function AIAssistantPanel({
                 </ModalHeader>
                 <ModalBody>
                   <p className="text-default-600 text-sm mb-4">
-                    Enter your Google Gemini API key to enable AI-powered features like title suggestions, 
-                    content improvement, and more.
+                    Enter your Google Gemini API key to enable AI-powered features like title
+                    suggestions, content improvement, and more.
                   </p>
                   <Input
                     label="Gemini API Key"
                     placeholder="AIzaSy..."
-                    type={showApiKey ? 'text' : 'password'}
+                    type={showApiKey ? "text" : "password"}
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     endContent={
@@ -224,12 +227,12 @@ export default function AIAssistantPanel({
                         isIconOnly
                         onPress={() => setShowApiKey(!showApiKey)}
                       >
-                        {showApiKey ? '🙈' : '👁️'}
+                        {showApiKey ? "🙈" : "👁️"}
                       </Button>
                     }
                   />
                   <p className="text-xs text-default-400 mt-2">
-                    Get your free API key from{' '}
+                    Get your free API key from{" "}
                     <a
                       href="https://makersuite.google.com/app/apikey"
                       target="_blank"
@@ -340,12 +343,7 @@ export default function AIAssistantPanel({
                     <Check className="text-success" size={16} />
                     <span className="text-sm text-success-700">API Key configured</span>
                   </div>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="flat"
-                    onPress={handleRemoveApiKey}
-                  >
+                  <Button size="sm" color="danger" variant="flat" onPress={handleRemoveApiKey}>
                     Remove
                   </Button>
                 </div>
@@ -364,22 +362,27 @@ export default function AIAssistantPanel({
       </Modal>
 
       {/* Results Modal */}
-      <Modal isOpen={isResultsOpen} onOpenChange={onResultsOpenChange} size="lg" scrollBehavior="inside">
+      <Modal
+        isOpen={isResultsOpen}
+        onOpenChange={onResultsOpenChange}
+        size="lg"
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Sparkles className="text-secondary" size={20} />
                 <span>
-                  {resultType === 'titles' && 'Title Suggestions'}
-                  {resultType === 'tags' && 'Tag Suggestions'}
-                  {resultType === 'outline' && 'Content Outline'}
-                  {resultType === 'quality' && 'Quality Analysis'}
+                  {resultType === "titles" && "Title Suggestions"}
+                  {resultType === "tags" && "Tag Suggestions"}
+                  {resultType === "outline" && "Content Outline"}
+                  {resultType === "quality" && "Quality Analysis"}
                 </span>
               </ModalHeader>
               <ModalBody>
                 {/* Title Suggestions */}
-                {resultType === 'titles' && (
+                {resultType === "titles" && (
                   <div className="space-y-3">
                     {titleSuggestions.map((suggestion, index) => (
                       <div
@@ -417,7 +420,7 @@ export default function AIAssistantPanel({
                 )}
 
                 {/* Tag Suggestions */}
-                {resultType === 'tags' && (
+                {resultType === "tags" && (
                   <div className="space-y-4">
                     <p className="text-sm text-default-600">
                       Based on your content, we recommend these tags:
@@ -444,7 +447,7 @@ export default function AIAssistantPanel({
                 )}
 
                 {/* Content Outline */}
-                {resultType === 'outline' && (
+                {resultType === "outline" && (
                   <div className="space-y-4">
                     <div className="p-4 bg-default-100 rounded-lg whitespace-pre-wrap">
                       {outline}
@@ -473,17 +476,17 @@ export default function AIAssistantPanel({
                 )}
 
                 {/* Quality Analysis */}
-                {resultType === 'quality' && qualityResult && (
+                {resultType === "quality" && qualityResult && (
                   <div className="space-y-4">
                     {/* Score */}
                     <div className="flex items-center gap-4 p-4 bg-default-100 rounded-lg">
                       <div
                         className={`text-4xl font-bold ${
                           qualityResult.score >= 8
-                            ? 'text-success'
+                            ? "text-success"
                             : qualityResult.score >= 5
-                            ? 'text-warning'
-                            : 'text-danger'
+                              ? "text-warning"
+                              : "text-danger"
                         }`}
                       >
                         {qualityResult.score}/10
@@ -492,10 +495,10 @@ export default function AIAssistantPanel({
                         <p className="font-medium">Quality Score</p>
                         <p className="text-sm text-default-500">
                           {qualityResult.score >= 8
-                            ? 'Excellent writing!'
+                            ? "Excellent writing!"
                             : qualityResult.score >= 5
-                            ? 'Good, but can be improved'
-                            : 'Needs improvement'}
+                              ? "Good, but can be improved"
+                              : "Needs improvement"}
                         </p>
                       </div>
                     </div>
@@ -509,7 +512,10 @@ export default function AIAssistantPanel({
                         </h4>
                         <ul className="space-y-1">
                           {qualityResult.issues.map((issue, index) => (
-                            <li key={index} className="text-sm text-default-600 flex items-start gap-2">
+                            <li
+                              key={index}
+                              className="text-sm text-default-600 flex items-start gap-2"
+                            >
                               <span className="text-warning">•</span>
                               {issue}
                             </li>
@@ -527,7 +533,10 @@ export default function AIAssistantPanel({
                         </h4>
                         <ul className="space-y-1">
                           {qualityResult.suggestions.map((suggestion, index) => (
-                            <li key={index} className="text-sm text-default-600 flex items-start gap-2">
+                            <li
+                              key={index}
+                              className="text-sm text-default-600 flex items-start gap-2"
+                            >
                               <span className="text-primary">•</span>
                               {suggestion}
                             </li>

@@ -1,7 +1,8 @@
 // AI Service using Google Gemini API
 // Provides content suggestions, summaries, and writing assistance
 
-const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_API_BASE =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 export interface AIGenerateOptions {
   maxTokens?: number;
@@ -9,7 +10,7 @@ export interface AIGenerateOptions {
 }
 
 export interface AISuggestion {
-  type: 'title' | 'content' | 'tags' | 'summary' | 'improve';
+  type: "title" | "content" | "tags" | "summary" | "improve";
   suggestion: string;
 }
 
@@ -17,14 +18,14 @@ export interface AISuggestion {
 async function callGeminiAPI(
   prompt: string,
   apiKey: string,
-  options: AIGenerateOptions = {}
+  options: AIGenerateOptions = {},
 ): Promise<string> {
   const { maxTokens = 1024, temperature = 0.7 } = options;
 
   const response = await fetch(`${GEMINI_API_BASE}?key=${apiKey}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       contents: [
@@ -47,14 +48,14 @@ async function callGeminiAPI(
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error?.message || 'Failed to generate content');
+    throw new Error(error.error?.message || "Failed to generate content");
   }
 
   const data = await response.json();
   const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!generatedText) {
-    throw new Error('No content generated');
+    throw new Error("No content generated");
   }
 
   return generatedText.trim();
@@ -64,7 +65,7 @@ async function callGeminiAPI(
 export async function generateTitleSuggestions(
   content: string,
   category: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<string[]> {
   const prompt = `You are a tech blog title generator. Based on the following content about ${category}, generate 3 catchy, SEO-friendly titles for a tech tips blog post. The titles should be engaging and include relevant keywords.
 
@@ -74,9 +75,9 @@ Return only the 3 titles, one per line, without numbering or bullet points.`;
 
   const result = await callGeminiAPI(prompt, apiKey, { maxTokens: 200 });
   return result
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
     .slice(0, 3);
 }
 
@@ -85,31 +86,28 @@ export async function suggestTags(
   content: string,
   title: string,
   availableTags: string[],
-  apiKey: string
+  apiKey: string,
 ): Promise<string[]> {
   const prompt = `You are a tech content tagger. Based on the following tech blog post, suggest the most relevant tags from the available list.
 
 Title: ${title}
 Content: ${content.substring(0, 800)}
 
-Available tags: ${availableTags.join(', ')}
+Available tags: ${availableTags.join(", ")}
 
 Return only the most relevant 3-5 tags from the available list, separated by commas. Only use tags from the provided list.`;
 
   const result = await callGeminiAPI(prompt, apiKey, { maxTokens: 100 });
   const suggestedTags = result
-    .split(',')
-    .map(tag => tag.trim())
-    .filter(tag => availableTags.includes(tag));
-  
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => availableTags.includes(tag));
+
   return suggestedTags.slice(0, 5);
 }
 
 // Generate a summary of the post
-export async function generateSummary(
-  content: string,
-  apiKey: string
-): Promise<string> {
+export async function generateSummary(content: string, apiKey: string): Promise<string> {
   const prompt = `Summarize the following tech blog post in 2-3 concise sentences. Focus on the key points and main takeaways.
 
 Content: ${content.substring(0, 2000)}
@@ -120,10 +118,7 @@ Provide only the summary, no additional text.`;
 }
 
 // Improve writing quality
-export async function improveWriting(
-  content: string,
-  apiKey: string
-): Promise<string> {
+export async function improveWriting(content: string, apiKey: string): Promise<string> {
   const prompt = `Improve the following tech blog content to make it more engaging, clear, and professional. Maintain the technical accuracy and the original meaning. Keep the same general structure but enhance readability and flow.
 
 Original content:
@@ -138,7 +133,7 @@ Provide only the improved content, maintaining HTML formatting if present.`;
 export async function generateContentOutline(
   title: string,
   category: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<string> {
   const prompt = `Create a detailed outline for a tech blog post with the following title. The outline should help the writer create comprehensive, valuable content.
 
@@ -154,7 +149,7 @@ Provide a structured outline with main sections and key points to cover. Format 
 export async function expandContent(
   content: string,
   topic: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<string> {
   const prompt = `Expand on the following content about "${topic}". Add more details, examples, and explanations to make it more comprehensive and helpful for readers.
 
@@ -170,7 +165,7 @@ Provide the expanded content, maintaining HTML formatting if present.`;
 export async function generateCodeExample(
   topic: string,
   language: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<string> {
   const prompt = `Generate a practical, well-commented code example in ${language} that demonstrates ${topic}. Include:
 1. A brief explanation of what the code does
@@ -185,7 +180,7 @@ Format the response with the explanation first, then the code in a code block.`;
 // Check content for grammar and style issues
 export async function checkWritingQuality(
   content: string,
-  apiKey: string
+  apiKey: string,
 ): Promise<{ issues: string[]; score: number; suggestions: string[] }> {
   const prompt = `Analyze the following tech blog content for writing quality. Evaluate:
 1. Grammar and spelling
@@ -204,19 +199,19 @@ Respond in this exact JSON format:
 }`;
 
   const result = await callGeminiAPI(prompt, apiKey, { maxTokens: 500, temperature: 0.3 });
-  
+
   try {
     // Try to extract JSON from the response
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
-    throw new Error('Invalid response format');
+    throw new Error("Invalid response format");
   } catch {
     return {
-      issues: ['Unable to analyze content'],
+      issues: ["Unable to analyze content"],
       score: 0,
-      suggestions: ['Please try again'],
+      suggestions: ["Please try again"],
     };
   }
 }
@@ -257,7 +252,9 @@ export class AIAssistant {
     return generateCodeExample(topic, language, this.apiKey);
   }
 
-  async checkQuality(content: string): Promise<{ issues: string[]; score: number; suggestions: string[] }> {
+  async checkQuality(
+    content: string,
+  ): Promise<{ issues: string[]; score: number; suggestions: string[] }> {
     return checkWritingQuality(content, this.apiKey);
   }
 }

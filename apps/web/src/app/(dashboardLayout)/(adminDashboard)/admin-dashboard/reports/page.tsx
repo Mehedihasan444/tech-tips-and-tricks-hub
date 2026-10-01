@@ -55,11 +55,7 @@ const generateMockReports = (posts: any[], users: any[]): Report[] => {
     "Harassment",
     "Off-topic content",
   ];
-  const statuses: ("pending" | "resolved" | "dismissed")[] = [
-    "pending",
-    "resolved",
-    "dismissed",
-  ];
+  const statuses: ("pending" | "resolved" | "dismissed")[] = ["pending", "resolved", "dismissed"];
 
   const reports: Report[] = [];
 
@@ -72,9 +68,7 @@ const generateMockReports = (posts: any[], users: any[]): Report[] => {
       status: statuses[index % statuses.length],
       reportedItem: post.title || `Post ${index + 1}`,
       reportedBy: users[index % users.length]?.name || "Anonymous",
-      createdAt: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-      ).toISOString(),
+      createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
     });
   });
 
@@ -86,15 +80,11 @@ const generateMockReports = (posts: any[], users: any[]): Report[] => {
       status: statuses[(index + 1) % statuses.length],
       reportedItem: user.name || `User ${index + 1}`,
       reportedBy: users[(index + 1) % users.length]?.name || "Anonymous",
-      createdAt: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-      ).toISOString(),
+      createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
     });
   });
 
-  return reports.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return reports.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 };
 
 export default function ReportsPage() {
@@ -108,10 +98,7 @@ export default function ReportsPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [postsRes, usersRes] = await Promise.all([
-          getPosts(1, 20),
-          getUsers(1, 20),
-        ]);
+        const [postsRes, usersRes] = await Promise.all([getPosts(1, 20), getUsers(1, 20)]);
 
         const posts = postsRes?.data || [];
         const users = usersRes?.data?.data || [];
@@ -129,9 +116,7 @@ export default function ReportsPage() {
   }, []);
 
   const handleStatusChange = (reportId: string, newStatus: "resolved" | "dismissed") => {
-    setReports((prev) =>
-      prev.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r))
-    );
+    setReports((prev) => prev.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r)));
   };
 
   const filteredReports = reports.filter((report) => {
@@ -140,11 +125,9 @@ export default function ReportsPage() {
       report.reason.toLowerCase().includes(searchQuery.toLowerCase()) ||
       report.reportedBy.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "all" || report.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || report.status === statusFilter;
 
-    const matchesTab =
-      selectedTab === "all" || report.type === selectedTab;
+    const matchesTab = selectedTab === "all" || report.type === selectedTab;
 
     return matchesSearch && matchesStatus && matchesTab;
   });
@@ -331,9 +314,7 @@ export default function ReportsPage() {
                     <span className="text-default-500">{report.reason}</span>
                   </TableCell>
                   <TableCell>{report.reportedBy}</TableCell>
-                  <TableCell>
-                    {new Date(report.createdAt).toLocaleDateString()}
-                  </TableCell>
+                  <TableCell>{new Date(report.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{getStatusChip(report.status)}</TableCell>
                   <TableCell>
                     {report.status === "pending" ? (

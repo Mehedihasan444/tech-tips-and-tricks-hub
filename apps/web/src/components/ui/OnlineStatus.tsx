@@ -10,11 +10,7 @@ interface OnlineStatusProps {
   showTooltip?: boolean;
 }
 
-export default function OnlineStatus({
-  userId,
-  children,
-  showTooltip = true,
-}: OnlineStatusProps) {
+export default function OnlineStatus({ userId, children, showTooltip = true }: OnlineStatusProps) {
   const { onlineUsers } = useSocket();
   const isOnline = onlineUsers.includes(userId);
 
@@ -63,9 +59,7 @@ export function OnlineDot({ userId, size = "sm", className = "" }: OnlineDotProp
 
   return (
     <Tooltip content="Online" size="sm">
-      <span
-        className={`${sizeClasses[size]} rounded-full bg-success animate-pulse ${className}`}
-      />
+      <span className={`${sizeClasses[size]} rounded-full bg-success animate-pulse ${className}`} />
     </Tooltip>
   );
 }

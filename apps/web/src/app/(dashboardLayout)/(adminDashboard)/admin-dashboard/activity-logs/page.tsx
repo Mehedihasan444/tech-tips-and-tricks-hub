@@ -65,7 +65,11 @@ interface ActivityLog {
 
 const activityConfig: Record<
   ActivityType,
-  { icon: React.ReactNode; color: "primary" | "success" | "warning" | "danger" | "secondary" | "default"; label: string }
+  {
+    icon: React.ReactNode;
+    color: "primary" | "success" | "warning" | "danger" | "secondary" | "default";
+    label: string;
+  }
 > = {
   user_registered: {
     icon: <UserPlus size={16} />,
@@ -189,7 +193,7 @@ const generateMockActivities = (users: any[]): ActivityLog[] => {
   });
 
   return activities.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 };
 
@@ -233,7 +237,7 @@ export default function ActivityLogsPage() {
   const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
   const paginatedActivities = filteredActivities.slice(
     (page - 1) * itemsPerPage,
-    page * itemsPerPage
+    page * itemsPerPage,
   );
 
   const formatTime = (dateStr: string) => {
@@ -348,16 +352,10 @@ export default function ActivityLogsPage() {
                   <TableRow key={activity.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar
-                          src={activity.user.avatar}
-                          name={activity.user.name}
-                          size="sm"
-                        />
+                        <Avatar src={activity.user.avatar} name={activity.user.name} size="sm" />
                         <div>
                           <p className="font-medium">{activity.user.name}</p>
-                          <p className="text-xs text-default-400">
-                            {activity.user.email}
-                          </p>
+                          <p className="text-xs text-default-400">{activity.user.email}</p>
                         </div>
                       </div>
                     </TableCell>

@@ -47,9 +47,9 @@ const Searchbar = () => {
     <div className="relative w-full">
       {/* Search Input */}
       <div className="relative">
-        <Search 
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-default-400 pointer-events-none" 
-          size={20} 
+        <Search
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-default-400 pointer-events-none"
+          size={20}
         />
         <input
           type="search"
@@ -119,27 +119,21 @@ const Searchbar = () => {
 
                       {/* Post Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-foreground line-clamp-1 
-                                       group-hover:text-primary transition-colors">
+                        <h3
+                          className="text-sm font-semibold text-foreground line-clamp-1 
+                                       group-hover:text-primary transition-colors"
+                        >
                           {post.title}
                         </h3>
                         <div className="mt-1 flex items-center gap-2">
-                          <Chip 
-                            size="sm" 
-                            variant="flat" 
-                            color="secondary"
-                            className="text-xs"
-                          >
+                          <Chip size="sm" variant="flat" color="secondary" className="text-xs">
                             {post.category}
                           </Chip>
                         </div>
                         {post?.tags && post.tags.length > 0 && (
                           <div className="mt-2 flex gap-1 flex-wrap">
                             {post.tags.slice(0, 3).map((tag) => (
-                              <span 
-                                key={tag} 
-                                className="text-xs text-primary font-medium"
-                              >
+                              <span key={tag} className="text-xs text-primary font-medium">
                                 #{tag}
                               </span>
                             ))}
@@ -170,15 +164,14 @@ const Searchbar = () => {
               </div>
             </>
           ) : (
-            search && !isPending && (
+            search &&
+            !isPending && (
               <div className="px-4 py-8 text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-default-100 mb-3">
                   <Search className="text-default-400" size={24} />
                 </div>
                 <p className="text-sm font-medium text-default-700">No results found</p>
-                <p className="text-xs text-default-400 mt-1">
-                  Try adjusting your search terms
-                </p>
+                <p className="text-xs text-default-400 mt-1">Try adjusting your search terms</p>
               </div>
             )
           )}

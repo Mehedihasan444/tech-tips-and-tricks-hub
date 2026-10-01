@@ -19,10 +19,7 @@ import DeleteConfirmationModal from "@/app/(dashboardLayout)/components/modal/Co
 import UserUpdateModal from "./UserUpdateModal";
 
 // Define a valid color map using the specific values allowed by the Chip component
-const statusColorMap: Record<
-  string,
-  "success" | "warning" | "danger" | "default"
-> = {
+const statusColorMap: Record<string, "success" | "warning" | "danger" | "default"> = {
   ACTIVE: "success",
   BLOCKED: "danger",
 };
@@ -50,14 +47,13 @@ type TUserWithoutObjects = Omit<IUser, OmittedKeys>;
 const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
   const [sortedBy, setSortedBy] = useState<SortedBy | null>(null);
 
-
   // Sort the data based on the selected column
   const sortedUsers = useMemo(() => {
     // CRITICAL: Always ensure we return an array, never undefined
     if (!Array.isArray(users) || users.length === 0) {
       return [];
     }
-    
+
     if (!sortedBy) {
       return users;
     }
@@ -89,10 +85,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
   }, [users, sortedBy]);
 
   const renderCell = useCallback(
-    (
-      user: TUserWithoutObjects,
-      columnKey: keyof TUserWithoutObjects | "actions"
-    ) => {
+    (user: TUserWithoutObjects, columnKey: keyof TUserWithoutObjects | "actions") => {
       const cellValue = user[columnKey as keyof TUserWithoutObjects];
 
       switch (columnKey) {
@@ -119,19 +112,14 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
         case "role":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize text-default-700">
-                {user.role}
-              </p>
+              <p className="text-bold text-sm capitalize text-default-700">{user.role}</p>
             </div>
           );
         case "status":
           return (
             <Chip
               className="capitalize"
-              color={
-                statusColorMap[user?.status as keyof typeof statusColorMap] ||
-                "default"
-              }
+              color={statusColorMap[user?.status as keyof typeof statusColorMap] || "default"}
               size="sm"
               variant="flat"
             >
@@ -155,14 +143,10 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
             </div>
           );
         default:
-          return (
-            <span className="text-default-600">
-              {String(cellValue || "")}
-            </span>
-          );
+          return <span className="text-default-600">{String(cellValue || "")}</span>;
       }
     },
-    []
+    [],
   );
 
   const handleSort = useCallback((column: keyof IUser) => {
@@ -210,8 +194,8 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody 
-        items={sortedUsers} 
+      <TableBody
+        items={sortedUsers}
         emptyContent={
           <div className="text-center py-10">
             <p className="text-default-500 text-lg">No users found</p>
@@ -225,10 +209,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
           <TableRow key={user._id} className="hover:bg-default-50 transition-colors">
             {(columnKey) => (
               <TableCell>
-                {renderCell(
-                  user,
-                  columnKey as keyof TUserWithoutObjects | "actions"
-                )}
+                {renderCell(user, columnKey as keyof TUserWithoutObjects | "actions")}
               </TableCell>
             )}
           </TableRow>

@@ -4,7 +4,7 @@ import { IUser } from "@/types/IUser";
 import { PenBoxIcon, X } from "lucide-react";
 import React, { useState } from "react";
 
-const Bio = ({ user ,showEditOption }: { user: IUser ,showEditOption:boolean }) => {
+const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean }) => {
   const [bioEditMode, setBioEditMode] = useState(false); // State to control bio edit mode
   const [bio, setBio] = useState(user?.bio || ""); // State to manage bio content
   const { mutate: handleUserUpdate } = useUpdateUser();
@@ -24,16 +24,14 @@ const Bio = ({ user ,showEditOption }: { user: IUser ,showEditOption:boolean }) 
     <div className="bg-default-50 shadow-md rounded-lg p-6 mb-6 flex-1">
       <div className="flex justify-between ">
         <h2 className="text-xl font-semibold ">Bio</h2>
-        {
-          showEditOption&&
-  
-        <button
-          onClick={() => setBioEditMode(!bioEditMode)}
-          className="mb-4 text-sm text-default-500 underline"
-        >
-          {bioEditMode ? <X /> : <PenBoxIcon />}
-        </button>
-        }
+        {showEditOption && (
+          <button
+            onClick={() => setBioEditMode(!bioEditMode)}
+            className="mb-4 text-sm text-default-500 underline"
+          >
+            {bioEditMode ? <X /> : <PenBoxIcon />}
+          </button>
+        )}
       </div>
       <h2 className="text-xl font-semibold mb-4"></h2>
 

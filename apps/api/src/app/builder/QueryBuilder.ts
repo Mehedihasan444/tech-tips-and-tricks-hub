@@ -22,7 +22,7 @@ export class QueryBuilder<T> {
         (field) =>
           ({
             [field]: new RegExp(searchTerm, "i"),
-          } as FilterQuery<T>)
+          }) as FilterQuery<T>,
       ),
     });
     return this;

@@ -31,12 +31,12 @@ export default function CreatePost() {
 
   // Load draft from localStorage if navigating from drafts page
   useEffect(() => {
-    const loadDraftData = localStorage.getItem('loadDraft');
+    const loadDraftData = localStorage.getItem("loadDraft");
     if (loadDraftData && quill) {
       try {
         const draft: PostDraft = JSON.parse(loadDraftData);
-        setTitle(draft.title || '');
-        setSelectedCategory(draft.category || '');
+        setTitle(draft.title || "");
+        setSelectedCategory(draft.category || "");
         setSelectedTags(new Set(draft.tags || []) as any);
         setIsPremium(draft.isPremium || false);
         if (draft.content) {
@@ -44,10 +44,10 @@ export default function CreatePost() {
         }
         setLoadedDraftId(draft.id);
         // Clear the loadDraft from localStorage after loading
-        localStorage.removeItem('loadDraft');
-        toast.success('Draft loaded successfully!');
+        localStorage.removeItem("loadDraft");
+        toast.success("Draft loaded successfully!");
       } catch (error) {
-        console.error('Error loading draft:', error);
+        console.error("Error loading draft:", error);
       }
     }
   }, [quill]);
@@ -67,10 +67,7 @@ export default function CreatePost() {
         const files = input.files;
         // Check if files are present and append them
         if (files) {
-          setPictures((prevPictures) => [
-            ...prevPictures,
-            ...Array.from(files),
-          ]);
+          setPictures((prevPictures) => [...prevPictures, ...Array.from(files)]);
         }
       };
     };
@@ -158,31 +155,27 @@ export default function CreatePost() {
 
           {/* Select Category */}
           <div className="mb-6 flex justify-between items-center gap-5">
-                      <Select
-                        isRequired
-                        id="category"
-                        name="category"
-                        className=""
-                        variant={"underlined"}
-                        label="Select your relevant Category"
-                        placeholder="Select a Category"
-                        value={selectedCategory}
-                        onChange={handleCategoryChange}
-                      >
-                        {postCategories.map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                      <Checkbox
-                        isSelected={isPremium}
-                        onValueChange={setIsPremium}
-                      
-                      >
-                        Premium
-                      </Checkbox>
-                    </div>
+            <Select
+              isRequired
+              id="category"
+              name="category"
+              className=""
+              variant={"underlined"}
+              label="Select your relevant Category"
+              placeholder="Select a Category"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+            >
+              {postCategories.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
+            </Select>
+            <Checkbox isSelected={isPremium} onValueChange={setIsPremium}>
+              Premium
+            </Checkbox>
+          </div>
 
           {/* Select Tags */}
           <div className="mb-6">

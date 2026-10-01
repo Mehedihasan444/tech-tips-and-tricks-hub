@@ -9,17 +9,14 @@ const PaymentSchema = new Schema<IPayment>(
       ref: "User",
       required: true,
     },
-    transactionId:{
-      type:String,
+    transactionId: {
+      type: String,
       required: true,
-    }
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export const Payment = model<IPayment, PaymentModel>(
-  "Payment",
-  PaymentSchema
-);
+export const Payment = model<IPayment, PaymentModel>("Payment", PaymentSchema);

@@ -43,21 +43,21 @@ A robust Express.js backend API with MongoDB, Socket.io for real-time features, 
 
 ## 🛠 Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| Express.js | Web framework |
-| TypeScript | Type safety |
-| MongoDB | Database |
-| Mongoose | ODM |
-| Socket.io | Real-time events |
-| JWT | Authentication |
-| bcryptjs | Password hashing |
-| Cloudinary | Image storage |
-| Multer | File upload handling |
-| Nodemailer | Email service |
-| Handlebars | Email templates |
-| Zod | Request validation |
-| Meilisearch | Search engine |
+| Technology  | Purpose              |
+| ----------- | -------------------- |
+| Express.js  | Web framework        |
+| TypeScript  | Type safety          |
+| MongoDB     | Database             |
+| Mongoose    | ODM                  |
+| Socket.io   | Real-time events     |
+| JWT         | Authentication       |
+| bcryptjs    | Password hashing     |
+| Cloudinary  | Image storage        |
+| Multer      | File upload handling |
+| Nodemailer  | Email service        |
+| Handlebars  | Email templates      |
+| Zod         | Request validation   |
+| Meilisearch | Search engine        |
 
 ---
 
@@ -247,81 +247,81 @@ ADMIN_PASSWORD=Admin@123
 
 ### Authentication (`/auth`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/auth/register` | Register new user | ❌ |
-| POST | `/auth/login` | Login with credentials | ❌ |
-| POST | `/auth/social-login` | Login via Google | ❌ |
-| POST | `/auth/refresh-token` | Refresh access token | Cookie |
-| POST | `/auth/forget-password` | Request password reset | ❌ |
-| POST | `/auth/reset-password` | Reset password | ✅ |
+| Method | Endpoint                | Description            | Auth   |
+| ------ | ----------------------- | ---------------------- | ------ |
+| POST   | `/auth/register`        | Register new user      | ❌     |
+| POST   | `/auth/login`           | Login with credentials | ❌     |
+| POST   | `/auth/social-login`    | Login via Google       | ❌     |
+| POST   | `/auth/refresh-token`   | Refresh access token   | Cookie |
+| POST   | `/auth/forget-password` | Request password reset | ❌     |
+| POST   | `/auth/reset-password`  | Reset password         | ✅     |
 
 ### Users (`/users`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/users` | Get all users | ❌ |
-| GET | `/users/:nickName` | Get user by nickname | ❌ |
-| POST | `/users/create-user` | Create user (Admin) | Admin |
-| PUT | `/users/:id` | Follow/Unfollow user | ❌ |
-| PUT | `/users/update-profile-photo` | Update profile photo | ❌ |
-| DELETE | `/users/:id` | Delete user | Admin |
+| Method | Endpoint                      | Description          | Auth  |
+| ------ | ----------------------------- | -------------------- | ----- |
+| GET    | `/users`                      | Get all users        | ❌    |
+| GET    | `/users/:nickName`            | Get user by nickname | ❌    |
+| POST   | `/users/create-user`          | Create user (Admin)  | Admin |
+| PUT    | `/users/:id`                  | Follow/Unfollow user | ❌    |
+| PUT    | `/users/update-profile-photo` | Update profile photo | ❌    |
+| DELETE | `/users/:id`                  | Delete user          | Admin |
 
 ### Posts (`/posts`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/posts` | Get all posts | ❌ |
-| GET | `/posts/:id` | Get single post | ❌ |
-| POST | `/posts` | Create post | User |
-| PUT | `/posts/:id` | Update post | User |
-| DELETE | `/posts/:id` | Delete post | User |
+| Method | Endpoint     | Description     | Auth |
+| ------ | ------------ | --------------- | ---- |
+| GET    | `/posts`     | Get all posts   | ❌   |
+| GET    | `/posts/:id` | Get single post | ❌   |
+| POST   | `/posts`     | Create post     | User |
+| PUT    | `/posts/:id` | Update post     | User |
+| DELETE | `/posts/:id` | Delete post     | User |
 
 ### Comments (`/comments`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/comments/post/:postId` | Get comments for post | ❌ |
-| POST | `/comments` | Create comment | User |
-| PUT | `/comments/:id` | Update comment | User |
-| DELETE | `/comments/:id` | Delete comment | User |
+| Method | Endpoint                 | Description           | Auth |
+| ------ | ------------------------ | --------------------- | ---- |
+| GET    | `/comments/post/:postId` | Get comments for post | ❌   |
+| POST   | `/comments`              | Create comment        | User |
+| PUT    | `/comments/:id`          | Update comment        | User |
+| DELETE | `/comments/:id`          | Delete comment        | User |
 
 ### Friends (`/friends`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/friends` | Get friends list | User |
-| GET | `/friends/requests` | Get friend requests | User |
-| POST | `/friends/request/:id` | Send friend request | User |
-| POST | `/friends/accept/:id` | Accept request | User |
-| POST | `/friends/reject/:id` | Reject request | User |
+| Method | Endpoint               | Description         | Auth |
+| ------ | ---------------------- | ------------------- | ---- |
+| GET    | `/friends`             | Get friends list    | User |
+| GET    | `/friends/requests`    | Get friend requests | User |
+| POST   | `/friends/request/:id` | Send friend request | User |
+| POST   | `/friends/accept/:id`  | Accept request      | User |
+| POST   | `/friends/reject/:id`  | Reject request      | User |
 
 ### Stories (`/stories`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/stories` | Get all stories | User |
-| POST | `/stories` | Create story | User |
-| DELETE | `/stories/:id` | Delete story | User |
+| Method | Endpoint       | Description     | Auth |
+| ------ | -------------- | --------------- | ---- |
+| GET    | `/stories`     | Get all stories | User |
+| POST   | `/stories`     | Create story    | User |
+| DELETE | `/stories/:id` | Delete story    | User |
 
 ### Payment (`/payment`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/payment/create` | Create payment | User |
-| GET | `/payment/history` | Get payment history | User |
+| Method | Endpoint           | Description         | Auth |
+| ------ | ------------------ | ------------------- | ---- |
+| POST   | `/payment/create`  | Create payment      | User |
+| GET    | `/payment/history` | Get payment history | User |
 
 ### Search (`/search-posts`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/search-posts?q=keyword` | Search posts | ❌ |
+| Method | Endpoint                  | Description  | Auth |
+| ------ | ------------------------- | ------------ | ---- |
+| GET    | `/search-posts?q=keyword` | Search posts | ❌   |
 
 ### Image Upload (`/image-upload`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/image-upload` | Upload image | User |
+| Method | Endpoint        | Description  | Auth |
+| ------ | --------------- | ------------ | ---- |
+| POST   | `/image-upload` | Upload image | User |
 
 ---
 
@@ -332,37 +332,37 @@ ADMIN_PASSWORD=Admin@123
 ```typescript
 // Client connects with auth token
 io.connect(SOCKET_URL, {
-  auth: { token: accessToken }
+  auth: { token: accessToken },
 });
 ```
 
 ### Events
 
-| Event | Direction | Payload | Description |
-|-------|-----------|---------|-------------|
-| `connection` | Server | - | Client connected |
-| `disconnect` | Server | - | Client disconnected |
-| `join` | Client → Server | `userId` | Join user room |
-| `sendMessage` | Client → Server | `{ receiverId, content }` | Send chat message |
-| `newMessage` | Server → Client | `Message` | Receive new message |
-| `typing` | Client → Server | `{ receiverId }` | User is typing |
-| `userTyping` | Server → Client | `userId` | Show typing indicator |
-| `stopTyping` | Client → Server | `{ receiverId }` | User stopped typing |
-| `notification` | Server → Client | `Notification` | New notification |
-| `onlineUsers` | Server → Client | `string[]` | Online users list |
+| Event          | Direction       | Payload                   | Description           |
+| -------------- | --------------- | ------------------------- | --------------------- |
+| `connection`   | Server          | -                         | Client connected      |
+| `disconnect`   | Server          | -                         | Client disconnected   |
+| `join`         | Client → Server | `userId`                  | Join user room        |
+| `sendMessage`  | Client → Server | `{ receiverId, content }` | Send chat message     |
+| `newMessage`   | Server → Client | `Message`                 | Receive new message   |
+| `typing`       | Client → Server | `{ receiverId }`          | User is typing        |
+| `userTyping`   | Server → Client | `userId`                  | Show typing indicator |
+| `stopTyping`   | Client → Server | `{ receiverId }`          | User stopped typing   |
+| `notification` | Server → Client | `Notification`            | New notification      |
+| `onlineUsers`  | Server → Client | `string[]`                | Online users list     |
 
 ### Example Usage
 
 ```typescript
 // Server-side
-io.on('connection', (socket) => {
-  socket.on('join', (userId) => {
+io.on("connection", (socket) => {
+  socket.on("join", (userId) => {
     socket.join(userId);
   });
 
-  socket.on('sendMessage', async (data) => {
+  socket.on("sendMessage", async (data) => {
     const message = await saveMessage(data);
-    io.to(data.receiverId).emit('newMessage', message);
+    io.to(data.receiverId).emit("newMessage", message);
   });
 });
 ```
@@ -382,8 +382,8 @@ interface IUser {
   profilePhoto?: string;
   coverPhoto?: string;
   nickName: string;
-  role: 'USER' | 'ADMIN';
-  status: 'ACTIVE' | 'BLOCKED';
+  role: "USER" | "ADMIN";
+  status: "ACTIVE" | "BLOCKED";
   isVerified: boolean;
   isPremium: boolean;
   subscriptionExpiry?: Date;
@@ -443,19 +443,15 @@ interface IComment {
 
 ```typescript
 // Usage in routes
-router.get('/protected', auth(USER_ROLE.USER), controller);
-router.get('/admin-only', auth(USER_ROLE.ADMIN), controller);
+router.get("/protected", auth(USER_ROLE.USER), controller);
+router.get("/admin-only", auth(USER_ROLE.ADMIN), controller);
 ```
 
 ### Validation Middleware
 
 ```typescript
 // Validate request body with Zod
-router.post(
-  '/posts',
-  validateRequest(PostValidation.createPostValidationSchema),
-  controller
-);
+router.post("/posts", validateRequest(PostValidation.createPostValidationSchema), controller);
 ```
 
 ### File Upload Middleware
@@ -463,11 +459,11 @@ router.post(
 ```typescript
 // Handle multipart form data
 router.post(
-  '/upload',
-  multerUpload.fields([{ name: 'images', maxCount: 3 }]),
+  "/upload",
+  multerUpload.fields([{ name: "images", maxCount: 3 }]),
   validateImageFileRequest(ImageFilesArrayZodSchema),
   parseBody,
-  controller
+  controller,
 );
 ```
 
@@ -480,7 +476,7 @@ router.post(
 ```typescript
 class AppError extends Error {
   statusCode: number;
-  
+
   constructor(statusCode: number, message: string) {
     super(message);
     this.statusCode = statusCode;
@@ -488,7 +484,7 @@ class AppError extends Error {
 }
 
 // Usage
-throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
+throw new AppError(httpStatus.NOT_FOUND, "Post not found");
 ```
 
 ### Error Types Handled
@@ -574,13 +570,13 @@ The server includes a `vercel.json` configuration:
 }
 ```
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server with hot reload |
-| `npm run build` | Compile TypeScript to JavaScript |
-| `npm run start:prod` | Start production server |
-| `npm run lint` | Check for linting errors |
-| `npm run lint:fix` | Auto-fix linting errors |
+| Script               | Description                              |
+| -------------------- | ---------------------------------------- |
+| `npm run dev`        | Start development server with hot reload |
+| `npm run build`      | Compile TypeScript to JavaScript         |
+| `npm run start:prod` | Start production server                  |
+| `npm run lint`       | Check for linting errors                 |
+| `npm run lint:fix`   | Auto-fix linting errors                  |
 
 ---
 
@@ -590,7 +586,7 @@ The `QueryBuilder` class provides a fluent API for building MongoDB queries:
 
 ```typescript
 const query = new QueryBuilder(Post.find(), queryParams)
-  .search(['title', 'content'])
+  .search(["title", "content"])
   .filter()
   .sort()
   .paginate()
@@ -601,6 +597,7 @@ const meta = await query.countTotal();
 ```
 
 **Features:**
+
 - Search across multiple fields
 - Filter by query parameters
 - Sort by any field
@@ -628,4 +625,3 @@ This project is licensed under the MIT License.
 <div align="center">
   <p>Built with ❤️ for the Tech Tips & Tricks Hub</p>
 </div>
-

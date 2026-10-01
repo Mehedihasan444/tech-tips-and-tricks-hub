@@ -1,6 +1,6 @@
 // SidebarContext.tsx (or whatever filename you're using)
 "use client";
-import { createContext, useContext} from 'react';
+import { createContext, useContext } from "react";
 
 // Define the interface for the context value
 interface SidebarContextProps {
@@ -12,12 +12,9 @@ interface SidebarContextProps {
 export const SidebarContext = createContext<SidebarContextProps>({
   collapsed: false,
   setCollapsed: () => {},
-
 });
 
 // Hook to use the SidebarContext in components
 export const useSidebarContext = () => {
   return useContext(SidebarContext);
 };
-
-

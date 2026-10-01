@@ -31,12 +31,14 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
+
 - **NextAuth.js** integration with Google OAuth
 - JWT-based authentication with secure cookie storage
 - Role-based access control (User/Admin)
 - Password reset via email
 
 ### 📝 Posts & Content
+
 - Create, edit, and delete tech tips/posts
 - Rich text editor with markdown support
 - Image upload via Cloudinary
@@ -47,6 +49,7 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 - Save posts for later
 
 ### 💬 Real-time Features
+
 - **Live Chat** with Socket.io
 - Real-time notifications
 - Typing indicators
@@ -54,11 +57,13 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 - Message read receipts
 
 ### 🤖 AI Integration
+
 - **Google Gemini AI** powered features
 - AI-assisted content suggestions
 - Smart search capabilities
 
 ### 👥 Social Features
+
 - Follow/Unfollow users
 - Friends system
 - User profiles with stats
@@ -69,6 +74,7 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 ### 📊 Dashboards
 
 #### User Dashboard
+
 - Personal analytics (posts, followers, views)
 - Post management
 - Draft management
@@ -77,6 +83,7 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 - Subscription management
 
 #### Admin Dashboard
+
 - Platform statistics
 - User management (verify, block, delete)
 - Content moderation
@@ -85,6 +92,7 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 - Payment tracking
 
 ### 💳 Subscription System
+
 - Premium subscription plans
 - Payment integration
 - Access to premium content
@@ -94,33 +102,35 @@ A full-stack social platform for sharing tech tips, tricks, and tutorials. Built
 ## 🛠 Tech Stack
 
 ### Frontend (Client)
-| Technology | Purpose |
-|------------|---------|
-| Next.js 14 | React framework with App Router |
-| TypeScript | Type safety |
-| NextUI v2 | UI component library |
-| Tailwind CSS | Utility-first styling |
-| React Query (TanStack) | Data fetching & caching |
-| Socket.io Client | Real-time communication |
-| Framer Motion | Animations |
-| Chart.js | Analytics charts |
-| NextAuth.js | Authentication |
-| Axios | HTTP client |
-| Zod | Schema validation |
+
+| Technology             | Purpose                         |
+| ---------------------- | ------------------------------- |
+| Next.js 14             | React framework with App Router |
+| TypeScript             | Type safety                     |
+| NextUI v2              | UI component library            |
+| Tailwind CSS           | Utility-first styling           |
+| React Query (TanStack) | Data fetching & caching         |
+| Socket.io Client       | Real-time communication         |
+| Framer Motion          | Animations                      |
+| Chart.js               | Analytics charts                |
+| NextAuth.js            | Authentication                  |
+| Axios                  | HTTP client                     |
+| Zod                    | Schema validation               |
 
 ### Backend (Server)
-| Technology | Purpose |
-|------------|---------|
-| Express.js | Node.js web framework |
-| MongoDB | Database |
-| Mongoose | ODM for MongoDB |
-| Socket.io | Real-time events |
-| Cloudinary | Image storage |
-| Nodemailer | Email service |
-| JWT | Token authentication |
-| Zod | Request validation |
-| Meilisearch | Search engine |
-| bcrypt | Password hashing |
+
+| Technology  | Purpose               |
+| ----------- | --------------------- |
+| Express.js  | Node.js web framework |
+| MongoDB     | Database              |
+| Mongoose    | ODM for MongoDB       |
+| Socket.io   | Real-time events      |
+| Cloudinary  | Image storage         |
+| Nodemailer  | Email service         |
+| JWT         | Token authentication  |
+| Zod         | Request validation    |
+| Meilisearch | Search engine         |
+| bcrypt      | Password hashing      |
 
 ---
 
@@ -315,12 +325,14 @@ cd tech-tips-and-tricks-hub
 #### 2. Install dependencies
 
 **Client:**
+
 ```bash
 cd client
 npm install
 ```
 
 **Server:**
+
 ```bash
 cd server
 npm install
@@ -333,6 +345,7 @@ Create `.env.local` in the `client` folder and `.env` in the `server` folder wit
 #### 4. Start MongoDB
 
 If using local MongoDB:
+
 ```bash
 mongod
 ```
@@ -342,17 +355,21 @@ Or use MongoDB Atlas connection string in `DATABASE_URL`.
 #### 5. Run the development servers
 
 **Server (Terminal 1):**
+
 ```bash
 cd server
 npm run dev
 ```
+
 Server runs on `http://localhost:5000`
 
 **Client (Terminal 2):**
+
 ```bash
 cd client
 npm run dev
 ```
+
 Client runs on `http://localhost:3000`
 
 ---
@@ -441,59 +458,59 @@ Client runs on `http://localhost:3000`
 
 ### Authentication Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register new user |
-| POST | `/api/v1/auth/login` | Login user |
-| POST | `/api/v1/auth/refresh-token` | Refresh access token |
-| POST | `/api/v1/auth/change-password` | Change password |
-| POST | `/api/v1/auth/forget-password` | Request password reset |
-| POST | `/api/v1/auth/reset-password` | Reset password |
+| Method | Endpoint                       | Description            |
+| ------ | ------------------------------ | ---------------------- |
+| POST   | `/api/v1/auth/register`        | Register new user      |
+| POST   | `/api/v1/auth/login`           | Login user             |
+| POST   | `/api/v1/auth/refresh-token`   | Refresh access token   |
+| POST   | `/api/v1/auth/change-password` | Change password        |
+| POST   | `/api/v1/auth/forget-password` | Request password reset |
+| POST   | `/api/v1/auth/reset-password`  | Reset password         |
 
 ### User Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/users` | Get all users |
-| GET | `/api/v1/users/:id` | Get user by ID |
-| GET | `/api/v1/users/me` | Get current user |
-| PATCH | `/api/v1/users/me` | Update current user |
-| POST | `/api/v1/users/follow/:id` | Follow a user |
-| POST | `/api/v1/users/unfollow/:id` | Unfollow a user |
-| PATCH | `/api/v1/users/:id/verify` | Verify user (Admin) |
-| PATCH | `/api/v1/users/:id/block` | Block user (Admin) |
+| Method | Endpoint                     | Description         |
+| ------ | ---------------------------- | ------------------- |
+| GET    | `/api/v1/users`              | Get all users       |
+| GET    | `/api/v1/users/:id`          | Get user by ID      |
+| GET    | `/api/v1/users/me`           | Get current user    |
+| PATCH  | `/api/v1/users/me`           | Update current user |
+| POST   | `/api/v1/users/follow/:id`   | Follow a user       |
+| POST   | `/api/v1/users/unfollow/:id` | Unfollow a user     |
+| PATCH  | `/api/v1/users/:id/verify`   | Verify user (Admin) |
+| PATCH  | `/api/v1/users/:id/block`    | Block user (Admin)  |
 
 ### Post Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/posts` | Get all posts |
-| GET | `/api/v1/posts/:id` | Get post by ID |
-| POST | `/api/v1/posts` | Create new post |
-| PATCH | `/api/v1/posts/:id` | Update post |
-| DELETE | `/api/v1/posts/:id` | Delete post |
-| POST | `/api/v1/posts/:id/upvote` | Upvote post |
-| POST | `/api/v1/posts/:id/downvote` | Downvote post |
-| POST | `/api/v1/posts/:id/save` | Save post |
+| Method | Endpoint                     | Description     |
+| ------ | ---------------------------- | --------------- |
+| GET    | `/api/v1/posts`              | Get all posts   |
+| GET    | `/api/v1/posts/:id`          | Get post by ID  |
+| POST   | `/api/v1/posts`              | Create new post |
+| PATCH  | `/api/v1/posts/:id`          | Update post     |
+| DELETE | `/api/v1/posts/:id`          | Delete post     |
+| POST   | `/api/v1/posts/:id/upvote`   | Upvote post     |
+| POST   | `/api/v1/posts/:id/downvote` | Downvote post   |
+| POST   | `/api/v1/posts/:id/save`     | Save post       |
 
 ### Comment Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/comments/post/:postId` | Get comments for post |
-| POST | `/api/v1/comments` | Create comment |
-| PATCH | `/api/v1/comments/:id` | Update comment |
-| DELETE | `/api/v1/comments/:id` | Delete comment |
+| Method | Endpoint                        | Description           |
+| ------ | ------------------------------- | --------------------- |
+| GET    | `/api/v1/comments/post/:postId` | Get comments for post |
+| POST   | `/api/v1/comments`              | Create comment        |
+| PATCH  | `/api/v1/comments/:id`          | Update comment        |
+| DELETE | `/api/v1/comments/:id`          | Delete comment        |
 
 ### Friends Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/friends` | Get friends list |
-| GET | `/api/v1/friends/requests` | Get friend requests |
-| POST | `/api/v1/friends/request/:id` | Send friend request |
-| POST | `/api/v1/friends/accept/:id` | Accept friend request |
-| POST | `/api/v1/friends/reject/:id` | Reject friend request |
+| Method | Endpoint                      | Description           |
+| ------ | ----------------------------- | --------------------- |
+| GET    | `/api/v1/friends`             | Get friends list      |
+| GET    | `/api/v1/friends/requests`    | Get friend requests   |
+| POST   | `/api/v1/friends/request/:id` | Send friend request   |
+| POST   | `/api/v1/friends/accept/:id`  | Accept friend request |
+| POST   | `/api/v1/friends/reject/:id`  | Reject friend request |
 
 ---
 
@@ -506,13 +523,17 @@ The chat system uses Socket.io for real-time communication:
 ```typescript
 // Client-side connection
 const socket = io(SOCKET_URL, {
-  auth: { token: accessToken }
+  auth: { token: accessToken },
 });
 
 // Events
-socket.emit('sendMessage', { receiverId, content });
-socket.on('newMessage', (message) => { /* handle */ });
-socket.on('typing', (userId) => { /* show indicator */ });
+socket.emit("sendMessage", { receiverId, content });
+socket.on("newMessage", (message) => {
+  /* handle */
+});
+socket.on("typing", (userId) => {
+  /* show indicator */
+});
 ```
 
 ### Draft System
@@ -521,9 +542,16 @@ Posts can be saved as drafts in localStorage:
 
 ```typescript
 // Save draft
-localStorage.setItem(`draft_${draftId}`, JSON.stringify({
-  title, content, category, tags, isPremium
-}));
+localStorage.setItem(
+  `draft_${draftId}`,
+  JSON.stringify({
+    title,
+    content,
+    category,
+    tags,
+    isPremium,
+  }),
+);
 
 // Load draft in create-post page via URL params
 // /dashboard/create-post?draft=draft_123
@@ -601,16 +629,13 @@ npm run type-check
 ### Backend (Vercel / Railway / Render)
 
 **Vercel:**
+
 ```json
 // vercel.json
 {
   "version": 2,
-  "builds": [
-    { "src": "src/server.ts", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "src/server.ts" }
-  ]
+  "builds": [{ "src": "src/server.ts", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "src/server.ts" }]
 }
 ```
 

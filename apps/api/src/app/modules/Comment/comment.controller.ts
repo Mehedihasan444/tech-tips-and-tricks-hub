@@ -18,9 +18,7 @@ const getAllCommentsOfASinglePost = catchAsync(async (req, res) => {
   if (!postId) {
     throw new Error("provide postId");
   }
-  const comments = await CommentServices.getAllCommentsOfASinglePostFromDB(
-    postId
-  );
+  const comments = await CommentServices.getAllCommentsOfASinglePostFromDB(postId);
 
   sendResponse(res, {
     success: true,
@@ -31,9 +29,7 @@ const getAllCommentsOfASinglePost = catchAsync(async (req, res) => {
 });
 
 const deleteComment = catchAsync(async (req, res) => {
-  await CommentServices.deleteCommentFromDB(
-    req.query as { commentId: string; postId: string }
-  );
+  await CommentServices.deleteCommentFromDB(req.query as { commentId: string; postId: string });
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

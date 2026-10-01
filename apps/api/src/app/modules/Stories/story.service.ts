@@ -36,45 +36,41 @@ const createStory = async (image: any, user: JwtPayload) => {
 // Get all active stories of user and stories of users they follow
 const getAllStories = async (user: JwtPayload) => {
   // Get all active stories
-  const stories = await Story.find({ isActive: true })
-    .sort({ createdAt: -1 })
-    .lean();
+  const stories = await Story.find({ isActive: true }).sort({ createdAt: -1 }).lean();
   // Get user's following list
   const userFriend = await User.findById(user._id).populate("following");
 
   const userFriendIds = userFriend?.following?.map((friend) => friend);
 
   // Get stories from friends in a single query
-  const friendStories = userFriendIds && userFriendIds.length > 0
-    ? await Story.find({
-      userId: { $in: userFriendIds },
-      isActive: true
-    }).lean()
-    : [];
+  const friendStories =
+    userFriendIds && userFriendIds.length > 0
+      ? await Story.find({
+          userId: { $in: userFriendIds },
+          isActive: true,
+        }).lean()
+      : [];
 
   // Get user's own stories
   const userStories = await Story.find({
     userId: new Types.ObjectId(user._id),
-    isActive: true
+    isActive: true,
   }).lean();
 
   // Combine both sets of stories
   const filteredStories = [...userStories, ...friendStories];
 
   // Format the stories for client consumption
-  const formattedStories = filteredStories.map((story) => {  // Changed from stories.map to filteredStories.map
+  const formattedStories = filteredStories.map((story) => {
+    // Changed from stories.map to filteredStories.map
     // Calculate time difference
     const now = new Date();
     const storyTime = new Date(story.timestamp);
-    const diffInHours = Math.floor(
-      (now.getTime() - storyTime.getTime()) / (1000 * 60 * 60)
-    );
+    const diffInHours = Math.floor((now.getTime() - storyTime.getTime()) / (1000 * 60 * 60));
 
     let timeAgo;
     if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(
-        (now.getTime() - storyTime.getTime()) / (1000 * 60)
-      );
+      const diffInMinutes = Math.floor((now.getTime() - storyTime.getTime()) / (1000 * 60));
       timeAgo = `${diffInMinutes}m ago`;
     } else {
       timeAgo = `${diffInHours}h ago`;
@@ -107,15 +103,11 @@ const getStoriesByUserId = async (userId: string) => {
     // Calculate time difference
     const now = new Date();
     const storyTime = new Date(story.timestamp);
-    const diffInHours = Math.floor(
-      (now.getTime() - storyTime.getTime()) / (1000 * 60 * 60)
-    );
+    const diffInHours = Math.floor((now.getTime() - storyTime.getTime()) / (1000 * 60 * 60));
 
     let timeAgo;
     if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(
-        (now.getTime() - storyTime.getTime()) / (1000 * 60)
-      );
+      const diffInMinutes = Math.floor((now.getTime() - storyTime.getTime()) / (1000 * 60));
       timeAgo = `${diffInMinutes}m ago`;
     } else {
       timeAgo = `${diffInHours}h ago`;

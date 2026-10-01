@@ -63,7 +63,7 @@ export function StoriesSection() {
   const { mutate: handleDeleteStory, isPending: isStoryLoading } = useDeleteStory();
   const [storyToDelete, setStoryToDelete] = useState<string | null>(null);
   const [storyProgress, setStoryProgress] = useState(0);
-  const { user } = useUser()
+  const { user } = useUser();
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -83,8 +83,8 @@ export function StoriesSection() {
         setStories([createStoryItem, ...fetchedStories]);
         setError(null);
       } catch (err) {
-        console.error('Error fetching stories:', err);
-        setError('Failed to load stories');
+        console.error("Error fetching stories:", err);
+        setError("Failed to load stories");
         setStories([createStoryItem]);
       } finally {
         setLoading(false);
@@ -139,14 +139,15 @@ export function StoriesSection() {
 
   const handleDelete = () => {
     if (storyToDelete) {
-      handleDeleteStory({ storyId: storyToDelete }, {
-        onSuccess: () => {
-          setStories(prevStories =>
-            prevStories.filter(story => story.id !== storyToDelete)
-          );
-          closeStoryView();
-        }
-      });
+      handleDeleteStory(
+        { storyId: storyToDelete },
+        {
+          onSuccess: () => {
+            setStories((prevStories) => prevStories.filter((story) => story.id !== storyToDelete));
+            closeStoryView();
+          },
+        },
+      );
     }
   };
 
@@ -155,9 +156,11 @@ export function StoriesSection() {
       {loading ? (
         <div className="flex gap-3 overflow-x-hidden">
           <StoryCardSkeleton />
-          {Array(5).fill(0).map((_, index) => (
-            <StoryCardSkeleton key={index} />
-          ))}
+          {Array(5)
+            .fill(0)
+            .map((_, index) => (
+              <StoryCardSkeleton key={index} />
+            ))}
         </div>
       ) : (
         <>
@@ -271,11 +274,7 @@ export function StoriesSection() {
                   {!selectedStory.isAddStory && selectedStory.userId === user?._id && (
                     <Dropdown placement="bottom-end">
                       <DropdownTrigger>
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          className="text-white hover:bg-white/10"
-                        >
+                        <Button isIconOnly variant="light" className="text-white hover:bg-white/10">
                           <EllipsisVertical size={20} />
                         </Button>
                       </DropdownTrigger>
@@ -299,18 +298,11 @@ export function StoriesSection() {
       )}
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        placement="center"
-        backdrop="blur"
-      >
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" backdrop="blur">
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                Delete Story
-              </ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Delete Story</ModalHeader>
               <ModalBody>
                 <p className="text-default-600">
                   Are you sure you want to delete this story? This action cannot be undone.
@@ -320,11 +312,7 @@ export function StoriesSection() {
                 <Button color="default" variant="flat" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button
-                  color="danger"
-                  onClick={handleDelete}
-                  isLoading={isStoryLoading}
-                >
+                <Button color="danger" onClick={handleDelete} isLoading={isStoryLoading}>
                   Delete
                 </Button>
               </ModalFooter>

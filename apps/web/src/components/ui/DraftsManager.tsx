@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalContent,
@@ -12,11 +12,11 @@ import {
   CardBody,
   Chip,
   useDisclosure,
-} from '@nextui-org/react';
-import { FileText, Trash2, Clock, Edit3, FolderOpen } from 'lucide-react';
-import { PostDraft, getAllDrafts, deleteDraft } from '@/hooks/useDraftAutoSave';
-import ConfirmationModal from './ConfirmationModal';
-import { formatDistanceToNow } from 'date-fns';
+} from "@nextui-org/react";
+import { FileText, Trash2, Clock, Edit3, FolderOpen } from "lucide-react";
+import { PostDraft, getAllDrafts, deleteDraft } from "@/hooks/useDraftAutoSave";
+import ConfirmationModal from "./ConfirmationModal";
+import { formatDistanceToNow } from "date-fns";
 
 interface DraftsManagerProps {
   onLoadDraft: (draft: PostDraft) => void;
@@ -50,14 +50,14 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
-      return 'Unknown';
+      return "Unknown";
     }
   };
 
   const stripHtml = (html: string) => {
-    const tmp = document.createElement('div');
+    const tmp = document.createElement("div");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    return tmp.textContent || tmp.innerText || "";
   };
 
   return (
@@ -73,7 +73,9 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
           onPress={onOpen}
           className="font-medium"
         >
-          Drafts {(drafts.length || getAllDrafts().length) > 0 && `(${drafts.length || getAllDrafts().length})`}
+          Drafts{" "}
+          {(drafts.length || getAllDrafts().length) > 0 &&
+            `(${drafts.length || getAllDrafts().length})`}
         </Button>
       )}
 
@@ -112,10 +114,10 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-lg truncate">
-                                {draft.title || 'Untitled Draft'}
+                                {draft.title || "Untitled Draft"}
                               </h4>
                               <p className="text-sm text-default-500 line-clamp-2 mt-1">
-                                {stripHtml(draft.content) || 'No content'}
+                                {stripHtml(draft.content) || "No content"}
                               </p>
                               <div className="flex items-center gap-3 mt-3">
                                 {draft.category && (

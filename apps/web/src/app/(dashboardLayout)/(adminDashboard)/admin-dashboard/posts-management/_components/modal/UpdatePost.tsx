@@ -30,12 +30,8 @@ export default function UpdatePost({ post }: { post: any }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { quill, quillRef } = useQuill();
   const [title, setTitle] = useState(post?.title || ""); // Prefill title
-  const [selectedCategory, setSelectedCategory] = useState(
-    post?.category || ""
-  ); // Prefill category
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(
-    new Set(post?.tags || [])
-  );
+  const [selectedCategory, setSelectedCategory] = useState(post?.category || ""); // Prefill category
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set(post?.tags || []));
   // Prefill tags
   const [pictures, setPictures] = useState<File[] | []>([]); // To handle newly selected pictures
 
@@ -53,10 +49,7 @@ export default function UpdatePost({ post }: { post: any }) {
         const files = input.files;
         // Append new images to the existing ones
         if (files) {
-          setPictures((prevPictures) => [
-            ...prevPictures,
-            ...Array.from(files),
-          ]);
+          setPictures((prevPictures) => [...prevPictures, ...Array.from(files)]);
         }
       };
     };
@@ -99,7 +92,7 @@ export default function UpdatePost({ post }: { post: any }) {
       title,
       category: selectedCategory,
       tags: Array.from(selectedTags),
-      images: post.images
+      images: post.images,
     };
 
     const formData = new FormData();

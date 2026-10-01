@@ -1,8 +1,6 @@
-
-import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
-import AppError from '../errors/AppError';
-import { USER_ROLE, USER_STATUS } from '../modules/User/user.constant';
-
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import AppError from "../errors/AppError";
+import { USER_ROLE, USER_STATUS } from "../modules/User/user.constant";
 
 export const createToken = (
   jwtPayload: {
@@ -15,23 +13,20 @@ export const createToken = (
     nickName: string;
   },
   secret: string,
-  expiresIn: string | undefined
+  expiresIn: string | undefined,
 ) => {
   return jwt.sign(jwtPayload, secret, {
     // `expiresIn` comes from process.env, so it is an arbitrary string at runtime
     // (e.g. "1d"). jsonwebtoken parses it with `ms` at runtime, but its types only
     // allow the `ms` StringValue union, so the cast is needed at this boundary.
-    expiresIn: expiresIn as SignOptions['expiresIn'],
+    expiresIn: expiresIn as SignOptions["expiresIn"],
   });
 };
 
-export const verifyToken = (
-  token: string,
-  secret: string
-): JwtPayload | Error => {
+export const verifyToken = (token: string, secret: string): JwtPayload | Error => {
   try {
     return jwt.verify(token, secret) as JwtPayload;
   } catch (error: any) {
-    throw new AppError(401, 'You are not authorized!');
+    throw new AppError(401, "You are not authorized!");
   }
 };

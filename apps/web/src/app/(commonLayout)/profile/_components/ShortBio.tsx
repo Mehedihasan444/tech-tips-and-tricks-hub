@@ -5,13 +5,7 @@ import { Input } from "@nextui-org/react";
 import { Check, PenBoxIcon, X } from "lucide-react";
 import React, { useState } from "react";
 
-const ShortBio = ({
-  user,
-  showEditOption,
-}: {
-  user: IUser;
-  showEditOption: boolean;
-}) => {
+const ShortBio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean }) => {
   const [shortBioEditMode, setShortBioEditMode] = useState(false); // State to control bio edit mode
   const [shortBio, setShortBio] = useState(user?.shortBio || ""); // State to manage shortBio content
   const { mutate: handleUserUpdate } = useUpdateUser();
@@ -42,10 +36,7 @@ const ShortBio = ({
             onChange={(e) => setShortBio(e.target.value)}
           />
           <div className="flex justify-end mt-2 ">
-            <button
-              onClick={handleSaveShortBio}
-              className=" text-sm text-default-500 underline"
-            >
+            <button onClick={handleSaveShortBio} className=" text-sm text-default-500 underline">
               <Check />
             </button>
             <button

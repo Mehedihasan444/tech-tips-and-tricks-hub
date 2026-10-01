@@ -2,13 +2,7 @@
 
 import React from "react";
 import { Card, CardBody, Chip } from "@nextui-org/react";
-import {
-  Sparkles,
-  Bug,
-  Shield,
-  Zap,
-  Layout,
-} from "lucide-react";
+import { Sparkles, Bug, Shield, Zap, Layout } from "lucide-react";
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
 
 interface ChangelogEntry {
@@ -151,22 +145,15 @@ export default function ChangelogPage() {
                       >
                         {config.label}
                       </Chip>
-                      <span className="text-sm text-default-400">
-                        {entry.date}
-                      </span>
+                      <span className="text-sm text-default-400">{entry.date}</span>
                     </div>
 
-                    <h3 className="text-xl font-semibold text-default-800 mb-2">
-                      {entry.title}
-                    </h3>
+                    <h3 className="text-xl font-semibold text-default-800 mb-2">{entry.title}</h3>
                     <p className="text-default-500 mb-4">{entry.description}</p>
 
                     <ul className="space-y-2">
                       {entry.items.map((item, itemIndex) => (
-                        <li
-                          key={itemIndex}
-                          className="flex items-start gap-2 text-default-600"
-                        >
+                        <li key={itemIndex} className="flex items-start gap-2 text-default-600">
                           <span className="text-primary mt-1.5">•</span>
                           <span>{item}</span>
                         </li>
@@ -186,10 +173,7 @@ export default function ChangelogPage() {
           <Layout className="mx-auto text-default-300 mb-3" size={32} />
           <p className="text-default-500">
             Want to see a specific feature? Contact us at{" "}
-            <a
-              href="mailto:support@technest.com"
-              className="text-primary hover:underline"
-            >
+            <a href="mailto:support@technest.com" className="text-primary hover:underline">
               support@technest.com
             </a>
           </p>

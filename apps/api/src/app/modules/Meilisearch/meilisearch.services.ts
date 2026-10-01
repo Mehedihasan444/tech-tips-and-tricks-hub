@@ -16,10 +16,7 @@ const getAllPosts = async (query: Record<string, unknown>) => {
 
   query = (await SearchPostByCategoryQueryMaker(query)) || query;
 
-  const postQuery = new QueryBuilder(
-    Post.find().populate("author").populate("category"),
-    query
-  )
+  const postQuery = new QueryBuilder(Post.find().populate("author").populate("category"), query)
     .filter()
     .search(PostsSearchableFields)
     .sort()

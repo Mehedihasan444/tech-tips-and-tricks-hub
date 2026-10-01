@@ -1,20 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Button,
-  Avatar,
-  Input,
-  Badge,
-  Spinner,
-  Tooltip,
-} from "@nextui-org/react";
-import {
-  MessageCircle,
-  Send,
-  X,
-  Minimize2,
-} from "lucide-react";
+import { Button, Avatar, Input, Badge, Spinner, Tooltip } from "@nextui-org/react";
+import { MessageCircle, Send, X, Minimize2 } from "lucide-react";
 import { useSocket, ChatMessage } from "@/context/socket.provider";
 import { useUser } from "@/context/user.provider";
 import { formatDistanceToNow } from "date-fns";
@@ -35,13 +23,13 @@ interface LiveChatProps {
 export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) {
   const { user } = useUser();
   const { socket, sendChatMessage, onlineUsers, isConnected } = useSocket();
-  
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,27 +70,28 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
         setMessages((prev) => {
           // Check if message already exists (by id or by matching content+time for optimistic messages)
           const isDuplicate = prev.some(
-            (m) => m.id === message.id || 
-            (m.senderId === message.senderId && 
-             m.message === message.message && 
-             m.id.startsWith('temp-'))
+            (m) =>
+              m.id === message.id ||
+              (m.senderId === message.senderId &&
+                m.message === message.message &&
+                m.id.startsWith("temp-")),
           );
-          
+
           if (isDuplicate) {
             // Replace temp message with real one
-            return prev.map((m) => 
-              (m.id.startsWith('temp-') && 
-               m.senderId === message.senderId && 
-               m.message === message.message) 
-                ? message 
-                : m
+            return prev.map((m) =>
+              m.id.startsWith("temp-") &&
+              m.senderId === message.senderId &&
+              m.message === message.message
+                ? message
+                : m,
             );
           }
-          
+
           return [...prev, message];
         });
         setTimeout(scrollToBottom, 100);
-        
+
         // Mark as read if it's from the recipient
         if (message.senderId === recipient._id) {
           socket.emit("mark-message-read", message.id);
@@ -133,7 +122,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
     if (!newMessage.trim() || !user) return;
 
     sendChatMessage(recipient._id, newMessage.trim());
-    
+
     // Optimistically add message to UI
     const optimisticMessage: ChatMessage = {
       id: `temp-${Date.now()}`,
@@ -222,9 +211,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
           </Badge>
           <div>
             <p className="font-semibold text-sm">{recipient.name}</p>
-            <p className="text-xs opacity-80">
-              {isRecipientOnline ? "Online" : "Offline"}
-            </p>
+            <p className="text-xs opacity-80">{isRecipientOnline ? "Online" : "Offline"}</p>
           </div>
         </div>
         <div className="flex gap-1">
@@ -272,22 +259,15 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
             {messages.map((msg) => {
               const isMe = msg.senderId === user?._id;
               return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                >
+                <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`max-w-[80%] px-3 py-2 rounded-2xl ${
-                      isMe
-                        ? "bg-primary text-white rounded-br-sm"
-                        : "bg-default-200 rounded-bl-sm"
+                      isMe ? "bg-primary text-white rounded-br-sm" : "bg-default-200 rounded-bl-sm"
                     }`}
                   >
                     <p className="text-sm break-words">{msg.message}</p>
                     <p
-                      className={`text-[10px] mt-1 ${
-                        isMe ? "text-white/70" : "text-default-400"
-                      }`}
+                      className={`text-[10px] mt-1 ${isMe ? "text-white/70" : "text-default-400"}`}
                     >
                       {formatTime(msg.createdAt)}
                     </p>

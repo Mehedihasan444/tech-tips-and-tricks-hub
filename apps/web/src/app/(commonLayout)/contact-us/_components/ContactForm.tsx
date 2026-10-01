@@ -4,9 +4,7 @@ import { Input, Textarea, Button } from "@nextui-org/react";
 const ContactForm = () => {
   return (
     <div className="bg-default-50 p-6 rounded-lg shadow-lg">
-      <h3 className="text-2xl font-semibold  mb-4">
-        Get in Touch
-      </h3>
+      <h3 className="text-2xl font-semibold  mb-4">Get in Touch</h3>
       <form className="space-y-4">
         <Input
           label="Your Name"
@@ -27,7 +25,7 @@ const ContactForm = () => {
         />
         <Input
           label="Subject"
-              aria-label="Subject"
+          aria-label="Subject"
           placeholder="Enter subject"
           required
           fullWidth
@@ -35,7 +33,7 @@ const ContactForm = () => {
         />
         <Textarea
           label="Your Message"
-              aria-label="Your Message"
+          aria-label="Your Message"
           placeholder="Write your message here..."
           required
           fullWidth

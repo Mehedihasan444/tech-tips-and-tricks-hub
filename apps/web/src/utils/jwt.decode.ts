@@ -4,11 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 export const jwtVerify = (token: string) => {
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_ACCESS_SECRET as string
-    ) as JwtPayload;
-
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as JwtPayload;
 
     return decoded;
   } catch (error: any) {

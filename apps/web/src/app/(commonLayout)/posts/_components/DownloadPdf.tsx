@@ -30,9 +30,7 @@ const DownloadPdf = ({ post }: { post: TPost }) => {
   // Function to generate and download PDF
   const downloadPdf = async () => {
     // Convert all images in the post to base64
-    const imagePromises = post.images.map((imageUrl: string) =>
-      convertImageToBase64(imageUrl)
-    );
+    const imagePromises = post.images.map((imageUrl: string) => convertImageToBase64(imageUrl));
 
     const base64Images = await Promise.all(imagePromises);
 
@@ -55,9 +53,7 @@ const DownloadPdf = ({ post }: { post: TPost }) => {
       { text: post.tags.join(", "), style: "body" },
       { text: " " },
       {
-        text: `Last updated on: ${new Date(
-          post.updatedAt
-        ).toLocaleDateString()}`,
+        text: `Last updated on: ${new Date(post.updatedAt).toLocaleDateString()}`,
         style: "subheader",
       },
       { text: " " },
@@ -92,12 +88,7 @@ const DownloadPdf = ({ post }: { post: TPost }) => {
 
   return (
     <section className="flex justify-center">
-      <Button
-        onPress={downloadPdf}
-        variant="bordered"
-        color="success"
-        endContent={<Download />}
-      >
+      <Button onPress={downloadPdf} variant="bordered" color="success" endContent={<Download />}>
         Download as PDF
       </Button>
     </section>

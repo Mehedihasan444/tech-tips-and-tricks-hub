@@ -29,7 +29,7 @@ export const seed = async () => {
         maritalStatus: "",
         education: [],
         socialMedia: [],
-        nickName: generateNickname("Admin")
+        nickName: generateNickname("Admin"),
       });
       console.log("Admin created successfully...");
       console.log("Seeding completed...");

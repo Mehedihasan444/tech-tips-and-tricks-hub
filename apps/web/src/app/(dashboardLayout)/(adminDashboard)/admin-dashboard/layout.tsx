@@ -12,9 +12,7 @@ export default function AdminDashboardLayout({
 }>) {
   return (
     <div>
-     <AdminLayout>
-      {children}
-     </AdminLayout>
+      <AdminLayout>{children}</AdminLayout>
     </div>
   );
 }

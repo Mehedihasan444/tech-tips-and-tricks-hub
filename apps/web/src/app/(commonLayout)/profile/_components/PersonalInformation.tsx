@@ -1,15 +1,6 @@
-
 "use client";
 import React, { useState } from "react";
-import {
-  Github,
-  Globe,
-  Linkedin,
-  Twitter,
-  Plus,
-  X,
-  PenBoxIcon,
-} from "lucide-react";
+import { Github, Globe, Linkedin, Twitter, Plus, X, PenBoxIcon } from "lucide-react";
 import Link from "next/link";
 import { IUser } from "@/types/IUser";
 import { useUpdateUser } from "@/hooks/user.hook";
@@ -28,7 +19,13 @@ type IMedia = {
   url: string;
 };
 
-const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOption:boolean }) => {
+const PersonalInformation = ({
+  user,
+  showEditOption,
+}: {
+  user: IUser;
+  showEditOption: boolean;
+}) => {
   const [editMode, setEditMode] = useState(false);
   const { mutate: handleUserUpdate, isPending } = useUpdateUser();
 
@@ -49,7 +46,7 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
   // Handle form changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    field: string
+    field: string,
   ) => {
     setFormData({ ...formData, [field]: e.target.value });
   };
@@ -74,25 +71,17 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
   };
 
   // Update education entry
-  const handleEducationChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
+  const handleEducationChange = (index: number, field: string, value: string) => {
     const updatedEducation = formData.education.map((edu, idx) =>
-      idx === index ? { ...edu, [field]: value } : edu
+      idx === index ? { ...edu, [field]: value } : edu,
     );
     setFormData({ ...formData, education: updatedEducation });
   };
 
   // Update social media entry
-  const handleSocialMediaChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
+  const handleSocialMediaChange = (index: number, field: string, value: string) => {
     const updatedSocialMedia = formData.socialMedia.map((media, idx) =>
-      idx === index ? { ...media, [field]: value } : media
+      idx === index ? { ...media, [field]: value } : media,
     );
     setFormData({ ...formData, socialMedia: updatedSocialMedia });
   };
@@ -107,15 +96,14 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
     <div className="bg-default-50 shadow-md rounded-lg p-6 mb-6">
       <div className="flex justify-between ">
         <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-        {
-          showEditOption&&
-        <button
-          onClick={() => setEditMode(!editMode)}
-          className="mb-4 text-sm text-default-500 underline"
-        >
-          {editMode ? <X /> : <PenBoxIcon />}
-        </button>
-        }
+        {showEditOption && (
+          <button
+            onClick={() => setEditMode(!editMode)}
+            className="mb-4 text-sm text-default-500 underline"
+          >
+            {editMode ? <X /> : <PenBoxIcon />}
+          </button>
+        )}
       </div>
 
       {editMode ? (
@@ -177,47 +165,27 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
                       type="text"
                       placeholder="Institution"
                       value={edu.institution}
-                      onChange={(e) =>
-                        handleEducationChange(
-                          index,
-                          "institution",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => handleEducationChange(index, "institution", e.target.value)}
                       className="input input-bordered w-full mb-2"
                     />
                     <input
                       type="text"
                       placeholder="Degree"
                       value={edu.degree}
-                      onChange={(e) =>
-                        handleEducationChange(index, "degree", e.target.value)
-                      }
+                      onChange={(e) => handleEducationChange(index, "degree", e.target.value)}
                       className="input input-bordered w-full mb-2"
                     />
                     <div className="flex gap-2">
                       <input
                         type="date"
                         value={edu.startDate}
-                        onChange={(e) =>
-                          handleEducationChange(
-                            index,
-                            "startDate",
-                            e.target.value
-                          )
-                        }
+                        onChange={(e) => handleEducationChange(index, "startDate", e.target.value)}
                         className="input input-bordered w-full"
                       />
                       <input
                         type="date"
                         value={edu.endDate}
-                        onChange={(e) =>
-                          handleEducationChange(
-                            index,
-                            "endDate",
-                            e.target.value
-                          )
-                        }
+                        onChange={(e) => handleEducationChange(index, "endDate", e.target.value)}
                         className="input input-bordered w-full"
                       />
                     </div>
@@ -225,9 +193,7 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
                       type="text"
                       placeholder="GPA"
                       value={edu.gpa}
-                      onChange={(e) =>
-                        handleEducationChange(index, "gpa", e.target.value)
-                      }
+                      onChange={(e) => handleEducationChange(index, "gpa", e.target.value)}
                       className="input input-bordered w-full mt-2"
                     />
                   </li>
@@ -252,9 +218,7 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
                   <select
                     className="select select-bordered w-full mb-2"
                     value={media.platform}
-                    onChange={(e) =>
-                      handleSocialMediaChange(index, "platform", e.target.value)
-                    }
+                    onChange={(e) => handleSocialMediaChange(index, "platform", e.target.value)}
                   >
                     {socialMediaOptions.map((platform) => (
                       <option key={platform} value={platform}>
@@ -266,9 +230,7 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
                     type="url"
                     placeholder="URL"
                     value={media.url}
-                    onChange={(e) =>
-                      handleSocialMediaChange(index, "url", e.target.value)
-                    }
+                    onChange={(e) => handleSocialMediaChange(index, "url", e.target.value)}
                     className="input input-bordered w-full"
                   />
                 </li>
@@ -313,8 +275,8 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
               <ul className="list-disc list-inside">
                 {formData.education.map((edu: IEducation, index: number) => (
                   <li key={index}>
-                    {edu.institution} - {edu.degree} ({edu.startDate} -{" "}
-                    {edu.endDate}), GPA: {edu.gpa}
+                    {edu.institution} - {edu.degree} ({edu.startDate} - {edu.endDate}), GPA:{" "}
+                    {edu.gpa}
                   </li>
                 ))}
               </ul>
@@ -348,9 +310,7 @@ const PersonalInformation = ({ user,showEditOption }: { user: IUser,showEditOpti
 
                   return (
                     <li key={index} className="flex gap-2 items-center">
-                      {IconComponent && (
-                        <IconComponent className="w-5 h-5 text-default-600" />
-                      )}
+                      {IconComponent && <IconComponent className="w-5 h-5 text-default-600" />}
                       <Link
                         href={media.url}
                         target="_blank"

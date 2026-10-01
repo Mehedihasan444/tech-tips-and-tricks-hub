@@ -5,18 +5,14 @@ import envConfig from "@/config/envConfig";
 import { IUserData } from "@/types/IUser";
 import { revalidateTag } from "next/cache";
 
-
-
-export const getUsers = async (page:number=1,limit:number=8) => {
+export const getUsers = async (page: number = 1, limit: number = 8) => {
   const fetchOptions = {
-    next:{
+    next: {
       revalidate: 10,
       cache: "force-cache" as RequestCache,
       tags: ["users"],
-    }
+    },
   };
-
-
 
   const res = await fetch(`${envConfig.baseApi}/users?page=${page}&limit=${limit}`, fetchOptions);
 
@@ -33,10 +29,7 @@ export const getUser = async (nickName: string) => {
     cache: "no-store" as RequestCache,
   };
 
-  const res = await fetch(
-    `${envConfig.baseApi}/users/${nickName}`,
-    fetchOptions
-  );
+  const res = await fetch(`${envConfig.baseApi}/users/${nickName}`, fetchOptions);
 
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -44,10 +37,7 @@ export const getUser = async (nickName: string) => {
 
   return res.json();
 };
-export const updateUser = async (
-  userData: IUserData,
-  userId: string
-): Promise<any> => {
+export const updateUser = async (userData: IUserData, userId: string): Promise<any> => {
   try {
     const { data } = await axiosInstance.put(`/users/${userId}`, userData, {
       headers: {
@@ -65,15 +55,11 @@ export const updateUser = async (
 };
 export const updateProfilePhoto = async (userData: FormData): Promise<any> => {
   try {
-    const { data } = await axiosInstance.put(
-      `/users/update-profile-photo`,
-      userData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const { data } = await axiosInstance.put(`/users/update-profile-photo`, userData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     revalidateTag("users");
 

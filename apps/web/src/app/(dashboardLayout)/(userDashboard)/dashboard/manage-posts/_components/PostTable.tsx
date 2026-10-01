@@ -66,7 +66,7 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
   const renderCell = useCallback(
     (
       post: TPostWithoutContentAndImages,
-      columnKey: keyof TPostWithoutContentAndImages | "actions"
+      columnKey: keyof TPostWithoutContentAndImages | "actions",
     ) => {
       const cellValue = post[columnKey as keyof TPostWithoutContentAndImages];
 
@@ -83,16 +83,12 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
 
         case "likes":
           return (
-            <div className="text-primary">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <div className="text-primary">{typeof cellValue === "number" ? cellValue : null}</div>
           );
 
         case "dislikes":
           return (
-            <div className="text-secondary">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <div className="text-secondary">{typeof cellValue === "number" ? cellValue : null}</div>
           );
 
         case "actions":
@@ -126,7 +122,7 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
           return null;
       }
     },
-    []
+    [],
   );
 
   const handleSort = (column: keyof TPost) => {
@@ -179,10 +175,7 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
             <TableRow key={item._id}>
               {(columnKey) => (
                 <TableCell>
-                  {renderCell(
-                    item,
-                    columnKey as keyof TPostWithoutContentAndImages | "actions"
-                  )}
+                  {renderCell(item, columnKey as keyof TPostWithoutContentAndImages | "actions")}
                 </TableCell>
               )}
             </TableRow>

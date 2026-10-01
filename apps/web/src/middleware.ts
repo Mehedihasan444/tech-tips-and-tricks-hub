@@ -15,12 +15,7 @@ interface TDecode {
   exp: number;
 }
 
-const AuthRoutes = [
-  "/login",
-  "/register",
-  "/forget-password",
-  "/reset-password",
-];
+const AuthRoutes = ["/login", "/register", "/forget-password", "/reset-password"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -34,9 +29,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next(); // Allow access to login/register
     } else {
       // Redirect to login page with redirect parameter
-      return NextResponse.redirect(
-        new URL(`/login?redirect=${pathname}`, request.url)
-      );
+      return NextResponse.redirect(new URL(`/login?redirect=${pathname}`, request.url));
     }
   }
 

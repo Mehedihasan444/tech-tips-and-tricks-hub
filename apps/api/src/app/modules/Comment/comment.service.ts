@@ -19,7 +19,7 @@ const createCommentIntoDB = async (payload: any) => {
     // Step 2: Recursive function to find immediate parent comment
     const findImmediateParent = (
       parentComment: typeof rootComment,
-      targetCommentId: Types.ObjectId
+      targetCommentId: Types.ObjectId,
     ): typeof rootComment | null => {
       // Check if current comment is the immediate parent
       if (parentComment._id.toString() === targetCommentId.toString()) {
@@ -29,10 +29,7 @@ const createCommentIntoDB = async (payload: any) => {
       // Traverse the children to find the target parent comment
       if (parentComment?.children) {
         for (let child of parentComment?.children) {
-          const foundComment = findImmediateParent(
-            child as any,
-            targetCommentId
-          );
+          const foundComment = findImmediateParent(child as any, targetCommentId);
           if (foundComment) {
             return foundComment;
           }
@@ -69,10 +66,10 @@ const createCommentIntoDB = async (payload: any) => {
     try {
       // Find the commenter info for notification
       const commenter = await User.findById(data.commentUser);
-      
+
       // Find the parent comment author (immediateParentComment has commentUser)
       const parentCommentUserId = (immediateParentComment as any).commentUser?.toString();
-      
+
       if (parentCommentUserId && parentCommentUserId !== data.commentUser) {
         sendReplyNotification(
           {
@@ -82,7 +79,7 @@ const createCommentIntoDB = async (payload: any) => {
           },
           parentCommentUserId,
           data.postId,
-          newComment._id.toString()
+          newComment._id.toString(),
         );
       }
     } catch (error) {
@@ -93,15 +90,15 @@ const createCommentIntoDB = async (payload: any) => {
   } else {
     // If there is no parent comment, just create the comment
     const result = await Comment.create(payload);
-    
+
     // Send comment notification to post author
     try {
       const post = await Post.findById(payload.postId);
       const commenter = await User.findById(payload.commentUser);
-      
+
       // Get the post author ID (it's a reference)
       const postAuthorId = post?.author?.toString();
-      
+
       if (postAuthorId && postAuthorId !== payload.commentUser) {
         sendCommentNotification(
           {
@@ -111,13 +108,13 @@ const createCommentIntoDB = async (payload: any) => {
           },
           postAuthorId,
           payload.postId,
-          result._id.toString()
+          result._id.toString(),
         );
       }
     } catch (error) {
       console.error("Failed to send comment notification:", error);
     }
-    
+
     return result;
   }
 };
@@ -141,9 +138,7 @@ const getAllCommentsOfASinglePostFromDB = async (postId: string) => {
 };
 
 const getSingleCommentFromDB = async (commentId: string) => {
-  const result = await Comment.findById(commentId)
-    .populate("commentUser")
-    .populate("children"); // Use commentUser for population
+  const result = await Comment.findById(commentId).populate("commentUser").populate("children"); // Use commentUser for population
   return result;
 };
 const updateCommentInDB = async (payload: any) => {
@@ -171,7 +166,7 @@ const updateCommentInDB = async (payload: any) => {
     // Step 3: Recursive function to find and update the target comment
     const findAndUpdateComment = (
       parentComment: typeof rootComment,
-      targetCommentId: string
+      targetCommentId: string,
     ): boolean => {
       if (parentComment.children && parentComment.children.length > 0) {
         for (let i = 0; i < parentComment.children.length; i++) {
@@ -228,7 +223,7 @@ const deleteCommentFromDB = async (payload: {
     // Step 2: Recursive function to find and delete the target comment
     const findAndDeleteComment = (
       parentComment: typeof rootComment,
-      targetCommentId: string
+      targetCommentId: string,
     ): boolean => {
       // Traverse through the children to find the target comment
       if (parentComment.children && parentComment.children.length > 0) {

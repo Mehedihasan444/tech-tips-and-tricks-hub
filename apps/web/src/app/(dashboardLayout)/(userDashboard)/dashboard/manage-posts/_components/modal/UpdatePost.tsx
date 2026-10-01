@@ -96,9 +96,7 @@ export default function UpdatePost({ post }: { post: any }) {
   const [title, setTitle] = useState(post?.title || "");
   const [selectedCategory, setSelectedCategory] = useState(post?.category || "");
   const [isPremium, setIsPremium] = useState(post?.isPremium || false);
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(
-    new Set(post?.tags || [])
-  );
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set(post?.tags || []));
   const [pictures, setPictures] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(post?.images || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -137,12 +135,9 @@ export default function UpdatePost({ post }: { post: any }) {
   }, []);
 
   // Memoized handler for category changes
-  const handleCategoryChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedCategory(e.target.value);
-    },
-    []
-  );
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  }, []);
 
   // Handle successful post update
   useEffect(() => {
@@ -242,8 +237,8 @@ export default function UpdatePost({ post }: { post: any }) {
       post,
       pictures,
       handleUpdatePost,
-      existingImages
-    ]
+      existingImages,
+    ],
   );
 
   // Handle modal close

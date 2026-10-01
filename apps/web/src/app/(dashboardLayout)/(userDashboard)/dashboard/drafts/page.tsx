@@ -1,27 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardBody,
-  Button,
-  Chip,
-  Divider,
-} from '@nextui-org/react';
-import { FileText, Trash2, Clock, Edit3, Plus, Search, RefreshCw } from 'lucide-react';
-import { PostDraft, getAllDrafts, deleteDraft } from '@/hooks/useDraftAutoSave';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import EmptyState from '@/components/ui/EmptyState';
-import { formatDistanceToNow } from 'date-fns';
-import { useRouter } from 'next/navigation';
-import { Input } from '@nextui-org/react';
+import React, { useState, useEffect } from "react";
+import { Card, CardBody, Button, Chip, Divider } from "@nextui-org/react";
+import { FileText, Trash2, Clock, Edit3, Plus, Search, RefreshCw } from "lucide-react";
+import { PostDraft, getAllDrafts, deleteDraft } from "@/hooks/useDraftAutoSave";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import EmptyState from "@/components/ui/EmptyState";
+import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
+import { Input } from "@nextui-org/react";
 
 export default function DraftsPage() {
   const router = useRouter();
   const [drafts, setDrafts] = useState<PostDraft[]>([]);
   const [filteredDrafts, setFilteredDrafts] = useState<PostDraft[]>([]);
   const [draftToDelete, setDraftToDelete] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Load drafts on mount
@@ -31,7 +25,7 @@ export default function DraftsPage() {
 
   // Filter drafts based on search
   useEffect(() => {
-    if (searchQuery.trim() === '') {
+    if (searchQuery.trim() === "") {
       setFilteredDrafts(drafts);
     } else {
       const query = searchQuery.toLowerCase();
@@ -41,8 +35,8 @@ export default function DraftsPage() {
             draft.title?.toLowerCase().includes(query) ||
             draft.content?.toLowerCase().includes(query) ||
             draft.category?.toLowerCase().includes(query) ||
-            draft.tags?.some((tag) => tag.toLowerCase().includes(query))
-        )
+            draft.tags?.some((tag) => tag.toLowerCase().includes(query)),
+        ),
       );
     }
   }, [searchQuery, drafts]);
@@ -64,23 +58,23 @@ export default function DraftsPage() {
 
   const handleEditDraft = (draft: PostDraft) => {
     // Store the draft in localStorage temporarily for the create post page to pick up
-    localStorage.setItem('loadDraft', JSON.stringify(draft));
-    router.push('/dashboard/create-post');
+    localStorage.setItem("loadDraft", JSON.stringify(draft));
+    router.push("/dashboard/create-post");
   };
 
   const formatDate = (timestamp: number) => {
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     } catch {
-      return 'Unknown';
+      return "Unknown";
     }
   };
 
   const stripHtml = (html: string) => {
-    if (typeof window === 'undefined') return html;
-    const tmp = document.createElement('div');
+    if (typeof window === "undefined") return html;
+    const tmp = document.createElement("div");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    return tmp.textContent || tmp.innerText || "";
   };
 
   return (
@@ -93,7 +87,7 @@ export default function DraftsPage() {
           </h1>
           {drafts.length > 0 && (
             <Chip size="sm" color="primary" variant="flat" className="ml-3">
-              {drafts.length} {drafts.length === 1 ? 'draft' : 'drafts'}
+              {drafts.length} {drafts.length === 1 ? "draft" : "drafts"}
             </Chip>
           )}
         </div>
@@ -113,12 +107,12 @@ export default function DraftsPage() {
             onPress={loadDrafts}
             aria-label="Refresh drafts"
           >
-            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
           </Button>
           <Button
             color="primary"
             startContent={<Plus size={18} />}
-            onPress={() => router.push('/dashboard/create-post')}
+            onPress={() => router.push("/dashboard/create-post")}
           >
             New Post
           </Button>
@@ -156,9 +150,9 @@ export default function DraftsPage() {
           actionLabel={searchQuery ? "Clear Search" : "Create New Post"}
           onAction={() => {
             if (searchQuery) {
-              setSearchQuery('');
+              setSearchQuery("");
             } else {
-              router.push('/dashboard/create-post');
+              router.push("/dashboard/create-post");
             }
           }}
         />
@@ -172,7 +166,7 @@ export default function DraftsPage() {
               <CardBody className="p-5">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <h3 className="font-semibold text-lg text-default-800 line-clamp-1">
-                    {draft.title || 'Untitled Draft'}
+                    {draft.title || "Untitled Draft"}
                   </h3>
                   {draft.isPremium && (
                     <Chip size="sm" variant="flat" color="warning">
@@ -182,7 +176,7 @@ export default function DraftsPage() {
                 </div>
 
                 <p className="text-sm text-default-500 line-clamp-3 mb-4 min-h-[3.75rem]">
-                  {stripHtml(draft.content) || 'No content yet...'}
+                  {stripHtml(draft.content) || "No content yet..."}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2 mb-4">

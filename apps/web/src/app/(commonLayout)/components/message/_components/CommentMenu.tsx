@@ -38,7 +38,10 @@ const CommentMenu = ({
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
   const { user } = useUser();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [commentToDelete, setCommentToDelete] = useState<{ commentId: string; postId: string } | null>(null);
+  const [commentToDelete, setCommentToDelete] = useState<{
+    commentId: string;
+    postId: string;
+  } | null>(null);
 
   const openDeleteModal = (commentId: string, postId: string) => {
     setCommentToDelete({ commentId, postId });
@@ -75,9 +78,7 @@ const CommentMenu = ({
       <>
         <div className="bg-default-200 p-2 rounded-lg">
           <div className="flex justify-between">
-            <h3 className="font-semibold text-sm">
-              {comment?.commentUser?.name}
-            </h3>
+            <h3 className="font-semibold text-sm">{comment?.commentUser?.name}</h3>
 
             {(isOwnerOfThePost || isOwnComment) && (
               <Dropdown size="sm">
@@ -106,18 +107,17 @@ const CommentMenu = ({
         </div>
 
         <div className="flex justify-between gap-5 px-3">
-          <span className="text-xs font-semibold text-default-500">{timeDifference(comment?.createdAt)}</span>
-          <button
-            onClick={handleReply}
-            className="text-xs font-semibold text-default-500"
-          >
+          <span className="text-xs font-semibold text-default-500">
+            {timeDifference(comment?.createdAt)}
+          </span>
+          <button onClick={handleReply} className="text-xs font-semibold text-default-500">
             Reply
           </button>
         </div>
 
         {/* Delete Confirmation Modal */}
-        <Modal 
-          isOpen={isDeleteModalOpen} 
+        <Modal
+          isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           size="sm"
           backdrop="blur"
@@ -136,16 +136,12 @@ const CommentMenu = ({
               <h3 className="text-xl font-bold text-center">Delete Comment</h3>
             </ModalHeader>
             <ModalBody className="text-center pb-2">
-              <p className="text-default-500">
-                Are you sure you want to delete this comment?
-              </p>
-              <p className="text-sm text-danger-500 mt-2">
-                This action cannot be undone.
-              </p>
+              <p className="text-default-500">Are you sure you want to delete this comment?</p>
+              <p className="text-sm text-danger-500 mt-2">This action cannot be undone.</p>
             </ModalBody>
             <ModalFooter className="flex gap-2 justify-center pb-6">
-              <Button 
-                variant="flat" 
+              <Button
+                variant="flat"
                 onPress={() => setIsDeleteModalOpen(false)}
                 isDisabled={isDeleting}
                 className="font-medium"

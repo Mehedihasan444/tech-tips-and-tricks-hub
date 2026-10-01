@@ -1,46 +1,44 @@
-import express from 'express';
-import auth from '../../middlewares/auth';
-import validateRequest, {
-  validateRequestCookies,
-} from '../../middlewares/validateRequest';
-import { AuthControllers } from './auth.controller';
-import { AuthValidation } from './auth.validation';
-import { USER_ROLE } from '../User/user.constant';
+import express from "express";
+import auth from "../../middlewares/auth";
+import validateRequest, { validateRequestCookies } from "../../middlewares/validateRequest";
+import { AuthControllers } from "./auth.controller";
+import { AuthValidation } from "./auth.validation";
+import { USER_ROLE } from "../User/user.constant";
 
 const router = express.Router();
 
 router.post(
-  '/register',
+  "/register",
   validateRequest(AuthValidation.registerValidationSchema),
-  AuthControllers.registerUser
+  AuthControllers.registerUser,
 );
 
 router.post(
-  '/login',
+  "/login",
   validateRequest(AuthValidation.loginValidationSchema),
-  AuthControllers.loginUser
+  AuthControllers.loginUser,
 );
 router.post(
-  '/social-login',
+  "/social-login",
   validateRequest(AuthValidation.socialLoginValidationSchema),
-  AuthControllers.socialLoginUser
+  AuthControllers.socialLoginUser,
 );
 
 router.post(
-  '/reset-password',
+  "/reset-password",
   auth(USER_ROLE.USER, USER_ROLE.ADMIN),
   validateRequest(AuthValidation.resetPasswordValidationSchema),
-  AuthControllers.resetPassword
+  AuthControllers.resetPassword,
 );
 
 router.post(
-  '/refresh-token',
+  "/refresh-token",
   validateRequestCookies(AuthValidation.refreshTokenValidationSchema),
-  AuthControllers.refreshToken
+  AuthControllers.refreshToken,
 );
 
 router.post(
-  '/forget-password',
+  "/forget-password",
   validateRequest(AuthValidation.forgetPasswordValidationSchema),
   AuthControllers.forgetPassword,
 );

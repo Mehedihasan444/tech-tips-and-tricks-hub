@@ -18,7 +18,7 @@ router.post(
   multerUpload.fields([{ name: "image", maxCount: 1 }]),
   // validateImageFileRequest(ImageFilesArrayZodSchema),
   //   validateRequest(createStoryValidationSchema),
-  StoryController.createStory
+  StoryController.createStory,
 );
 
 // Get user stories and stories of users they follow

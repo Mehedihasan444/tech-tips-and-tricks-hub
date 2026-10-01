@@ -30,7 +30,7 @@ export interface IUser {
   createdAt?: string;
   updatedAt?: string;
   isPremium?: boolean;
-subscriptionStartDate?: string;
+  subscriptionStartDate?: string;
   __v?: number;
 }
 

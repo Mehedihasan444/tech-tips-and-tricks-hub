@@ -15,14 +15,14 @@ router.post(
   "/create-user",
   auth(USER_ROLE.ADMIN),
   validateRequest(UserValidation.createUserValidationSchema),
-  UserControllers.userRegister
+  UserControllers.userRegister,
 );
 router.get("/", UserControllers.getAllUsers);
 router.put(
   "/update-profile-photo",
   multerUpload.fields([{ name: "image" }]),
   parseBody,
-  UserControllers.updateProfilePhoto
+  UserControllers.updateProfilePhoto,
 );
 router.get("/:nickName", UserControllers.getSingleUser);
 router.put("/:id", UserControllers.updateUserFollowListAndFollowersList);

@@ -1,8 +1,8 @@
-import { MeiliSearch } from 'meilisearch';
-import { Document, Types } from 'mongoose';
-import config from '../config';
-import { noImage } from '../modules/Post/post.constant';
-import { TPost } from '../modules/Post/post.interface';
+import { MeiliSearch } from "meilisearch";
+import { Document, Types } from "mongoose";
+import config from "../config";
+import { noImage } from "../modules/Post/post.constant";
+import { TPost } from "../modules/Post/post.interface";
 
 const meiliClient = new MeiliSearch({
   host: config.meilisearch_host as string,
@@ -11,11 +11,11 @@ const meiliClient = new MeiliSearch({
 
 export async function addDocumentToIndex(
   result: Document<unknown, object, TPost> & TPost & { _id: Types.ObjectId },
-  indexKey: string
+  indexKey: string,
 ) {
   const index = meiliClient.index(indexKey);
 
-  const { _id, title, content, images,category,tags } = result;
+  const { _id, title, content, images, category, tags } = result;
   const firstImage = images?.[0] || noImage;
 
   const document = {
@@ -31,7 +31,7 @@ export async function addDocumentToIndex(
     await index.addDocuments([document]);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error adding document to MeiliSearch:', error);
+    console.error("Error adding document to MeiliSearch:", error);
   }
 }
 
@@ -42,7 +42,7 @@ export const deleteDocumentFromIndex = async (indexKey: string, id: string) => {
     await index.deleteDocument(id);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error deleting resource from MeiliSearch:', error);
+    console.error("Error deleting resource from MeiliSearch:", error);
   }
 };
 

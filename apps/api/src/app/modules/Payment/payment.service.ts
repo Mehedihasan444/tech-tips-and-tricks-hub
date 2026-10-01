@@ -28,7 +28,13 @@ const createPayment = async (payload: TPayment) => {
 
   return paymentSession;
 };
-const paymentConfirmation = async ({ transactionId, userId,}: {transactionId: string;userId: string;}) => {
+const paymentConfirmation = async ({
+  transactionId,
+  userId,
+}: {
+  transactionId: string;
+  userId: string;
+}) => {
   let payment;
   const verifyResponse = await verifyPayment(transactionId);
   if (verifyResponse && verifyResponse.pay_status === "Successful") {
@@ -38,10 +44,10 @@ const paymentConfirmation = async ({ transactionId, userId,}: {transactionId: st
       {
         $set: {
           isPremium: true,
-          subscriptionStartDate: new Date()
+          subscriptionStartDate: new Date(),
         },
       },
-      { new: true }
+      { new: true },
     );
   }
 

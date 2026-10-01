@@ -1,13 +1,13 @@
-"use client"
-import { Button, Card, CardBody, Divider, Input, Spinner,  } from "@nextui-org/react";
+"use client";
+import { Button, Card, CardBody, Divider, Input, Spinner } from "@nextui-org/react";
 import { useUpdateUser } from "@/hooks/user.hook";
 import { useUpdateProfilePhoto } from "@/hooks/user.hook";
 import { useState } from "react";
 import { useUser } from "@/context/user.provider";
 import Image from "next/image";
 
-const Settings =  () => {
-const {user,isLoading}=useUser()
+const Settings = () => {
+  const { user, isLoading } = useUser();
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -20,7 +20,7 @@ const {user,isLoading}=useUser()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +54,7 @@ const {user,isLoading}=useUser()
   return (
     <div className="container mx-auto px-4 py-8 ">
       <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Photo Section */}
         <Card className="md:col-span-1">
@@ -79,17 +79,13 @@ const {user,isLoading}=useUser()
               <Button
                 color="primary"
                 variant="flat"
-                onClick={() => document.getElementById('profile-photo')?.click()}
+                onClick={() => document.getElementById("profile-photo")?.click()}
                 fullWidth
               >
                 Change Photo
               </Button>
               {profilePhoto && (
-                <Button 
-                  color="success" 
-                  onClick={handlePhotoSubmit}
-                  fullWidth
-                >
+                <Button color="success" onClick={handlePhotoSubmit} fullWidth>
                   Save Photo
                 </Button>
               )}
@@ -102,7 +98,7 @@ const {user,isLoading}=useUser()
           <CardBody className="space-y-4">
             <h2 className="text-xl font-semibold">Personal Information</h2>
             <Divider />
-            
+
             <div className="space-y-4">
               <Input
                 label="Name"
@@ -138,11 +134,7 @@ const {user,isLoading}=useUser()
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button 
-                color="primary" 
-                onClick={handleSubmit}
-                className="w-full md:w-auto"
-              >
+              <Button color="primary" onClick={handleSubmit} className="w-full md:w-auto">
                 Save Changes
               </Button>
             </div>

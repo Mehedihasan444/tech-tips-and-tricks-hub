@@ -9,13 +9,11 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const { mutate, isPending } = useForgetPassword();
-  
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     mutate({ email });
-    setMessage(
-      "If this email exists, you will receive a password reset link shortly."
-    );
+    setMessage("If this email exists, you will receive a password reset link shortly.");
   };
 
   return (
@@ -26,17 +24,15 @@ export default function ForgotPassword() {
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
             <Mail className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold text-foreground">
-            Forgot your password?
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground">Forgot your password?</h2>
           <p className="text-default-500 text-sm">
             Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
         </div>
 
         {/* Form */}
-        <form 
-          className="mt-8 space-y-6 bg-content1 p-8 rounded-2xl shadow-lg border border-divider" 
+        <form
+          className="mt-8 space-y-6 bg-content1 p-8 rounded-2xl shadow-lg border border-divider"
           onSubmit={handleSubmit}
         >
           <Input
@@ -54,7 +50,7 @@ export default function ForgotPassword() {
             isDisabled={isPending}
             classNames={{
               input: "text-base",
-              inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+              inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
             }}
           />
 

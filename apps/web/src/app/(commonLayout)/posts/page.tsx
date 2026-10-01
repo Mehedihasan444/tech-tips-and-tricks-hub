@@ -12,7 +12,7 @@ const Page = () => {
   const router = useRouter();
   const search = searchParams.get("query");
   const { mutate: handleSearch, data, isPending } = useGetSearchedPosts();
-  
+
   useEffect(() => {
     if (!search) return;
     handleSearch(search);
@@ -43,7 +43,7 @@ const Page = () => {
             Search Results for &quot;{search}&quot;
           </h1>
           <p className="text-default-500 mt-1">
-            {data?.data?.length || 0} {data?.data?.length === 1 ? 'result' : 'results'} found
+            {data?.data?.length || 0} {data?.data?.length === 1 ? "result" : "results"} found
           </p>
         </div>
       )}
@@ -51,12 +51,10 @@ const Page = () => {
       {/* Results */}
       <div className="grid grid-cols-1 gap-5">
         {data?.data?.length > 0 ? (
-          data?.data?.map((post: TPost) => (
-            <PostCard key={post._id} post={post} />
-          ))
+          data?.data?.map((post: TPost) => <PostCard key={post._id} post={post} />)
         ) : (
           <div className="bg-content1 rounded-2xl border border-divider">
-            <EmptyState 
+            <EmptyState
               type="search"
               title="No Results Found"
               description={`We couldn't find any posts matching "${search}". Try different keywords or check your spelling.`}

@@ -15,18 +15,10 @@ import {
 } from "@nextui-org/react";
 import { Trash2, AlertTriangle } from "lucide-react";
 
-export default function DeleteConfirmationModal({
-  item,
-  title,
-}: {
-  item: any;
-  title: string;
-}) {
+export default function DeleteConfirmationModal({ item, title }: { item: any; title: string }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { mutate: handleDeleteUser, isPending: isUserLoading } =
-    useDeleteUser();
-  const { mutate: handleDeletePost, isPending: isPostLoading } =
-    useDeletePost();
+  const { mutate: handleDeleteUser, isPending: isUserLoading } = useDeleteUser();
+  const { mutate: handleDeletePost, isPending: isPostLoading } = useDeletePost();
 
   const isLoading = title === "user" ? isUserLoading : isPostLoading;
 
@@ -45,9 +37,9 @@ export default function DeleteConfirmationModal({
           <Trash2 className="text-danger hover:scale-110 transition-transform" />
         </Tooltip>
       </Button>
-      <Modal 
-        isOpen={isOpen} 
-        onOpenChange={onOpenChange} 
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
         placement="center"
         backdrop="blur"
         isDismissable={!isLoading}
@@ -73,13 +65,11 @@ export default function DeleteConfirmationModal({
                   Are you sure you want to delete{" "}
                   <strong className="text-foreground">{item?.name || item?.title}</strong>?
                 </p>
-                <p className="text-sm text-danger-500 mt-2">
-                  This action cannot be undone.
-                </p>
+                <p className="text-sm text-danger-500 mt-2">This action cannot be undone.</p>
               </ModalBody>
               <ModalFooter className="flex gap-2 justify-center pb-6">
-                <Button 
-                  variant="flat" 
+                <Button
+                  variant="flat"
                   onPress={onClose}
                   isDisabled={isLoading}
                   className="font-medium"

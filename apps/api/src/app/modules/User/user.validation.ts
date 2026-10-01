@@ -23,7 +23,6 @@ const createUserValidationSchema = z.object({
     nickName: z.string({
       required_error: "Nickname is required",
     }),
-
   }),
 });
 
@@ -48,7 +47,7 @@ const updateUserValidationSchema = z.object({
           gpa: z.string(),
           startDate: z.string(),
           endDate: z.string(),
-        })
+        }),
       )
       .optional()
       .default([]),
@@ -57,28 +56,30 @@ const updateUserValidationSchema = z.object({
         z.object({
           platform: z.string(),
           url: z.string({ message: "Invalid URL format" }),
-        })
+        }),
       )
       .optional()
       .default([]),
     nickName: z.string().optional(),
     shortBio: z.string().optional(),
-    followers:  z
-    .string({
-      required_error: "User is required",
-    })
-    .refine((val) => {
-      return mongoose.Types.ObjectId.isValid(val);
-    }).optional(),
-    following:  z
-    .string({
-      required_error: "User is required",
-    })
-    .refine((val) => {
-      return mongoose.Types.ObjectId.isValid(val);
-    }).optional(),
+    followers: z
+      .string({
+        required_error: "User is required",
+      })
+      .refine((val) => {
+        return mongoose.Types.ObjectId.isValid(val);
+      })
+      .optional(),
+    following: z
+      .string({
+        required_error: "User is required",
+      })
+      .refine((val) => {
+        return mongoose.Types.ObjectId.isValid(val);
+      })
+      .optional(),
     isPremium: z.boolean().optional(),
-    subscriptionStartDate:z.string().optional(),
+    subscriptionStartDate: z.string().optional(),
   }),
 });
 

@@ -54,7 +54,7 @@ const renderMedia = (media: string[], maxVisible: number = 5) => {
 
   return visibleMedia.map((item, index) => {
     const isLast = index === maxVisible - 1 && remainingCount > 0;
-    
+
     return (
       <a
         key={index}
@@ -81,10 +81,10 @@ const renderMedia = (media: string[], maxVisible: number = 5) => {
             `}
             priority={index < 2}
           />
-          
+
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-          
+
           {/* Zoom Icon on Hover */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="bg-black/60 backdrop-blur-sm rounded-full p-2">
@@ -110,14 +110,14 @@ const renderMedia = (media: string[], maxVisible: number = 5) => {
 const MediaGallery = ({ media }: { media: string[] }) => {
   if (!media || media.length === 0) return null;
 
-  console.log(media)
+  console.log(media);
   return (
     <div className="MediaGallery w-full">
       <LightGallery
         elementClassNames={`
           grid gap-2 
           ${getGridLayout(media.length)}
-          ${media.length === 3 ? 'grid-rows-2' : ''}
+          ${media.length === 3 ? "grid-rows-2" : ""}
         `}
         plugins={[lgThumbnail, lgZoom]}
         speed={500}
@@ -137,28 +137,28 @@ const MediaGallery = ({ media }: { media: string[] }) => {
         .lg-backdrop {
           background-color: rgba(0, 0, 0, 0.95);
         }
-        
+
         .lg-toolbar {
           background-color: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(10px);
         }
-        
+
         .lg-sub-html {
           background-color: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(10px);
           padding: 15px;
           font-size: 16px;
         }
-        
+
         .lg-thumb-outer {
           background-color: rgba(0, 0, 0, 0.8);
         }
-        
+
         .lg-thumb-item {
           border-radius: 8px;
           overflow: hidden;
         }
-        
+
         .lg-thumb-item.active {
           border-color: rgb(59, 130, 246);
         }

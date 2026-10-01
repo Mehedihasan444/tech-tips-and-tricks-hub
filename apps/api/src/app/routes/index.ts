@@ -44,8 +44,7 @@ const moduleRoutes = [
     path: "/image-upload",
     route: ImageUploadRoutes,
   },
-  { path: '/stories',
-    route: StoryRoutes }
+  { path: "/stories", route: StoryRoutes },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

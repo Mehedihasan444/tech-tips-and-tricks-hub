@@ -39,7 +39,7 @@ ChartJS.register(
   BarElement,
   ArcElement,
   Tooltip,
-  Legend
+  Legend,
 );
 
 interface AnalyticsData {
@@ -80,14 +80,13 @@ const AnalyticsPage = () => {
           totalViews += post.views || Math.floor(Math.random() * 500) + 50;
 
           if (post.category) {
-            categoryCount[post.category] =
-              (categoryCount[post.category] || 0) + 1;
+            categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
           }
         });
 
         // Get top posts by upvotes
         const sortedPosts = [...(posts || [])].sort(
-          (a, b) => (b.upvotes?.length || 0) - (a.upvotes?.length || 0)
+          (a, b) => (b.upvotes?.length || 0) - (a.upvotes?.length || 0),
         );
         const topPosts = sortedPosts.slice(0, 5).map((p) => ({
           title: p.title?.substring(0, 30) + (p.title?.length > 30 ? "..." : "") || "Untitled",
@@ -95,9 +94,10 @@ const AnalyticsPage = () => {
         }));
 
         // Category distribution
-        const categoryDistribution = Object.entries(categoryCount).map(
-          ([category, count]) => ({ category, count })
-        );
+        const categoryDistribution = Object.entries(categoryCount).map(([category, count]) => ({
+          category,
+          count,
+        }));
 
         // Generate monthly activity (simulated based on posts)
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
@@ -166,13 +166,7 @@ const AnalyticsPage = () => {
       {
         label: "Upvotes",
         data: analytics?.topPosts.map((p) => p.upvotes) || [],
-        backgroundColor: [
-          "#8b5cf6",
-          "#06b6d4",
-          "#22c55e",
-          "#f59e0b",
-          "#ef4444",
-        ],
+        backgroundColor: ["#8b5cf6", "#06b6d4", "#22c55e", "#f59e0b", "#ef4444"],
       },
     ],
   };
@@ -182,14 +176,7 @@ const AnalyticsPage = () => {
     datasets: [
       {
         data: analytics?.categoryDistribution.map((c) => c.count) || [],
-        backgroundColor: [
-          "#8b5cf6",
-          "#06b6d4",
-          "#22c55e",
-          "#f59e0b",
-          "#ef4444",
-          "#ec4899",
-        ],
+        backgroundColor: ["#8b5cf6", "#06b6d4", "#22c55e", "#f59e0b", "#ef4444", "#ec4899"],
         borderWidth: 0,
       },
     ],
@@ -197,9 +184,7 @@ const AnalyticsPage = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">
-        My Analytics
-      </h1>
+      <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -222,9 +207,7 @@ const AnalyticsPage = () => {
             </div>
             <div>
               <p className="text-xs opacity-80">Comments</p>
-              <p className="text-2xl font-bold">
-                {analytics?.totalComments || 0}
-              </p>
+              <p className="text-2xl font-bold">{analytics?.totalComments || 0}</p>
             </div>
           </CardBody>
         </Card>
@@ -236,9 +219,7 @@ const AnalyticsPage = () => {
             </div>
             <div>
               <p className="text-xs opacity-80">Upvotes</p>
-              <p className="text-2xl font-bold">
-                {analytics?.totalUpvotes || 0}
-              </p>
+              <p className="text-2xl font-bold">{analytics?.totalUpvotes || 0}</p>
             </div>
           </CardBody>
         </Card>
@@ -321,9 +302,7 @@ const AnalyticsPage = () => {
                 }}
               />
             ) : (
-              <p className="text-default-400 text-center py-8">
-                Create posts to see analytics
-              </p>
+              <p className="text-default-400 text-center py-8">Create posts to see analytics</p>
             )}
           </CardBody>
         </Card>
@@ -339,27 +318,21 @@ const AnalyticsPage = () => {
                   <Eye className="text-primary" size={20} />
                   <span>Total Views</span>
                 </div>
-                <span className="font-bold">
-                  {analytics?.totalViews?.toLocaleString() || 0}
-                </span>
+                <span className="font-bold">{analytics?.totalViews?.toLocaleString() || 0}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-default-100 rounded-lg">
                 <div className="flex items-center gap-3">
                   <ThumbsUp className="text-success" size={20} />
                   <span>Total Upvotes</span>
                 </div>
-                <span className="font-bold text-success">
-                  {analytics?.totalUpvotes || 0}
-                </span>
+                <span className="font-bold text-success">{analytics?.totalUpvotes || 0}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-default-100 rounded-lg">
                 <div className="flex items-center gap-3">
                   <ThumbsDown className="text-danger" size={20} />
                   <span>Total Downvotes</span>
                 </div>
-                <span className="font-bold text-danger">
-                  {analytics?.totalDownvotes || 0}
-                </span>
+                <span className="font-bold text-danger">{analytics?.totalDownvotes || 0}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-default-100 rounded-lg">
                 <div className="flex items-center gap-3">

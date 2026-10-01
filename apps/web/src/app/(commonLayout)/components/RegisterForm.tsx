@@ -11,7 +11,6 @@ import Link from "next/link";
 import { generateNickname } from "@/utils/generateNickname";
 import { useUser } from "@/context/user.provider";
 
-
 const profilePhoto =
   "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 
@@ -25,7 +24,7 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
-  const { setIsLoading: userLoading,user } = useUser();
+  const { setIsLoading: userLoading, user } = useUser();
   const {
     mutate: handleUserRegistration,
     isPending,
@@ -47,26 +46,25 @@ const RegisterForm = () => {
     if (isSuccess && !isPending) {
       const nickLogin = setTimeout(() => {
         handleUserLogin({ email, password });
-      }, 0)
-      
-      return () => clearTimeout(nickLogin)
+      }, 0);
+
+      return () => clearTimeout(nickLogin);
     }
- 
+
     if (isError) {
       setErrors(error?.message || "Registration failed. Please try again.");
     }
   }, [isSuccess, isPending, isError, error, handleUserLogin, email, password]);
 
-
   // 2) Login effect after registration
   useEffect(() => {
-       userLoading(isloginPending)
+    userLoading(isloginPending);
     if (isloginSuccess && !isloginPending) {
       if (redirect) {
         router.push(redirect);
-      } else if(user) {
+      } else if (user) {
         router.push("/");
-      }else{
+      } else {
         router.push("/login");
       }
     }
@@ -74,8 +72,16 @@ const RegisterForm = () => {
     if (isloginError) {
       setErrors(loginError?.message || "Login after registration failed.");
     }
-  }, [isloginSuccess, isloginPending, isloginError, loginError, redirect, router,user,userLoading]);
-
+  }, [
+    isloginSuccess,
+    isloginPending,
+    isloginError,
+    loginError,
+    redirect,
+    router,
+    user,
+    userLoading,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,9 +96,8 @@ const RegisterForm = () => {
       setErrors("Passwords do not match.");
       return;
     }
-    const nickName = generateNickname(name)
+    const nickName = generateNickname(name);
     handleUserRegistration({ name, email, password, profilePhoto, nickName });
-
   };
 
   return (
@@ -114,7 +119,7 @@ const RegisterForm = () => {
           onChange={(e) => setName(e.target.value)}
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
 
@@ -130,7 +135,7 @@ const RegisterForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
 
@@ -143,7 +148,7 @@ const RegisterForm = () => {
           placeholder="Enter your password"
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
           endContent={
             <button
@@ -191,7 +196,7 @@ const RegisterForm = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           classNames={{
             input: "text-base",
-            inputWrapper: "border-default-200 data-[hover=true]:border-default-400"
+            inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
 
@@ -199,7 +204,11 @@ const RegisterForm = () => {
         {errors && <p className="text-red-500 text-center text-sm">{errors}</p>}
 
         {/* Submit button */}
-        <SubmitBtn text="Create Account" loadingText="Creating account..." isLoading={isPending || isloginPending} />
+        <SubmitBtn
+          text="Create Account"
+          loadingText="Creating account..."
+          isLoading={isPending || isloginPending}
+        />
 
         {/* Divider */}
         <FormDivider />
@@ -211,7 +220,10 @@ const RegisterForm = () => {
         <div className="text-center">
           <p className="text-sm text-default-600">
             Already registered?{" "}
-            <Link href="/login" className="text-primary hover:text-primary-600 font-semibold transition-colors">
+            <Link
+              href="/login"
+              className="text-primary hover:text-primary-600 font-semibold transition-colors"
+            >
               Login here
             </Link>
           </p>

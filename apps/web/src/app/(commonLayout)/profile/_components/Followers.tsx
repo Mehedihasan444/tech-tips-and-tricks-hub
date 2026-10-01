@@ -13,7 +13,6 @@ const Followers = ({ user, posts }: { user: IUser; posts: TPost[] }) => {
   const { mutate: handleUserUpdate } = useUpdateUser();
   const { openChat } = useChatManager();
 
-
   const isFollower = () => {
     if (!loggedInUser || !user) return false; // Ensure loggedInUser and user are not null
     const res = user?.followers?.find((i) => i._id === loggedInUser._id);
@@ -38,7 +37,6 @@ const Followers = ({ user, posts }: { user: IUser; posts: TPost[] }) => {
     });
   };
 
-  
   return (
     <div className=" p-6  flex justify-between items-center flex-1 gap-5 text-center ">
       <div className="flex flex-col items-center justify-center">

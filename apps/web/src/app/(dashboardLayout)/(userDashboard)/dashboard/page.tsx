@@ -1,23 +1,23 @@
-"use client"
+"use client";
 import React from "react";
 import { User, BarChart2, FileText, DollarSign, Users, FolderOpen } from "lucide-react";
 import { useUser } from "@/context/user.provider";
 import Link from "next/link";
 
 const DashboardPage = () => {
-  const { user } = useUser()
-  
+  const { user } = useUser();
+
   // Calculate real stats from user data
   const followersCount = user?.followers?.length || 0;
   const followingCount = user?.following?.length || 0;
-  
+
   return (
     // bg-gradient-to-r from-blue-100 to-teal-100
     <div className="min-h-screen  p-6">
       {/* Welcome Section */}
       <div className="mb-8">
         <h2 className="text-4xl font-bold text-default-800 mb-2">
-          Welcome back, {user?.name || 'User'}! 👋
+          Welcome back, {user?.name || "User"}! 👋
         </h2>
         <p className="text-lg text-default-600">
           Here&apos;s an overview of your account and recent activities.
@@ -39,10 +39,10 @@ const DashboardPage = () => {
             <strong>Email:</strong> {user?.email}
           </p>
           <p className="text-default-600 mb-2">
-            <strong>Username:</strong> @{user?.nickName || 'N/A'}
+            <strong>Username:</strong> @{user?.nickName || "N/A"}
           </p>
           <p className="text-default-600">
-            <strong>Member Since:</strong> {user?.createdAt?.split('T')[0]}
+            <strong>Member Since:</strong> {user?.createdAt?.split("T")[0]}
           </p>
         </div>
 
@@ -59,7 +59,7 @@ const DashboardPage = () => {
             <strong>Following:</strong> {followingCount}
           </p>
           <p className="text-default-600">
-            <strong>Status:</strong> {user?.isPremium ? '⭐ Premium Member' : 'Free Account'}
+            <strong>Status:</strong> {user?.isPremium ? "⭐ Premium Member" : "Free Account"}
           </p>
           <Link
             href="/dashboard/analytics"

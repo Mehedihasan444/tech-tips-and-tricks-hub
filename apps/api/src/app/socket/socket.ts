@@ -79,7 +79,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
     // Handle user joining their room
     socket.on("join-user-room", (userIdRoom: string) => {
       socket.join(`user:${userIdRoom}`);
-      
+
       // Add to online users
       onlineUsers.set(userIdRoom, {
         odId: userIdRoom,
@@ -111,7 +111,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
     socket.on("typing-start", (data: { userId: string; userName: string; postId?: string }) => {
       const typingData: TypingData = { ...data, isTyping: true };
       typingUsers.set(data.userId, typingData);
-      
+
       if (data.postId) {
         socket.to(`post:${data.postId}`).emit("user-typing", typingData);
       }
@@ -119,14 +119,14 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
 
     socket.on("typing-stop", (data: { userId: string; postId?: string }) => {
       typingUsers.delete(data.userId);
-      
+
       const typingData: TypingData = {
         userId: data.userId,
         userName: "",
         postId: data.postId,
         isTyping: false,
       };
-      
+
       if (data.postId) {
         socket.to(`post:${data.postId}`).emit("user-typing", typingData);
       }
@@ -173,7 +173,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
     // Handle story views
     socket.on("view-story", (data: { storyId: string; userId: string }) => {
       const views = storyViews.get(data.storyId) || [];
-      
+
       // Check if user already viewed
       const alreadyViewed = views.some((v) => v.viewerId === data.userId);
       if (!alreadyViewed) {
@@ -209,7 +209,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
     socket.on("mark-notification-read", (notificationId: string) => {
       const notifications = userNotifications.get(userId) || [];
       const updated = notifications.map((n) =>
-        n.id === notificationId ? { ...n, read: true } : n
+        n.id === notificationId ? { ...n, read: true } : n,
       );
       userNotifications.set(userId, updated);
     });
@@ -227,7 +227,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
     // Handle disconnect
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${userId} (Socket: ${socket.id})`);
-      
+
       // Remove from online users
       onlineUsers.delete(userId);
       typingUsers.delete(userId);
@@ -264,7 +264,7 @@ export const sendNotification = (notification: Notification): void => {
 export const sendLikeNotification = (
   fromUser: { _id: string; name: string; profilePhoto: string },
   toUserId: string,
-  postId: string
+  postId: string,
 ): void => {
   if (fromUser._id === toUserId) return; // Don't notify self
 
@@ -287,7 +287,7 @@ export const sendCommentNotification = (
   fromUser: { _id: string; name: string; profilePhoto: string },
   toUserId: string,
   postId: string,
-  commentId: string
+  commentId: string,
 ): void => {
   if (fromUser._id === toUserId) return;
 
@@ -309,7 +309,7 @@ export const sendCommentNotification = (
 // Function to send notification for follows
 export const sendFollowNotification = (
   fromUser: { _id: string; name: string; profilePhoto: string },
-  toUserId: string
+  toUserId: string,
 ): void => {
   if (fromUser._id === toUserId) return;
 
@@ -331,7 +331,7 @@ export const sendReplyNotification = (
   fromUser: { _id: string; name: string; profilePhoto: string },
   toUserId: string,
   postId: string,
-  commentId: string
+  commentId: string,
 ): void => {
   if (fromUser._id === toUserId) return;
 

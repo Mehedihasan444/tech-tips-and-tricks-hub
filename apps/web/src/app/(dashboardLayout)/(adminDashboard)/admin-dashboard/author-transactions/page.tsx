@@ -18,13 +18,11 @@ const page = async () => {
   return (
     <div className="min-h-screen p-8">
       <div className="bg-gray-50 p-8">
-
         {/* Page Title */}
         <PageTitle title="Payment Information"></PageTitle>
 
         {/* Table Section */}
         <div className="overflow-x-auto shadow-md rounded-lg p-8">
-
           <table className="min-w-full bg-default-50 border">
             <thead>
               <tr>
@@ -40,13 +38,9 @@ const page = async () => {
               {payments && payments.length > 0 ? (
                 payments.map((payment: TPayment, index: number) => (
                   <tr key={index} className="text-default-700">
-                    <td className="border px-4 py-2">
-                      {payment.transactionId}
-                    </td>
+                    <td className="border px-4 py-2">{payment.transactionId}</td>
                     <td className="border px-4 py-2">N/A</td>
-                    <td className="border px-4 py-2">
-                      {payment?.userId?.name}
-                    </td>
+                    <td className="border px-4 py-2">{payment?.userId?.name}</td>
                     <td className="border px-4 py-2">
                       {new Date(payment.createdAt).toLocaleDateString()}
                     </td>
@@ -56,10 +50,7 @@ const page = async () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="text-center px-4 py-2 text-default-500"
-                  >
+                  <td colSpan={6} className="text-center px-4 py-2 text-default-500">
                     No payment data available.
                   </td>
                 </tr>
@@ -71,16 +62,12 @@ const page = async () => {
         {/* Footer Information */}
         <div className="text-center mt-6 text-sm text-default-500">
           If you have any issues with payments, please contact support at{" "}
-          <a
-            href="mailto:support@technest.com"
-            className="text-teal-600 underline"
-          >
+          <a href="mailto:support@technest.com" className="text-teal-600 underline">
             support@technest.com
           </a>
           .
         </div>
       </div>
-
     </div>
   );
 };

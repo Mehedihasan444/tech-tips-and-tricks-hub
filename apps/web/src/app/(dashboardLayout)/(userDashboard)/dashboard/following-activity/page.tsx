@@ -72,4 +72,3 @@ const ActivityPage = () => {
 };
 
 export default ActivityPage;
-

@@ -36,8 +36,8 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
   disabled = false,
   onClick,
 }) => {
-  const displayText = isLoading ? (loadingText || text) : text;
-  
+  const displayText = isLoading ? loadingText || text : text;
+
   return (
     <Button
       type={type}

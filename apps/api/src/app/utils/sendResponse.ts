@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response } from "express";
 
 type TResponse<T> = {
   statusCode: number;

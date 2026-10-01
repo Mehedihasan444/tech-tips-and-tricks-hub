@@ -26,12 +26,15 @@ interface ConfirmationModalProps {
   icon?: LucideIcon;
 }
 
-const typeConfig: Record<ConfirmationType, {
-  color: "danger" | "warning" | "primary" | "success";
-  icon: LucideIcon;
-  bgColor: string;
-  iconColor: string;
-}> = {
+const typeConfig: Record<
+  ConfirmationType,
+  {
+    color: "danger" | "warning" | "primary" | "success";
+    icon: LucideIcon;
+    bgColor: string;
+    iconColor: string;
+  }
+> = {
   danger: {
     color: "danger",
     icon: Trash2,
@@ -99,11 +102,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </div>
               <h3 className="text-xl font-bold text-center">{title}</h3>
             </ModalHeader>
-            
+
             <ModalBody className="text-center pb-2">
               <p className="text-default-500">{message}</p>
             </ModalBody>
-            
+
             <ModalFooter className="flex gap-2 justify-center pb-6">
               <Button
                 variant="flat"

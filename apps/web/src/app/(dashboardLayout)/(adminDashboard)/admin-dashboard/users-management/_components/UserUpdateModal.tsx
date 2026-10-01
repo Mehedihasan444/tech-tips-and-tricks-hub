@@ -33,7 +33,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
   const [role, setRole] = useState<string>(user?.role || "USER");
   const [status, setStatus] = useState<string>(user?.status || "ACTIVE");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { mutate: handleUserUpdate, isPending, isSuccess } = useUpdateUser();
 
   // Reset form when modal opens
@@ -95,18 +95,21 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
 
   return (
     <>
-      <Button 
-        onPress={onOpen} 
+      <Button
+        onPress={onOpen}
         className="bg-transparent min-w-0 w-auto h-auto p-0"
         isDisabled={isSubmitting || isPending}
       >
         <Tooltip color="primary" content="Edit user">
-          <FilePenLine className="text-primary cursor-pointer hover:scale-110 transition-transform" size={20} />
+          <FilePenLine
+            className="text-primary cursor-pointer hover:scale-110 transition-transform"
+            size={20}
+          />
         </Tooltip>
       </Button>
-      <Modal 
-        isOpen={isOpen} 
-        onOpenChange={handleClose} 
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={handleClose}
         placement="top-center"
         isDismissable={!isSubmitting && !isPending}
         hideCloseButton={isSubmitting || isPending}
@@ -124,9 +127,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                 <FilePenLine className="text-primary" size={20} />
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">Update User</span>
-                  <span className="text-sm text-default-500 font-normal">
-                    {user.name}
-                  </span>
+                  <span className="text-sm text-default-500 font-normal">{user.name}</span>
                 </div>
                 {(isSubmitting || isPending) && (
                   <Loader2 className="ml-auto animate-spin text-primary" size={20} />
@@ -149,11 +150,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                     }}
                   >
                     {roles.map((r) => (
-                      <SelectItem 
-                        key={r.key} 
-                        value={r.key}
-                        startContent={<r.icon size={16} />}
-                      >
+                      <SelectItem key={r.key} value={r.key} startContent={<r.icon size={16} />}>
                         {r.label}
                       </SelectItem>
                     ))}
@@ -175,10 +172,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                     }}
                   >
                     {statuses.map((s) => (
-                      <SelectItem 
-                        key={s.key} 
-                        value={s.key}
-                      >
+                      <SelectItem key={s.key} value={s.key}>
                         {s.label}
                       </SelectItem>
                     ))}
@@ -188,29 +182,25 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                 {/* Changes indicator */}
                 {hasChanges && (
                   <div className="bg-warning-50 border-l-4 border-warning p-3 rounded-r-lg">
-                    <p className="text-sm text-warning-700">
-                      You have unsaved changes
-                    </p>
+                    <p className="text-sm text-warning-700">You have unsaved changes</p>
                   </div>
                 )}
               </ModalBody>
               <ModalFooter className="gap-2">
-                <Button 
-                  color="default" 
-                  variant="flat" 
+                <Button
+                  color="default"
+                  variant="flat"
                   onPress={onClose}
                   isDisabled={isSubmitting || isPending}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  color="primary" 
+                <Button
+                  color="primary"
                   onPress={handleSave}
                   isLoading={isSubmitting || isPending}
                   isDisabled={isSubmitting || isPending || !hasChanges}
-                  startContent={
-                    !(isSubmitting || isPending) && <FilePenLine size={16} />
-                  }
+                  startContent={!(isSubmitting || isPending) && <FilePenLine size={16} />}
                 >
                   {isSubmitting || isPending ? "Updating..." : "Save Changes"}
                 </Button>

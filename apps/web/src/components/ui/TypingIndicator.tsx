@@ -15,7 +15,7 @@ export default function TypingIndicator({ postId, className = "" }: TypingIndica
   useEffect(() => {
     // Filter typing users for this specific post
     const usersTypingInPost = Array.from(typingUsers.values()).filter(
-      (user) => user.postId === postId && user.isTyping
+      (user) => user.postId === postId && user.isTyping,
     );
     setTypingList(usersTypingInPost);
   }, [typingUsers, postId]);

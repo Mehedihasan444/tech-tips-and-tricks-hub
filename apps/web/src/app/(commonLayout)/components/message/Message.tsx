@@ -4,15 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { SendHorizonal } from "lucide-react";
 import Image from "next/image";
 import { IUser } from "@/types/IUser";
-import {
-  useCreateComment,
-  useReplyComment,
-  useUpdateComment,
-} from "@/hooks/comment.hook";
+import { useCreateComment, useReplyComment, useUpdateComment } from "@/hooks/comment.hook";
 import Messages from "./_components/Messages";
 import { TPost } from "@/types/TPost";
 import { TComment } from "@/types/TComment";
-import { useSocket  } from "@/context/socket.provider";
+import { useSocket } from "@/context/socket.provider";
 
 const Message = ({ user, post }: { user: IUser; post: TPost }) => {
   const [comment, setComment] = useState<TComment>();
@@ -22,7 +18,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
   const [updateComment, setUpdateComment] = useState(false);
   const { startTyping, stopTyping, typingUsers } = useSocket();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // data fetch or manipulate
   const { mutate: handleCreateComment } = useCreateComment();
   const { mutate: handleReplyComment } = useReplyComment();
@@ -30,22 +26,22 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
 
   // Get typing users for this post
   const typingInThisPost = Array.from(typingUsers.values()).filter(
-    (t) => t.postId === post._id && t.isTyping
+    (t) => t.postId === post._id && t.isTyping,
   );
 
   // Handle typing indicator
   const handleTextChange = (value: string) => {
     setText(value);
-    
+
     // Start typing indicator
     if (value.length > 0) {
       startTyping(post._id);
-      
+
       // Clear existing timeout
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-      
+
       // Stop typing after 2 seconds of inactivity
       typingTimeoutRef.current = setTimeout(() => {
         stopTyping(post._id);
@@ -72,7 +68,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     if (replyTo && comment) {
       const commentData = {
         commentId: comment?._id,
@@ -87,7 +83,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
           createdAt: new Date(),
         },
       };
-       handleReplyComment(commentData);
+      handleReplyComment(commentData);
       setText("");
     } else if (updateComment && comment) {
       // edit comment logic here
@@ -105,7 +101,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
         },
       };
 
-       handleUpdateComment(updateCommentData);
+      handleUpdateComment(updateCommentData);
     } else {
       const commentData = {
         postId: post?._id,
@@ -121,7 +117,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
       setText(""); // Clear the text after submission
     }
   };
-  
+
   return (
     <div className="">
       <button className="" onClick={() => setSeeMore(!seeMore)}>
@@ -136,14 +132,23 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
         setText={setText}
         setUpdateComment={setUpdateComment}
       />
-      
+
       {/* Typing Indicator */}
       {typingInThisPost.length > 0 && (
         <div className="px-2 py-1 text-xs text-default-500 italic flex items-center gap-1">
           <span className="flex gap-0.5">
-            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+            <span
+              className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+              style={{ animationDelay: "0ms" }}
+            />
+            <span
+              className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            />
+            <span
+              className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
           </span>
           <span>
             {typingInThisPost.length === 1
@@ -152,7 +157,7 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
           </span>
         </div>
       )}
-      
+
       {/* comment textarea */}
       <div className="mt-2 flex gap-2">
         <div className="flex  ">
@@ -165,35 +170,27 @@ const Message = ({ user, post }: { user: IUser; post: TPost }) => {
           />
         </div>
         <div className="flex-1">
-   
-
-            <Textarea
-              value={text} // Use undefined instead of null
-              onChange={(e) => handleTextChange(e.target.value)}
-              label={
-                replyTo ? (
-                  <span className="text-xs text-primary">
-                    replying to @{replyTo}
-                  </span>
-                ) : null
-              }
-              variant="faded"
-              placeholder="Write a comment"
-              disableAnimation
-              disableAutosize
-              endContent={
-                text && (
-                  <button onClick={() => handleComment()}>
-                    <SendHorizonal className="text-primary" />
-                  </button>
-                )
-              }
-              classNames={{
-                input: "resize-y",
-              }}
-            />
-  
-         
+          <Textarea
+            value={text} // Use undefined instead of null
+            onChange={(e) => handleTextChange(e.target.value)}
+            label={
+              replyTo ? <span className="text-xs text-primary">replying to @{replyTo}</span> : null
+            }
+            variant="faded"
+            placeholder="Write a comment"
+            disableAnimation
+            disableAutosize
+            endContent={
+              text && (
+                <button onClick={() => handleComment()}>
+                  <SendHorizonal className="text-primary" />
+                </button>
+              )
+            }
+            classNames={{
+              input: "resize-y",
+            }}
+          />
         </div>
       </div>
     </div>

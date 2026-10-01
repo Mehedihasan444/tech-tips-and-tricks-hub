@@ -1,7 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Divider, Link, Tooltip, Avatar, Badge } from "@nextui-org/react";
-import { ThumbsDown, ThumbsUp, Share2, MessageCircle, Bookmark, Clock, Crown, TrendingUp, MoreVertical, Eye } from "lucide-react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Chip,
+  Divider,
+  Link,
+  Tooltip,
+  Avatar,
+  Badge,
+} from "@nextui-org/react";
+import {
+  ThumbsDown,
+  ThumbsUp,
+  Share2,
+  MessageCircle,
+  Bookmark,
+  Clock,
+  Crown,
+  TrendingUp,
+  MoreVertical,
+  Eye,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import MediaGallery from "./MediaGallery";
 import parse from "html-react-parser";
@@ -12,7 +35,7 @@ import Message from "./message/Message";
 import { toast } from "sonner";
 import { getAllCommentsOfASinglePost } from "@/services/CommentService";
 import { IUser } from "@/types/IUser";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/context/socket.provider";
 
 const CHARACTER_LIMIT = 300;
@@ -31,7 +54,10 @@ const PostCard = ({ post }: { post: any }) => {
   const router = useRouter();
 
   const isAuthorOnline = user?._id && onlineUsers.includes(user._id);
-  const isPremiumLocked = post?.isPremium && !loggedInUser?.isPremium && post?.author?.nickName !== loggedInUser?.nickName;
+  const isPremiumLocked =
+    post?.isPremium &&
+    !loggedInUser?.isPremium &&
+    post?.author?.nickName !== loggedInUser?.nickName;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -59,8 +85,8 @@ const PostCard = ({ post }: { post: any }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleLikesAndDislikes = (type: 'like' | 'dislike') => {
-    if (type === 'like') {
+  const handleLikesAndDislikes = (type: "like" | "dislike") => {
+    if (type === "like") {
       setIsLiked(!isLiked);
       if (isDisliked) setIsDisliked(false);
     } else {
@@ -70,13 +96,13 @@ const PostCard = ({ post }: { post: any }) => {
 
     const formData = new FormData();
     const updatedPostData: { likes?: number; dislikes?: number } = {};
-    
-    if (type === 'dislike') {
+
+    if (type === "dislike") {
       updatedPostData.dislikes = post.dislikes + 1;
-    } else if (type === 'like') {
+    } else if (type === "like") {
       updatedPostData.likes = post.likes + 1;
     }
-    
+
     formData.append("data", JSON.stringify(updatedPostData));
     handleUpdatePost({ formData, postId: post._id });
   };
@@ -126,7 +152,7 @@ const PostCard = ({ post }: { post: any }) => {
                     src={user?.profilePhoto}
                     size="lg"
                     isBordered
-                    color={user?.isPremium ? 'warning' : 'primary'}
+                    color={user?.isPremium ? "warning" : "primary"}
                     className="flex-shrink-0 hover:scale-105 transition-transform cursor-pointer"
                   />
                 </Badge>
@@ -191,12 +217,7 @@ const PostCard = ({ post }: { post: any }) => {
                   Trending
                 </Chip>
               )}
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="hover:bg-default-100"
-              >
+              <Button isIconOnly variant="light" size="sm" className="hover:bg-default-100">
                 <MoreVertical size={18} />
               </Button>
             </div>
@@ -205,12 +226,7 @@ const PostCard = ({ post }: { post: any }) => {
           {/* Category Badge */}
           {post.category && (
             <div className="flex w-full">
-              <Chip
-                variant="bordered"
-                size="sm"
-                color="secondary"
-                className="font-medium"
-              >
+              <Chip variant="bordered" size="sm" color="secondary" className="font-medium">
                 {post.category}
               </Chip>
             </div>
@@ -222,14 +238,9 @@ const PostCard = ({ post }: { post: any }) => {
           {/* Title */}
           <div className="space-y-2">
             {isPremiumLocked ? (
-              <h3 className="text-2xl font-bold text-foreground leading-tight">
-                {post.title}
-              </h3>
+              <h3 className="text-2xl font-bold text-foreground leading-tight">{post.title}</h3>
             ) : (
-              <Link
-                href={`/posts/${post._id}`}
-                className="group"
-              >
+              <Link href={`/posts/${post._id}`} className="group">
                 <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
                   {post.title}
                 </h3>
@@ -242,7 +253,7 @@ const PostCard = ({ post }: { post: any }) => {
             {isPremiumLocked ? (
               <>
                 <div className="prose prose-sm max-w-none text-default-700 blur-sm select-none line-clamp-4">
-                  {parse(post.content || '')}
+                  {parse(post.content || "")}
                 </div>
                 <div className="flex flex-col items-center gap-3 py-4 bg-gradient-to-t from-warning-50 to-transparent rounded-lg mt-2">
                   <div className="flex items-center gap-2 text-warning">
@@ -265,10 +276,10 @@ const PostCard = ({ post }: { post: any }) => {
               <>
                 <div className="prose prose-sm max-w-none text-default-700">
                   {isExpanded ? (
-                    parse(post.content || '')
+                    parse(post.content || "")
                   ) : (
                     <>
-                      {parse(post.content?.slice(0, CHARACTER_LIMIT) || '')}
+                      {parse(post.content?.slice(0, CHARACTER_LIMIT) || "")}
                       {post.content?.length > CHARACTER_LIMIT && (
                         <span className="text-default-500">... </span>
                       )}
@@ -279,7 +290,7 @@ const PostCard = ({ post }: { post: any }) => {
                       onClick={handleReadMore}
                       className="text-default-600 hover:text-primary font-semibold ml-1 transition-colors"
                     >
-                      {isExpanded ? 'See less' : 'See more'}
+                      {isExpanded ? "See less" : "See more"}
                     </button>
                   )}
                 </div>
@@ -289,7 +300,7 @@ const PostCard = ({ post }: { post: any }) => {
 
           {/* Media Gallery */}
           {post?.images?.length > 0 && (
-            <div className={`${isPremiumLocked ? 'blur-md select-none' : ''}`}>
+            <div className={`${isPremiumLocked ? "blur-md select-none" : ""}`}>
               <MediaGallery media={post.images} />
             </div>
           )}
@@ -324,12 +335,12 @@ const PostCard = ({ post }: { post: any }) => {
                   variant="light"
                   size="sm"
                   startContent={
-                    <ThumbsUp 
-                      className={`w-5 h-5 transition-colors ${isLiked ? 'fill-primary text-primary' : 'text-default-500'}`} 
+                    <ThumbsUp
+                      className={`w-5 h-5 transition-colors ${isLiked ? "fill-primary text-primary" : "text-default-500"}`}
                     />
                   }
-                  onClick={() => handleLikesAndDislikes('like')}
-                  className={`font-semibold ${isLiked ? 'text-primary' : 'text-default-600'}`}
+                  onClick={() => handleLikesAndDislikes("like")}
+                  className={`font-semibold ${isLiked ? "text-primary" : "text-default-600"}`}
                 >
                   {post.likes + (isLiked ? 1 : 0)}
                 </Button>
@@ -340,12 +351,12 @@ const PostCard = ({ post }: { post: any }) => {
                   variant="light"
                   size="sm"
                   startContent={
-                    <ThumbsDown 
-                      className={`w-5 h-5 transition-colors ${isDisliked ? 'fill-danger text-danger' : 'text-default-500'}`} 
+                    <ThumbsDown
+                      className={`w-5 h-5 transition-colors ${isDisliked ? "fill-danger text-danger" : "text-default-500"}`}
                     />
                   }
-                  onClick={() => handleLikesAndDislikes('dislike')}
-                  className={`font-semibold ${isDisliked ? 'text-danger' : 'text-default-600'}`}
+                  onClick={() => handleLikesAndDislikes("dislike")}
+                  className={`font-semibold ${isDisliked ? "text-danger" : "text-default-600"}`}
                 >
                   {post.dislikes + (isDisliked ? 1 : 0)}
                 </Button>
@@ -355,9 +366,13 @@ const PostCard = ({ post }: { post: any }) => {
                 <Button
                   variant="light"
                   size="sm"
-                  startContent={<MessageCircle className={`w-5 h-5 ${messageOpen ? 'text-primary' : 'text-default-500'}`} />}
+                  startContent={
+                    <MessageCircle
+                      className={`w-5 h-5 ${messageOpen ? "text-primary" : "text-default-500"}`}
+                    />
+                  }
                   onClick={handleMessage}
-                  className={`font-semibold ${messageOpen ? 'text-primary' : 'text-default-600'}`}
+                  className={`font-semibold ${messageOpen ? "text-primary" : "text-default-600"}`}
                 >
                   {numberOfComments}
                 </Button>
@@ -390,7 +405,7 @@ const PostCard = ({ post }: { post: any }) => {
                   Share
                 </Button>
               </Tooltip>
-              
+
               <Tooltip content={isBookmarked ? "Remove bookmark" : "Bookmark"}>
                 <Button
                   isIconOnly
@@ -399,8 +414,8 @@ const PostCard = ({ post }: { post: any }) => {
                   onClick={handleBookmark}
                   className="hover:bg-default-100"
                 >
-                  <Bookmark 
-                    className={`w-5 h-5 transition-all ${isBookmarked ? 'fill-primary text-primary' : 'text-default-500'}`}
+                  <Bookmark
+                    className={`w-5 h-5 transition-all ${isBookmarked ? "fill-primary text-primary" : "text-default-500"}`}
                   />
                 </Button>
               </Tooltip>

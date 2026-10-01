@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { User, Tooltip, Button, Divider } from "@nextui-org/react";
 import { ThumbsUp, ThumbsDown, Share2, ArrowLeft } from "lucide-react";
@@ -21,9 +19,8 @@ const PostDetailPage = async ({ params: { PostId } }: IProps) => {
     <div className="m-6 space-y-5 max-w-5xl mx-auto">
       <div className="flex justify-between items-center w-full">
         <Link href={`/`}>
-        <ArrowLeft />
+          <ArrowLeft />
         </Link>
-
 
         {/* breadcrumb */}
         <nav aria-label="Breadcrumb" className="text-sm">
@@ -55,9 +52,7 @@ const PostDetailPage = async ({ params: { PostId } }: IProps) => {
               avatarProps={{ src: post.author.profilePhoto, radius: "lg" }}
               name={post.author.name}
               description={
-                <Link href={`/profile/${post.author.nickName}`}>
-                  {post.author.nickName}
-                </Link>
+                <Link href={`/profile/${post.author.nickName}`}>{post.author.nickName}</Link>
               }
             />
             <h3 className="text-default-300 pr-5">

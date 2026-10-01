@@ -8,7 +8,7 @@ import { RequestHandler } from "express";
 const createStory = catchAsync(async (req, res) => {
   // console.log(Array.isArray(req.files) ? req.files : req.files?.['image'][0], "files")
 
-  const image = Array.isArray(req.files) ? req.files : req.files?.['image'][0]
+  const image = Array.isArray(req.files) ? req.files : req.files?.["image"][0];
 
   const result = await StoryService.createStory(image, req.user);
 

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Navbar,
-  NavbarContent,
-  NavbarItem,
-  Badge,
-} from "@nextui-org/react";
+import { Button, Navbar, NavbarContent, NavbarItem, Badge } from "@nextui-org/react";
 import Searchbar from "../Searchbar";
 import ProfileDropdown from "../ProfileDropdown";
 import { ThemeSwitcher } from "./ThemeSwitcher";
@@ -20,9 +14,9 @@ export default function NavigationBar() {
   const { isConnected } = useSocket();
 
   return (
-    <Navbar 
+    <Navbar
       maxWidth="full"
-      className="border-b border-divider backdrop-blur-md bg-background/70 py-2" 
+      className="border-b border-divider backdrop-blur-md bg-background/70 py-2"
       position="sticky"
       isBordered
     >
@@ -46,18 +40,18 @@ export default function NavigationBar() {
 
         {/* Messages - Opens Chat Manager */}
         <NavbarItem>
-          <Badge 
-            content="" 
-            color="primary" 
+          <Badge
+            content=""
+            color="primary"
             size="sm"
             placement="top-right"
             className="border-2 border-background"
             isInvisible={!isConnected}
             isDot
           >
-            <Button 
-              isIconOnly 
-              variant="light" 
+            <Button
+              isIconOnly
+              variant="light"
               radius="full"
               className="hover:bg-default-100 transition-colors"
               aria-label="Messages"

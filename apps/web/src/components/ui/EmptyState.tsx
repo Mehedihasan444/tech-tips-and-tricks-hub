@@ -1,27 +1,27 @@
 "use client";
 import React from "react";
 import { Button } from "@nextui-org/react";
-import { 
-  FileText, 
-  Search, 
-  Users, 
-  MessageCircle, 
-  Bookmark, 
+import {
+  FileText,
+  Search,
+  Users,
+  MessageCircle,
+  Bookmark,
   Heart,
   Bell,
   Settings,
   Image as ImageIcon,
   LucideIcon,
   Plus,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
 
-type EmptyStateType = 
-  | "posts" 
-  | "search" 
-  | "comments" 
-  | "friends" 
-  | "bookmarks" 
+type EmptyStateType =
+  | "posts"
+  | "search"
+  | "comments"
+  | "friends"
+  | "bookmarks"
   | "notifications"
   | "followers"
   | "following"
@@ -40,13 +40,16 @@ interface EmptyStateProps {
   showIllustration?: boolean;
 }
 
-const typeConfig: Record<EmptyStateType, {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  actionLabel?: string;
-  color: string;
-}> = {
+const typeConfig: Record<
+  EmptyStateType,
+  {
+    icon: LucideIcon;
+    title: string;
+    description: string;
+    actionLabel?: string;
+    color: string;
+  }
+> = {
   posts: {
     icon: FileText,
     title: "No posts yet",
@@ -138,12 +141,14 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <div className="relative mb-6">
           {/* Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full blur-2xl opacity-50 scale-150" />
-          
+
           {/* Main icon container */}
-          <div className={`relative w-24 h-24 rounded-full bg-default-100 flex items-center justify-center border-2 border-dashed border-default-300`}>
+          <div
+            className={`relative w-24 h-24 rounded-full bg-default-100 flex items-center justify-center border-2 border-dashed border-default-300`}
+          >
             <Icon className="w-10 h-10 text-default-400" strokeWidth={1.5} />
           </div>
-          
+
           {/* Floating decorations */}
           <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-primary-400" />
@@ -156,12 +161,8 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 
       {/* Content */}
       <div className="max-w-sm space-y-2">
-        <h3 className="text-xl font-semibold text-foreground">
-          {displayTitle}
-        </h3>
-        <p className="text-default-500 text-sm leading-relaxed">
-          {displayDescription}
-        </p>
+        <h3 className="text-xl font-semibold text-foreground">{displayTitle}</h3>
+        <p className="text-default-500 text-sm leading-relaxed">{displayDescription}</p>
       </div>
 
       {/* Actions */}

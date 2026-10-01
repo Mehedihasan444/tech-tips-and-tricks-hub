@@ -20,8 +20,7 @@ const updateUserFollowListAndFollowersList = catchAsync(async (req, res) => {
   if (!id && !req.body) {
     throw new AppError(400, "Something went wrong");
   }
-  const updatedUser =
-    await UserServices.updateUserFollowListAndFollowersListInDB(id, req.body);
+  const updatedUser = await UserServices.updateUserFollowListAndFollowersListInDB(id, req.body);
 
   sendResponse(res, {
     success: true,
@@ -66,7 +65,7 @@ const updateProfilePhoto = catchAsync(async (req, res) => {
   if (!req.files) {
     throw new AppError(400, "No profile picture found");
   }
-  await UserServices.updateProfilePhoto(req.body,req.files  as TImageFiles);
+  await UserServices.updateProfilePhoto(req.body, req.files as TImageFiles);
 
   sendResponse(res, {
     success: true,

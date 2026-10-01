@@ -22,7 +22,7 @@ export const createPost = async (formData: FormData): Promise<any> => {
   }
 };
 
-export const getPosts = async (page=1,limit=10) => {
+export const getPosts = async (page = 1, limit = 10) => {
   const fetchOption = {
     cache: "no-store" as RequestCache,
   };
@@ -61,10 +61,7 @@ export const getMyPosts = async (id: string) => {
   return res.data;
 };
 
-export const updatePost = async (
-  formData: FormData,
-  postId: string
-): Promise<any> => {
+export const updatePost = async (formData: FormData, postId: string): Promise<any> => {
   try {
     const { data } = await axiosInstance.put(`/posts/${postId}`, formData, {
       headers: {

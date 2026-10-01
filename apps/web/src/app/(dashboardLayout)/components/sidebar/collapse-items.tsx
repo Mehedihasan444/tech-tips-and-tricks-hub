@@ -19,7 +19,6 @@ interface Props {
 }
 
 export const CollapseItems = ({ icon, items, title, isActive }: Props) => {
-
   return (
     <div className="flex gap-4 h-full items-center cursor-pointer">
       <Accordion className="px-0">
@@ -36,7 +35,7 @@ export const CollapseItems = ({ icon, items, title, isActive }: Props) => {
           aria-label="Accordion 1"
           title={
             <div className="flex flex-row gap-2 ">
-              <span >{icon}</span>
+              <span>{icon}</span>
               <span>{title}</span>
             </div>
           }

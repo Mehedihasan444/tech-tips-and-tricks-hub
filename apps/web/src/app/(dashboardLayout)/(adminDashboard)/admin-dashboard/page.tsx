@@ -1,8 +1,8 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Bar } from 'react-chartjs-2';
-import { Doughnut } from 'react-chartjs-2';
+"use client";
+import React, { useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,12 +14,12 @@ import {
   Tooltip,
   Legend,
   ArcElement,
-} from 'chart.js';
-import PageTitle from '../../components/_page-title/PageTitle';
-import { Card, CardBody, Spinner } from '@nextui-org/react';
-import { Users, FileText, MessageSquare, TrendingUp, DollarSign, Eye } from 'lucide-react';
-import { getUsers } from '@/services/UserService';
-import { getPosts } from '@/services/PostService';
+} from "chart.js";
+import PageTitle from "../../components/_page-title/PageTitle";
+import { Card, CardBody, Spinner } from "@nextui-org/react";
+import { Users, FileText, MessageSquare, TrendingUp, DollarSign, Eye } from "lucide-react";
+import { getUsers } from "@/services/UserService";
+import { getPosts } from "@/services/PostService";
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +30,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 interface DashboardStats {
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch users
         const usersResponse = await getUsers(1, 1000);
         const users = usersResponse?.data?.data || [];
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
         for (let i = 6; i >= 0; i--) {
           const date = new Date(today);
           date.setDate(date.getDate() - i);
-          const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
           recentActivity.push({
             date: dateStr,
             users: Math.floor(Math.random() * 50) + 10,
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
           recentActivity,
         });
       } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
+        console.error("Error fetching dashboard stats:", error);
       } finally {
         setLoading(false);
       }
@@ -111,22 +111,22 @@ const AdminDashboard = () => {
 
   // Chart data
   const activityData = {
-    labels: stats.recentActivity.map(a => a.date),
+    labels: stats.recentActivity.map((a) => a.date),
     datasets: [
       {
-        label: 'New Users',
-        data: stats.recentActivity.map(a => a.users),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        label: "New Users",
+        data: stats.recentActivity.map((a) => a.users),
+        borderColor: "#8b5cf6",
+        backgroundColor: "rgba(139, 92, 246, 0.1)",
         borderWidth: 2,
         fill: true,
         tension: 0.4,
       },
       {
-        label: 'New Posts',
-        data: stats.recentActivity.map(a => a.posts),
-        borderColor: '#06b6d4',
-        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+        label: "New Posts",
+        data: stats.recentActivity.map((a) => a.posts),
+        borderColor: "#06b6d4",
+        backgroundColor: "rgba(6, 182, 212, 0.1)",
         borderWidth: 2,
         fill: true,
         tension: 0.4,
@@ -135,23 +135,23 @@ const AdminDashboard = () => {
   };
 
   const userTypeData = {
-    labels: ['Free Users', 'Premium Users'],
+    labels: ["Free Users", "Premium Users"],
     datasets: [
       {
         data: [stats.totalUsers - stats.premiumUsers, stats.premiumUsers],
-        backgroundColor: ['#64748b', '#f59e0b'],
+        backgroundColor: ["#64748b", "#f59e0b"],
         borderWidth: 0,
       },
     ],
   };
 
   const engagementData = {
-    labels: ['Upvotes', 'Comments', 'Posts'],
+    labels: ["Upvotes", "Comments", "Posts"],
     datasets: [
       {
-        label: 'Engagement',
+        label: "Engagement",
         data: [stats.totalReactions, stats.totalComments, stats.totalPosts],
-        backgroundColor: ['#22c55e', '#3b82f6', '#8b5cf6'],
+        backgroundColor: ["#22c55e", "#3b82f6", "#8b5cf6"],
       },
     ],
   };
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6">
-      <PageTitle title='Admin Dashboard' />
+      <PageTitle title="Admin Dashboard" />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -224,14 +224,16 @@ const AdminDashboard = () => {
         {/* Activity Trend */}
         <Card className="lg:col-span-2">
           <CardBody className="p-5">
-            <h3 className="text-lg font-bold mb-4 text-default-800">Activity Trend (Last 7 Days)</h3>
-            <Line 
-              data={activityData} 
-              options={{ 
+            <h3 className="text-lg font-bold mb-4 text-default-800">
+              Activity Trend (Last 7 Days)
+            </h3>
+            <Line
+              data={activityData}
+              options={{
                 responsive: true,
                 plugins: {
                   legend: {
-                    position: 'bottom',
+                    position: "bottom",
                   },
                 },
                 scales: {
@@ -239,7 +241,7 @@ const AdminDashboard = () => {
                     beginAtZero: true,
                   },
                 },
-              }} 
+              }}
             />
           </CardBody>
         </Card>
@@ -250,22 +252,23 @@ const AdminDashboard = () => {
             <h3 className="text-lg font-bold mb-4 text-default-800">User Distribution</h3>
             <div className="flex justify-center">
               <div className="w-48 h-48">
-                <Doughnut 
-                  data={userTypeData} 
-                  options={{ 
+                <Doughnut
+                  data={userTypeData}
+                  options={{
                     responsive: true,
                     plugins: {
                       legend: {
-                        position: 'bottom',
+                        position: "bottom",
                       },
                     },
-                  }} 
+                  }}
                 />
               </div>
             </div>
             <div className="mt-4 text-center">
               <p className="text-sm text-default-500">
-                <span className="text-amber-500 font-semibold">{stats.premiumUsers}</span> Premium Users
+                <span className="text-amber-500 font-semibold">{stats.premiumUsers}</span> Premium
+                Users
               </p>
             </div>
           </CardBody>
@@ -277,16 +280,16 @@ const AdminDashboard = () => {
         <Card>
           <CardBody className="p-5">
             <h3 className="text-lg font-bold mb-4 text-default-800">Platform Engagement</h3>
-            <Bar 
-              data={engagementData} 
-              options={{ 
+            <Bar
+              data={engagementData}
+              options={{
                 responsive: true,
                 plugins: {
                   legend: {
                     display: false,
                   },
                 },
-              }} 
+              }}
             />
           </CardBody>
         </Card>
@@ -296,19 +299,31 @@ const AdminDashboard = () => {
           <CardBody className="p-5">
             <h3 className="text-lg font-bold mb-4 text-default-800">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-4">
-              <a href="/admin-dashboard/users-management" className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center">
+              <a
+                href="/admin-dashboard/users-management"
+                className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center"
+              >
                 <Users className="mx-auto mb-2 text-primary" size={24} />
                 <p className="text-sm font-medium">Manage Users</p>
               </a>
-              <a href="/admin-dashboard/posts-management" className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center">
+              <a
+                href="/admin-dashboard/posts-management"
+                className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center"
+              >
                 <FileText className="mx-auto mb-2 text-secondary" size={24} />
                 <p className="text-sm font-medium">Manage Posts</p>
               </a>
-              <a href="/admin-dashboard/author-transactions" className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center">
+              <a
+                href="/admin-dashboard/author-transactions"
+                className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center"
+              >
                 <DollarSign className="mx-auto mb-2 text-success" size={24} />
                 <p className="text-sm font-medium">Transactions</p>
               </a>
-              <a href="/admin-dashboard/reports" className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center">
+              <a
+                href="/admin-dashboard/reports"
+                className="p-4 bg-default-100 rounded-xl hover:bg-default-200 transition-colors text-center"
+              >
                 <Eye className="mx-auto mb-2 text-warning" size={24} />
                 <p className="text-sm font-medium">View Reports</p>
               </a>

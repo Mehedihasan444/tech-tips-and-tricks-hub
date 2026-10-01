@@ -12,7 +12,7 @@ export const AdminLayout = ({ children }: Props) => {
   return (
     <section className="flex">
       <AdminSidebarWrapper></AdminSidebarWrapper>
-    <NavbarWrapper>{children}</NavbarWrapper>
+      <NavbarWrapper>{children}</NavbarWrapper>
     </section>
   );
 };

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation<any, Error, FormData>({
     mutationKey: ["CREATE_POST"],
     mutationFn: async (postData) => await createPost(postData),
@@ -23,7 +23,7 @@ export const useCreatePost = () => {
 export const useUpdatePost = () => {
   return useMutation<any, Error, { postId: string; formData: FormData }>({
     mutationKey: ["UPDATE_POST"],
-    mutationFn: async ({ postId, formData }) => await updatePost(formData,postId ), // Destructure the input
+    mutationFn: async ({ postId, formData }) => await updatePost(formData, postId), // Destructure the input
     onSuccess: () => {
       toast.success("Post updated successfully");
     },
@@ -44,4 +44,3 @@ export const useDeletePost = () => {
     },
   });
 };
-

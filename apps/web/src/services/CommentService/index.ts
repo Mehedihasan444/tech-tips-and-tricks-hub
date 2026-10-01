@@ -6,9 +6,7 @@ import envConfig from "@/config/envConfig";
 import { TCommentCreate, TReplyComment } from "@/hooks/comment.hook";
 import { revalidateTag } from "next/cache";
 
-export const createComment = async (
-  commentData: TCommentCreate
-): Promise<any> => {
+export const createComment = async (commentData: TCommentCreate): Promise<any> => {
   try {
     const { data } = await axiosInstance.post("/comments", commentData, {
       headers: {
@@ -24,9 +22,7 @@ export const createComment = async (
     throw new Error("Failed to post comment");
   }
 };
-export const replyComment = async (
-  commentData: TReplyComment
-): Promise<any> => {
+export const replyComment = async (commentData: TReplyComment): Promise<any> => {
   try {
     const { data } = await axiosInstance.post("/comments", commentData, {
       headers: {
@@ -42,9 +38,7 @@ export const replyComment = async (
     throw new Error("Failed to post comment");
   }
 };
-export const updateComment = async (
-  commentData: TReplyComment
-): Promise<any> => {
+export const updateComment = async (commentData: TReplyComment): Promise<any> => {
   try {
     const { data } = await axiosInstance.put("/comments", commentData, {
       headers: {
@@ -60,10 +54,7 @@ export const updateComment = async (
     throw new Error("Failed to post comment");
   }
 };
-export const deleteComment = async (
-  commentId: string,
-  postId: string
-): Promise<any> => {
+export const deleteComment = async (commentId: string, postId: string): Promise<any> => {
   try {
     const { data } = await axiosInstance.delete(`/comments`, {
       params: { commentId, postId },
@@ -89,10 +80,7 @@ export const getAllCommentsOfASinglePost = async (postId: string) => {
     },
   };
 
-  const res = await fetch(
-    `${envConfig.baseApi}/comments?postId=${postId}`,
-    fetchOption
-  );
+  const res = await fetch(`${envConfig.baseApi}/comments?postId=${postId}`, fetchOption);
 
   return res.json();
 };

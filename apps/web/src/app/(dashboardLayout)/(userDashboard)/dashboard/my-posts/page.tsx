@@ -25,10 +25,7 @@ const MyPosts = async () => {
       {/* Posts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {posts?.map((post: TPost) => (
-          <div
-            key={post._id}
-            className="bg-default-50 rounded-lg shadow-lg overflow-hidden"
-          >
+          <div key={post._id} className="bg-default-50 rounded-lg shadow-lg overflow-hidden">
             <Image
               width={300}
               height={300}
@@ -37,9 +34,7 @@ const MyPosts = async () => {
               className="w-full h-48 object-cover"
             />
             <div className="p-6 space-y-2">
-              <h2 className="text-2xl font-semibold text-default-800 ">
-                {post.title}
-              </h2>
+              <h2 className="text-2xl font-semibold text-default-800 ">{post.title}</h2>
               <div
                 className="text-default-600 "
                 dangerouslySetInnerHTML={{
@@ -51,24 +46,18 @@ const MyPosts = async () => {
               />
 
               <p className="text-sm text-default-500">
-                <span className="font-semibold text-sm text-default-500">
-                  Posted at:{" "}
-                </span>
+                <span className="font-semibold text-sm text-default-500">Posted at: </span>
                 {post.createdAt.split("T")[0]}
               </p>
 
               {/* Displaying category and tags */}
               <div className="">
                 {/* Display category */}
-                <span className="font-semibold text-sm text-default-500">
-                  Category:{" "}
-                </span>
+                <span className="font-semibold text-sm text-default-500">Category: </span>
                 <span className="text-sm text-default-600">{post.category}</span>
               </div>
               <div className="">
-                <span className="font-semibold text-sm text-default-500">
-                  Tags:{" "}
-                </span>
+                <span className="font-semibold text-sm text-default-500">Tags: </span>
                 {/* Display tags */}
                 <div className="flex flex-wrap gap-2  mt-1">
                   {post.tags.map((tag) => (

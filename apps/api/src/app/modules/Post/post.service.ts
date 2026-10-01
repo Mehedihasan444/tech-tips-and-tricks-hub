@@ -1,9 +1,6 @@
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import { TImageFile, TImageFiles } from "../../interfaces/image.interface";
-import {
-  addDocumentToIndex,
-  deleteDocumentFromIndex,
-} from "../../utils/meilisearch";
+import { addDocumentToIndex, deleteDocumentFromIndex } from "../../utils/meilisearch";
 import { PostsSearchableFields } from "./post.constant";
 import { TPost } from "./post.interface";
 import { Post } from "./post.model";
@@ -29,11 +26,7 @@ const createPostIntoDB = async (payload: TPost, images: any) => {
     return result;
   }
 };
-const updatePostInDB = async (
-  postId: string,
-  payload: TPost,
-  images: TImageFiles
-) => {
+const updatePostInDB = async (postId: string, payload: TPost, images: TImageFiles) => {
   if (images.postImages) {
     const { postImages } = images;
     const previousImages = payload.images || [];
@@ -72,15 +65,13 @@ const getAllPostsFromDB = async (query: Record<string, unknown>) => {
   const limit = Number(query?.limit) || 10;
   const pageCount = Math.ceil(totalPosts / limit);
 
-  if (query?.page|| query?.limit) {
-    
+  if (query?.page || query?.limit) {
     return {
       data: result,
       pageCount,
       currentPage: Number(query?.page) || 1,
     };
-  }
-  else{
+  } else {
     return result;
   }
 };

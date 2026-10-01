@@ -1,5 +1,5 @@
-import { cloudinaryUpload } from '../config/cloudinary.config';
-import { TImageFiles } from '../interfaces/image.interface';
+import { cloudinaryUpload } from "../config/cloudinary.config";
+import { TImageFiles } from "../interfaces/image.interface";
 
 export const deleteImageFromCloudinary = (files: TImageFiles) => {
   const publicIds: string[] = [];
@@ -13,14 +13,14 @@ export const deleteImageFromCloudinary = (files: TImageFiles) => {
   return new Promise((resolve, reject) => {
     cloudinaryUpload.api.delete_resources(
       publicIds,
-      { resource_type: 'image' },
-      (error:any, result:any) => {
+      { resource_type: "image" },
+      (error: any, result: any) => {
         if (error) {
           reject(error);
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };

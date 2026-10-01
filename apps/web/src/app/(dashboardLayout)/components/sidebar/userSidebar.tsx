@@ -29,7 +29,7 @@ export const SidebarWrapper = () => {
         })}
       >
         <div className={Sidebar.Header()}>
-         <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">T</span>
             </div>
@@ -72,7 +72,7 @@ export const SidebarWrapper = () => {
                 items={[
                   {
                     title: "Create Post",
-                    icon: <BadgePlus/>,
+                    icon: <BadgePlus />,
                     href: "/dashboard/create-post",
                   },
                   {
