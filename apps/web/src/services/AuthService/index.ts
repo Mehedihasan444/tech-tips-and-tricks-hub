@@ -13,9 +13,10 @@ export const registerUser = async (userData: Record<string, unknown>) => {
     const { data } = await axiosInstance.post("/auth/register", userData);
 
     if (data.success) {
-      cookies().set("accessToken", data?.data?.accessToken);
-      cookies().set("refreshToken", data?.data?.refreshToken);
-      revalidateTag("users");
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", data?.data?.accessToken);
+      cookieStore.set("refreshToken", data?.data?.refreshToken);
+      revalidateTag("users", "max");
     }
 
     return data;
@@ -33,8 +34,9 @@ export const loginUser = async (userData: Record<string, unknown>) => {
     const { data } = await axiosInstance.post("/auth/login", userData);
 
     if (data.success) {
-      cookies().set("accessToken", data?.data?.accessToken);
-      cookies().set("refreshToken", data?.data?.refreshToken);
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", data?.data?.accessToken);
+      cookieStore.set("refreshToken", data?.data?.refreshToken);
     }
 
     return data;
@@ -64,7 +66,8 @@ export const resetPassword = async (userData: Record<string, unknown>) => {
   try {
     const { token, ...newData } = userData;
     if (typeof token === "string") {
-      cookies().set("accessToken", token);
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", token);
     }
 
     const { data } = await axiosInstance.post("/auth/reset-password", newData);
@@ -75,13 +78,15 @@ export const resetPassword = async (userData: Record<string, unknown>) => {
   }
 };
 
-export const logout = () => {
-  cookies().delete("accessToken");
-  cookies().delete("refreshToken");
+export const logout = async () => {
+  const cookieStore = await cookies();
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = cookies().get("accessToken")?.value;
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
 
   let decodedToken = null;
 
@@ -98,7 +103,8 @@ export const getCurrentUser = async () => {
 
 export const getNewAccessToken = async () => {
   try {
-    const refreshToken = cookies().get("refreshToken")?.value;
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("refreshToken")?.value;
 
     const res = await axiosInstance({
       url: "/auth/refresh-token",

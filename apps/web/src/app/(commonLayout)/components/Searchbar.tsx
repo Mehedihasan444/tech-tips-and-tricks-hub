@@ -58,15 +58,12 @@ const Searchbar = () => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder="Search tech tips, tutorials, guides..."
-          className="w-full pl-12 pr-12 py-3 bg-default-100 border-2 border-transparent rounded-xl 
-                     focus:outline-none focus:border-primary focus:bg-background
-                     transition-all duration-200 text-sm placeholder:text-default-400"
+          className="w-full pl-12 pr-12 py-3 bg-default-100 border-2 border-transparent rounded-xl focus:outline-none focus:border-primary focus:bg-background transition-all duration-200 text-sm placeholder:text-default-400"
         />
         {search && (
           <button
             onClick={clearSearch}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-default-400 
-                       hover:text-default-600 transition-colors"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-default-400 hover:text-default-600 transition-colors"
             aria-label="Clear search"
           >
             <X size={18} />
@@ -98,9 +95,7 @@ const Searchbar = () => {
                     <Link
                       key={post._id}
                       href={`/posts/${post._id}`}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-default-100 
-                                 transition-all duration-200 group border border-transparent 
-                                 hover:border-default-200"
+                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-default-100 transition-all duration-200 group border border-transparent hover:border-default-200"
                       onClick={() => {
                         setSearch("");
                         setSearchResults([]);
@@ -119,10 +114,7 @@ const Searchbar = () => {
 
                       {/* Post Info */}
                       <div className="flex-1 min-w-0">
-                        <h3
-                          className="text-sm font-semibold text-foreground line-clamp-1 
-                                       group-hover:text-primary transition-colors"
-                        >
+                        <h3 className="text-sm font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                           {post.title}
                         </h3>
                         <div className="mt-1 flex items-center gap-2">

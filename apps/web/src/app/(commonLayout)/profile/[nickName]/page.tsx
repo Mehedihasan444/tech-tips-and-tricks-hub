@@ -17,12 +17,13 @@ import AllFollowings from "../_components/AllFollowings";
 import UpdateProfilePhoto from "../_components/UpdateProfilePhoto";
 
 interface IProps {
-  params: {
+  params: Promise<{
     nickName: string;
-  };
+  }>;
 }
 
-const ProfilePage = async ({ params: { nickName } }: IProps) => {
+const ProfilePage = async ({ params }: IProps) => {
+  const { nickName } = await params;
   const { data: user = {} } = await getUser(nickName);
   const { data: posts = {} } = await getMyPosts(user?._id);
   const loggedInUser = await getCurrentUser();

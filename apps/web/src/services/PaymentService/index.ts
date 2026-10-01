@@ -16,7 +16,7 @@ export const createPayment = async (userId: string): Promise<any> => {
       },
     );
 
-    revalidateTag("payments");
+    revalidateTag("payments", "max");
 
     return data;
   } catch (error) {

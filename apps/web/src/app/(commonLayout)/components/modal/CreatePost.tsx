@@ -472,7 +472,7 @@ export default function CreatePost() {
                         <div className="flex flex-wrap gap-1.5">
                           {items.map((item) => (
                             <Chip key={item.key} size="sm" color="primary" variant="flat">
-                              {item.key}
+                              {String(item.key)}
                             </Chip>
                           ))}
                         </div>

@@ -13,7 +13,7 @@ export const createPost = async (formData: FormData): Promise<any> => {
       },
     });
 
-    revalidateTag("posts");
+    revalidateTag("posts", "max");
 
     return data;
   } catch (error) {
@@ -69,7 +69,7 @@ export const updatePost = async (formData: FormData, postId: string): Promise<an
       },
     });
 
-    revalidateTag("posts");
+    revalidateTag("posts", "max");
 
     return data;
   } catch (error) {
@@ -81,7 +81,7 @@ export const updatePost = async (formData: FormData, postId: string): Promise<an
 export const deletePost = async (postId: string) => {
   try {
     const res = await axiosInstance.delete(`/posts/${postId}`);
-    revalidateTag("posts");
+    revalidateTag("posts", "max");
     return res.data;
   } catch (error) {
     console.log(error);

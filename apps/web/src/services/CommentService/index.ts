@@ -14,7 +14,7 @@ export const createComment = async (commentData: TCommentCreate): Promise<any> =
       },
     });
 
-    revalidateTag("comments");
+    revalidateTag("comments", "max");
 
     return data;
   } catch (error) {
@@ -30,7 +30,7 @@ export const replyComment = async (commentData: TReplyComment): Promise<any> => 
       },
     });
 
-    revalidateTag("comments");
+    revalidateTag("comments", "max");
 
     return data;
   } catch (error) {
@@ -46,7 +46,7 @@ export const updateComment = async (commentData: TReplyComment): Promise<any> =>
       },
     });
 
-    revalidateTag("comments");
+    revalidateTag("comments", "max");
 
     return data;
   } catch (error) {
@@ -63,7 +63,7 @@ export const deleteComment = async (commentId: string, postId: string): Promise<
       },
     });
 
-    revalidateTag("comments");
+    revalidateTag("comments", "max");
 
     return data;
   } catch (error) {

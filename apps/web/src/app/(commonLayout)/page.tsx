@@ -209,7 +209,7 @@ const NewsFeed = () => {
     });
 
     if (currentLoader) {
-      observer.observe(loaderRef.current);
+      observer.observe(currentLoader);
     }
 
     return () => {

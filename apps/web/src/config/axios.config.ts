@@ -8,8 +8,8 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  function (config) {
-    const cookieStore = cookies();
+  async function (config) {
+    const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
 
     if (accessToken) {
@@ -36,7 +36,8 @@ axiosInstance.interceptors.response.use(
       const accessToken = res.data.accessToken;
 
       config.headers["Authorization"] = accessToken;
-      cookies().set("accessToken", accessToken);
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", accessToken);
 
       return axiosInstance(config);
     } else {

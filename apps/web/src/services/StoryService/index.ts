@@ -11,7 +11,7 @@ export const createStory = async (formData: FormData): Promise<any> => {
       },
     });
 
-    revalidateTag("stories");
+    revalidateTag("stories", "max");
 
     return data;
   } catch (error) {
@@ -37,7 +37,7 @@ export const getStories = async () => {
 // Add a function to manually trigger revalidation
 export const refreshStories = async () => {
   try {
-    revalidateTag("stories");
+    revalidateTag("stories", "max");
     return { success: true };
   } catch (error) {
     console.error("Error revalidating stories:", error);
@@ -48,7 +48,7 @@ export const refreshStories = async () => {
 export const deleteStory = async (storyId: string) => {
   try {
     const res = await axiosInstance.delete(`/stories/${storyId}`);
-    revalidateTag("stories");
+    revalidateTag("stories", "max");
     return res.data;
   } catch (error) {
     console.log(error);

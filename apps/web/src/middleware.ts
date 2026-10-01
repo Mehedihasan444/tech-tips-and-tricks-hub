@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { cookies } from "next/headers";
 import { decode } from "./utils/jwt.decode";
 
 interface TDecode {
@@ -20,8 +19,8 @@ const AuthRoutes = ["/login", "/register", "/forget-password", "/reset-password"
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check for access token
-  const accessToken = cookies().get("accessToken")?.value;
+  // Check for access token (use request cookies in middleware — edge-safe)
+  const accessToken = request.cookies.get("accessToken")?.value;
 
   if (!accessToken) {
     // If user is not logged in, allow access to auth routes only

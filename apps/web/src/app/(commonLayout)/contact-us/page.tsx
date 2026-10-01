@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Card } from "@nextui-org/react";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram } from "lucide-react";

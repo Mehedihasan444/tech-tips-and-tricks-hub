@@ -45,7 +45,7 @@ export const updateUser = async (userData: IUserData, userId: string): Promise<a
       },
     });
 
-    revalidateTag("users");
+    revalidateTag("users", "max");
 
     return data;
   } catch (error) {
@@ -61,7 +61,7 @@ export const updateProfilePhoto = async (userData: FormData): Promise<any> => {
       },
     });
 
-    revalidateTag("users");
+    revalidateTag("users", "max");
 
     return data;
   } catch (error) {
@@ -72,7 +72,7 @@ export const updateProfilePhoto = async (userData: FormData): Promise<any> => {
 export const deleteUser = async (userId: string) => {
   try {
     const res = await axiosInstance.delete(`/users/${userId}`);
-    revalidateTag("users");
+    revalidateTag("users", "max");
     return res.data;
   } catch (error) {
     console.log(error);

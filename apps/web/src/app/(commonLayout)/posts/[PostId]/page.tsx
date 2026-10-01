@@ -7,12 +7,13 @@ import Link from "next/link";
 import DownloadPdf from "../_components/DownloadPdf";
 
 interface IProps {
-  params: {
+  params: Promise<{
     PostId: string;
-  };
+  }>;
 }
 
-const PostDetailPage = async ({ params: { PostId } }: IProps) => {
+const PostDetailPage = async ({ params }: IProps) => {
+  const { PostId } = await params;
   const { data: post } = await getPost(PostId);
 
   return (

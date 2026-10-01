@@ -29,8 +29,9 @@ export const AuthOptions: NextAuthOptions = {
           });
 
           if (response.data.data.accessToken || response.data.data.refreshToken) {
-            cookies().set("accessToken", response.data.data.accessToken);
-            cookies().set("refreshToken", response.data.data.refreshToken);
+            const cookieStore = await cookies();
+            cookieStore.set("accessToken", response.data.data.accessToken);
+            cookieStore.set("refreshToken", response.data.data.refreshToken);
             return true;
           } else {
             return false;

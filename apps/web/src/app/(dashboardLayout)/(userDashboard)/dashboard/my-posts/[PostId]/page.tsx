@@ -6,12 +6,13 @@ import Image from "next/image";
 import DownloadPdf from "@/app/(commonLayout)/posts/_components/DownloadPdf";
 
 interface IProps {
-  params: {
+  params: Promise<{
     PostId: string;
-  };
+  }>;
 }
 
-const PostDetailPage = async ({ params: { PostId } }: IProps) => {
+const PostDetailPage = async ({ params }: IProps) => {
+  const { PostId } = await params;
   const { data: post } = await getPost(PostId);
   return (
     <div className="m-6 space-y-5">
