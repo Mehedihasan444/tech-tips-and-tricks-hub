@@ -3,7 +3,7 @@
 A full-stack social platform where users publish tech tips and tutorials, with real-time chat,
 stories, comments, search, and a premium subscription tier.
 
-This repository is a **[Turborepo](https://turborepo.com) monorepo** using **npm workspaces**.
+This repository is a **[Turborepo](https://turborepo.com) monorepo** using **pnpm workspaces**.
 
 ![Turborepo](https://img.shields.io/badge/Turborepo-2.11.5-black?style=flat-square&logo=turborepo)
 ![Next.js](https://img.shields.io/badge/Next.js-14.2.14-black?style=flat-square&logo=next.js)
@@ -51,8 +51,8 @@ AamarPay
 
 ## Prerequisites
 
-- **Node.js >= 18.18.0** (developed and verified on v22.22.3)
-- **npm** (this repo uses npm workspaces; `packageManager` is pinned to `npm@12.0.1`)
+- **Node.js >= 20.19.0** (developed and verified on v22.22.3, pinned via `.nvmrc`)
+- **pnpm >= 9** (this repo uses pnpm workspaces; `packageManager` is pinned to `pnpm@12.8.1`)
 - **MongoDB** running locally (or a reachable connection string)
 - Optional: a **Meilisearch** instance (search degrades if absent)
 
@@ -62,7 +62,7 @@ AamarPay
 
 ```bash
 # 1. Install all workspace dependencies from the repo root (single lockfile)
-npm install
+pnpm install
 
 # 2. Create your env files
 cp apps/api/.env.example apps/api/.env
@@ -71,14 +71,14 @@ cp apps/web/.env.example apps/web/.env.local
 # 3. Fill in the values (see Environment Variables below)
 
 # 4. Start client and server together
-npm run dev
+pnpm dev
 ```
 
-`npm run dev` runs both apps in parallel via Turbo. To run just one:
+`pnpm dev` runs both apps in parallel via Turbo. To run just one:
 
 ```bash
-npm run dev --workspace=@tech-tips-hub/api   # API on  :5000
-npm run dev --workspace=@tech-tips-hub/web   # Web  on  :3000
+pnpm --filter @tech-tips-hub/api dev   # API on  :5000
+pnpm --filter @tech-tips-hub/web dev   # Web  on  :3000
 ```
 
 | App | Dev URL |
@@ -145,7 +145,7 @@ Variables marked *Feature* are only needed when that feature is used (uploads, e
 > **`JWT_ACCESS_SECRET` must be identical in both apps.** `apps/web/src/middleware.ts` decodes
 > the access-token cookie with it to enforce role-based routing.
 
-> **Build-time requirement** — `NEXT_PUBLIC_SERVER_URL` must be set when running `npm run build`.
+> **Build-time requirement** — `NEXT_PUBLIC_SERVER_URL` must be set when running `pnpm build`.
 > It is embedded into the client bundle at build time. Turbo treats it as a cache input, so
 > changing it correctly invalidates the cache and triggers a rebuild.
 
@@ -155,15 +155,15 @@ Variables marked *Feature* are only needed when that feature is used (uploads, e
 
 | Script | Description |
 |---|---|
-| `npm run dev` | Run client + server dev servers in parallel |
-| `npm run build` | Build both packages (Turbo caches the output) |
-| `npm run start` | Start production servers for both packages |
-| `npm run lint` | Lint both packages (API currently fails on pre-existing errors) |
-| `npm run lint:web` | Lint the web app only (currently clean) |
-| `npm run lint:api` | Lint the API app only |
-| `npm run type-check` | Type-check both packages without emitting |
-| `npm run clean` | Remove build output, caches, and `node_modules` |
-| `npm run format` | Format the repo with Prettier |
+| `pnpm dev` | Run client + server dev servers in parallel |
+| `pnpm build` | Build both packages (Turbo caches the output) |
+| `pnpm start` | Start production servers for both packages |
+| `pnpm lint` | Lint both packages (API currently fails on pre-existing errors) |
+| `pnpm lint:web` | Lint the web app only (currently clean) |
+| `pnpm lint:api` | Lint the API app only |
+| `pnpm type-check` | Type-check both packages without emitting |
+| `pnpm clean` | Remove build output, caches, and `node_modules` |
+| `pnpm format` | Format the repo with Prettier |
 
 Tasks are defined in `turbo.json`. `build` caches to `.next/` and `dist/`; `dev` and `start` are
 persistent and never cached.
@@ -203,7 +203,7 @@ tech-tips-and-tricks-hub/
 │               ├── modules/     # feature modules (see API Reference)
 │               ├── socket/      # Socket.IO gateway
 │               └── utils/       # seeding, email, Meilisearch, token helpers
-├── package.json         # npm workspaces root
+├── package.json         # pnpm workspaces root
 ├── turbo.json           # task graph + cache config
 └── package-lock.json    # single lockfile for the whole workspace
 ```
@@ -312,15 +312,15 @@ Both apps deploy independently. In a monorepo, set **Root Directory** on each pl
 **Client (Vercel)**
 
 - Root Directory: `apps/web`
-- Build Command: `npm run build`
-- Install Command: `npm install`
+- Build Command: `pnpm build`
+- Install Command: `pnpm install`
 - Environment: the `apps/web` variables above
 
 **Server (Railway / Render / Fly.io)**
 
 - Root Directory: `apps/api`
-- Build Command: `npm run build`
-- Start Command: `npm run start:prod`
+- Build Command: `pnpm build`
+- Start Command: `pnpm start:prod`
 - Environment: the `apps/api` variables above
 - Requires a hosted MongoDB
 
@@ -356,15 +356,15 @@ Legacy remotes, kept for reference:
   uses Node APIs. The build warns but succeeds.
 - **Blocked install scripts.** npm skipped postinstall scripts for `sharp`, `core-js`, and
   `unrs-resolver`. Run `npm install-scripts approve <pkg>` if you hit native-module errors.
-- **`npm run lint` fails on the API.** `apps/api` has 41 pre-existing ESLint errors
+- **`pnpm lint` fails on the API.** `apps/api` has 41 pre-existing ESLint errors
   (`no-explicit-any`, `no-unused-vars`, `prefer-const`, `no-unsafe-optional-chaining`) plus 26
   `no-console` warnings. These are inherited from the original codebase, not introduced here.
-  `npm run lint:web` is clean. Use `npm run lint:api` / `npm run lint:web` to target one package.
+  `pnpm lint:web` is clean. Use `pnpm lint:api` / `pnpm lint:web` to target one package.
 - **No tests.** Neither package has a test suite configured.
 
 ### Changes made during the monorepo migration
 
-These were required to get `npm run build` passing; all are pre-existing issues that the old
+These were required to get `pnpm build` passing; all are pre-existing issues that the old
 per-package lockfiles were hiding.
 
 - Added `export const dynamic = "force-dynamic"` to the admin `author-transactions` and
@@ -381,8 +381,8 @@ per-package lockfiles were hiding.
 
 ```bash
 git checkout -b feature/my-change
-npm run type-check && npm run lint
-npm run build
+pnpm type-check && pnpm lint
+pnpm build
 ```
 
 Use conventional commit prefixes (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`).

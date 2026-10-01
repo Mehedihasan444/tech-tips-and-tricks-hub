@@ -3,28 +3,26 @@
   "version": "1.0.0",
   "private": true,
   "description": "Tech Tips & Tricks Hub - Turborepo monorepo containing the Next.js web app and the Express API.",
-  "workspaces": [
-    "apps/*"
-  ],
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",
-    "lint:api": "npm run lint --workspace=@tech-tips-hub/api",
-    "lint:web": "npm run lint --workspace=@tech-tips-hub/web",
+    "lint:api": "pnpm --filter @tech-tips-hub/api lint",
+    "lint:web": "pnpm --filter @tech-tips-hub/web lint",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean && rm -rf node_modules .turbo apps/*/.next apps/*/dist",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.4.2",
-    "turbo": "^2.11.5",
-    "typescript": "^5.7.2"
-  },
-  "engines": {
-    "node": ">=18.18.0"
-  },
-  "packageManager": "npm@12.0.1"
+    "prettier": "^3.6.2",
+    "turbo": "^2.11.6",
+    "typescript": "^5.9.2"
+  }
 }
