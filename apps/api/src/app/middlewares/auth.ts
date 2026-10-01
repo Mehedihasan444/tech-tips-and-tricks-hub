@@ -10,9 +10,15 @@ import { USER_ROLE } from "../modules/User/user.constant";
 
 const auth = (...requiredRoles: (keyof typeof USER_ROLE)[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
+    const header = req.headers.authorization;
 
     // checking if the token is missing
+    if (!header) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+    }
+
+    // Accept both "Bearer <token>" and raw "<token>" (legacy clients)
+    const token = header.startsWith("Bearer ") ? header.slice(7).trim() : header.trim();
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
