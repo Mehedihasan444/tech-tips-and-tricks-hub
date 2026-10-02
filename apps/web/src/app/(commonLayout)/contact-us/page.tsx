@@ -2,7 +2,8 @@
 
 import React from "react";
 import { Card } from "@heroui/react";
-import { Phone, Mail, MapPin, Facebook, Twitter, Instagram } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { FacebookIcon, XIcon, InstagramIcon } from "@/components/ui/BrandIcons";
 // import MapSection from "./_components/MapSection";
 import ContactForm from "./_components/ContactForm";
 import dynamic from "next/dynamic";
@@ -51,21 +52,21 @@ const ContactUs = () => {
                   aria-label="Follow us on Facebook"
                   className="text-teal-600 hover:text-teal-800"
                 >
-                  <Facebook />
+                  <FacebookIcon />
                 </a>
                 <a
                   href="#"
-                  aria-label="Follow us on Twitter"
+                  aria-label="Follow us on X"
                   className="text-teal-600 hover:text-teal-800"
                 >
-                  <Twitter />
+                  <XIcon />
                 </a>
                 <a
                   href="#"
                   aria-label="Follow us on Instagram"
                   className="text-teal-600 hover:text-teal-800"
                 >
-                  <Instagram />
+                  <InstagramIcon />
                 </a>
               </div>
             </Card>

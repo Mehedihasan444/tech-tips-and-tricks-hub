@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Github, Globe, Linkedin, Twitter, Plus, X, PenBoxIcon } from "lucide-react";
+import { Globe, Plus, X, PenBoxIcon } from "lucide-react";
+import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/BrandIcons";
 import Link from "next/link";
 import { IUser } from "@/types/IUser";
 import { useUpdateUser } from "@/hooks/user.hook";
@@ -293,13 +294,13 @@ const PersonalInformation = ({
                   let IconComponent;
                   switch (media.platform) {
                     case "github":
-                      IconComponent = Github;
+                      IconComponent = GithubIcon;
                       break;
                     case "linkedin":
-                      IconComponent = Linkedin;
+                      IconComponent = LinkedinIcon;
                       break;
                     case "twitter":
-                      IconComponent = Twitter;
+                      IconComponent = XIcon;
                       break;
                     case "portfolio":
                       IconComponent = Globe;
