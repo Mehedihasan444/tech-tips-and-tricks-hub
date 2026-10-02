@@ -1,5 +1,4 @@
 import { QueryBuilder } from "../../builder/QueryBuilder";
-import meiliClient from "../../utils/meilisearch";
 import { PostsSearchableFields } from "../Post/post.constant";
 import { Post } from "../Post/post.model";
 import {

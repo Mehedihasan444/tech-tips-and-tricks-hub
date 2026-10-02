@@ -366,7 +366,7 @@ Legacy remotes, kept for reference:
 - **Edge runtime warnings.** `apps/web/src/utils/jwt.decode.ts` imports `jsonwebtoken`, which
   uses Node APIs. The build warns but succeeds.
 - **`pnpm lint` fails on the API.** `apps/api` reports pre-existing ESLint errors
-  (currently ~59 errors / ~28 warnings: `no-explicit-any`, `no-unused-vars`, etc.). These are
+  (currently ~33 errors / ~28 warnings: `no-explicit-any`, `no-unsafe-optional-chaining`, etc.). These are
   inherited from the original codebase. Use `pnpm lint:api` / `pnpm lint:web` to target one package.
 - **Minimal tests.** Both packages have Vitest wired up (`pnpm test`) with first sample suites
   (`getRouteParam`, `generateNickname`). Coverage is still thin — add suites per feature.

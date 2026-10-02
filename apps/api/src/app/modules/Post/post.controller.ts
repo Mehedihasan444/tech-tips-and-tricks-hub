@@ -1,5 +1,4 @@
 import httpStatus from "http-status";
-import AppError from "../../errors/AppError";
 import { TImageFiles } from "../../interfaces/image.interface";
 import { catchAsync } from "../../utils/catchAsync";
 import { getRouteParam } from "../../utils/getRouteParam";

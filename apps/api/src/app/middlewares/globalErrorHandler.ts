@@ -10,6 +10,9 @@ import { TErrorSources } from "../interfaces/error.interface";
 import { TImageFiles } from "../interfaces/image.interface";
 import { deleteImageFromCloudinary } from "../utils/deleteImage";
 
+// `next` is intentionally unused: Express detects error-handling middleware
+// by its 4-argument arity, so the parameter must stay.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   //setting default values
   let statusCode = 500;

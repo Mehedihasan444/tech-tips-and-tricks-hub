@@ -35,8 +35,6 @@ const createStory = async (image: any, user: JwtPayload) => {
 
 // Get all active stories of user and stories of users they follow
 const getAllStories = async (user: JwtPayload) => {
-  // Get all active stories
-  const stories = await Story.find({ isActive: true }).sort({ createdAt: -1 }).lean();
   // Get user's following list
   const userFriend = await User.findById(user._id).populate("following");
 

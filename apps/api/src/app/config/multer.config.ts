@@ -16,6 +16,10 @@ const buildPublicId = (file: Express.Multer.File) =>
  * `file.path` = secure URL, `file.filename` = public id.
  */
 class CloudinaryStorageEngine implements multer.StorageEngine {
+  // Parameter types are explicit because class methods don't inherit
+  // contextual types from the implemented interface. The `error`/`info`
+  // names below mirror multer's StorageEngine callback shape.
+  /* eslint-disable no-unused-vars */
   _handleFile(
     _req: Request,
     file: Express.Multer.File,
@@ -50,6 +54,7 @@ class CloudinaryStorageEngine implements multer.StorageEngine {
       .then(() => cb(null))
       .catch(() => cb(null));
   }
+  /* eslint-enable no-unused-vars */
 }
 
 const imageFilter: multer.Options["fileFilter"] = (_req, file, cb) => {

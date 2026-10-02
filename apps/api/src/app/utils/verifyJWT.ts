@@ -26,7 +26,7 @@ export const createToken = (
 export const verifyToken = (token: string, secret: string): JwtPayload | Error => {
   try {
     return jwt.verify(token, secret) as JwtPayload;
-  } catch (error: any) {
+  } catch {
     throw new AppError(401, "You are not authorized!");
   }
 };

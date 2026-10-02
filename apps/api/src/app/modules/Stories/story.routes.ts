@@ -1,13 +1,8 @@
 import express from "express";
 import auth from "../../middlewares/auth";
-import validateRequest from "../../middlewares/validateRequest";
 import { StoryController } from "./story.controller";
-import { createStoryValidationSchema } from "./story.validation";
 import { USER_ROLE } from "../User/user.constant";
 import { multerUpload } from "../../config/multer.config";
-import validateImageFileRequest from "../../middlewares/validateImageFileRequest";
-import { ImageFilesArrayZodSchema } from "../../zod/image.validation";
-import { parseBody } from "../../middlewares/bodyParser";
 
 const router = express.Router();
 
