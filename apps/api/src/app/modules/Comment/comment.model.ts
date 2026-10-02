@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import { TComment } from "./comment.interface";
 
 // Define the schema for the embedded child comments
-let childCommentSchema = new Schema({
+const childCommentSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, required: true }, // Define _id explicitly
   postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
   commentText: { type: String, required: true },
@@ -19,7 +19,7 @@ let childCommentSchema = new Schema({
 childCommentSchema.add({ children: [childCommentSchema] });
 
 // Define the main comment schema
-let commentSchema = new Schema<TComment>(
+const commentSchema = new Schema<TComment>(
   {
     postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
     commentText: { type: String, required: true },
