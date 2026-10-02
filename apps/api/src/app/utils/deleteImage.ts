@@ -1,7 +1,7 @@
 import { cloudinaryUpload } from "../config/cloudinary.config";
 import { TImageFiles } from "../interfaces/image.interface";
 
-export const deleteImageFromCloudinary = (files: TImageFiles) => {
+export const deleteImageFromCloudinary = async (files: TImageFiles) => {
   const publicIds: string[] = [];
 
   for (const file of Object.values(files)) {
@@ -10,17 +10,9 @@ export const deleteImageFromCloudinary = (files: TImageFiles) => {
     }
   }
 
-  return new Promise((resolve, reject) => {
-    cloudinaryUpload.api.delete_resources(
-      publicIds,
-      { resource_type: "image" },
-      (error: any, result: any) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      },
-    );
-  });
+  if (publicIds.length === 0) {
+    return null;
+  }
+
+  return cloudinaryUpload.api.delete_resources(publicIds, { resource_type: "image" });
 };
