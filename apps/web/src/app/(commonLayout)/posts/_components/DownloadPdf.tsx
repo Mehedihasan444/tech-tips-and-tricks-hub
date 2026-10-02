@@ -6,13 +6,15 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { Download } from "lucide-react";
 
-// @types/pdfmake >= 0.2.10 types "pdfmake/build/vfs_fonts" as a flat string map,
+// @types/pdfmake types "pdfmake/build/vfs_fonts" as a flat string map,
 // but at runtime it exports { pdfMake: { vfs } }. Narrow it to the real shape.
 const fonts = pdfFonts as unknown as {
   pdfMake: { vfs: Record<string, string> };
 };
 
-pdfMake.vfs = fonts.pdfMake.vfs;
+// pdfmake 0.3 types no longer expose .vfs on the pdfMake instance;
+// assign through a narrow cast (runtime shape is unchanged).
+(pdfMake as unknown as { vfs: Record<string, string> }).vfs = fonts.pdfMake.vfs;
 
 const DownloadPdf = ({ post }: { post: TPost }) => {
   // Helper function to convert image URL to base64
