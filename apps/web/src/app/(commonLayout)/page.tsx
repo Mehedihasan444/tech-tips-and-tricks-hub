@@ -7,7 +7,7 @@ import CreatePost from "./components/modal/CreatePost";
 import PostFilter from "./components/PostFilter";
 import PostCard from "./components/PostCard";
 import { StoriesSection } from "./components/stories/stories-section";
-import { UserPlus, TrendingUp } from "lucide-react";
+import { UserPlus, TrendingUp, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import { useUser } from "@/context/user.provider";
@@ -224,6 +224,55 @@ const NewsFeed = () => {
         <div className="flex gap-6 px-6 py-4 max-w-[1600px] mx-auto w-full">
           {/* Main Feed */}
           <div className="flex-1 max-w-3xl mx-auto w-full space-y-6">
+            {/* Welcome hero for visitors — hidden once logged in */}
+            {!loggedInUser && (
+              <section className="hero-premium relative overflow-hidden rounded-2xl shadow-card border border-white/10 animate-fade-up">
+                <div
+                  className="hero-grid pointer-events-none absolute inset-0"
+                  aria-hidden="true"
+                />
+                <div className="relative p-6 sm:p-8">
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    startContent={<Sparkles size={14} />}
+                    className="bg-white/10 text-white backdrop-blur border border-white/15"
+                  >
+                    Community-driven knowledge
+                  </Chip>
+                  <h1 className="mt-4 max-w-xl text-balance text-3xl sm:text-4xl font-extrabold leading-tight text-white">
+                    Level up your stack, one tip at a time.
+                  </h1>
+                  <p className="mt-3 max-w-xl text-sm sm:text-base text-white/80">
+                    Bite-size tutorials, real-world fixes, and premium deep-dives from engineers
+                    shipping in production. Free forever — no spam, just signal.
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Button
+                      as="a"
+                      href="/register"
+                      className="bg-white text-teal-900 font-semibold"
+                      endContent={<ArrowRight size={16} />}
+                    >
+                      Join the community
+                    </Button>
+                    <Button
+                      as="a"
+                      href="/posts"
+                      variant="bordered"
+                      className="border-white/30 text-white font-semibold"
+                    >
+                      Explore posts
+                    </Button>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-xs text-white/70">
+                    <ShieldCheck size={14} />
+                    <span>Free forever · Real engineers · New tips daily</span>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Stories Section */}
             <div className="bg-content1 rounded-2xl shadow-sm border border-divider overflow-hidden">
               <StoriesSection />

@@ -5,35 +5,116 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #00b3a6;
-  --color-secondary: #ff6f61;
+  /* Brand — teal primary scale */
+  --color-primary-50: #effcfb;
+  --color-primary-100: #c9f5f1;
+  --color-primary-200: #93ebe3;
+  --color-primary-300: #55d9d0;
+  --color-primary-400: #26bfb8;
+  --color-primary-500: #00b3a6;
+  --color-primary-600: #03867f;
+  --color-primary-700: #076b67;
+  --color-primary-800: #0b5552;
+  --color-primary-900: #0e4745;
+
+  /* Brand — coral secondary scale */
+  --color-secondary-50: #fff3f1;
+  --color-secondary-100: #ffe4e0;
+  --color-secondary-200: #ffcdc6;
+  --color-secondary-300: #ffa89d;
+  --color-secondary-400: #ff7a6b;
+  --color-secondary-500: #ff6f61;
+  --color-secondary-600: #e04a3c;
+  --color-secondary-700: #bc372c;
+
+  /* Back-compat aliases used across the app (bg-primary, text-secondary, …) */
+  --color-primary: var(--color-primary-500);
+  --color-secondary: var(--color-secondary-500);
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Shape */
+  --radius-card: 1rem;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px -4px rgb(0 0 0 / 0.08);
+  --shadow-pop: 0 8px 32px -8px rgb(0 0 0 / 0.2);
+
+  /* Motion */
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
 }
 
 :root {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
   --primary: var(--color-primary);
   --secondary: var(--color-secondary);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  color-scheme: dark;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Roboto", sans-serif; /* For body */
-  /* font-family: Arial, Helvetica, sans-serif; */
-  /* font-family: 'Merriweather', serif; For headings */
+  font-family: var(--font-sans);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Premium gradient hero surface (light + dark aware) */
+  .hero-premium {
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgb(0 179 166 / 0.22), transparent 60%),
+      radial-gradient(900px 380px at 95% 10%, rgb(255 111 97 / 0.2), transparent 60%),
+      linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800) 55%, #123b3f);
+  }
+  .dark .hero-premium {
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgb(0 179 166 / 0.28), transparent 60%),
+      radial-gradient(900px 380px at 95% 10%, rgb(255 111 97 / 0.24), transparent 60%),
+      linear-gradient(135deg, #073b39, #0b2527 60%, #060f10);
+  }
+
+  /* Subtle grid texture for hero surfaces */
+  .hero-grid {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 55%, transparent 100%);
   }
 }
 
