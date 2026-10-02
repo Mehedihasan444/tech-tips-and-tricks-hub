@@ -15,7 +15,10 @@ export default tseslint.config(
   {
     rules: {
       "no-unused-vars": "error",
-      "no-undef": "error",
+      // typescript-eslint's no-undef is not type-aware and false-positives on
+      // ambient namespaces (e.g. Express.Multer.File from @types/multer).
+      // tsc already rejects genuinely undefined variables.
+      "no-undef": "off",
       "prefer-const": "error",
       "no-console": "warn",
     },
