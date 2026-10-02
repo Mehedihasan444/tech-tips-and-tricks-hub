@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import type { NextAuthConfig } from "next-auth";
+import Google from "next-auth/providers/google";
 import { cookies } from "next/headers";
 import axiosInstance from "./axios.config";
 import { generateNickname } from "@/utils/generateNickname";
 
-export const AuthOptions: NextAuthOptions = {
+export const authConfig = {
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_ID as string,
       clientSecret: process.env.GOOGLE_SECRET as string,
     }),
@@ -49,5 +49,10 @@ export const AuthOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET as string,
-};
+  // Auth.js v5 prefers AUTH_SECRET; fall back to the legacy NEXTAUTH_SECRET.
+  secret: (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET) as string,
+  trustHost: true,
+} satisfies NextAuthConfig;
+
+// Legacy alias (v4 name) to avoid breaking existing imports.
+export const AuthOptions = authConfig;
