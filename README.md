@@ -5,11 +5,11 @@ stories, comments, search, and a premium subscription tier.
 
 This repository is a **[Turborepo](https://turborepo.com) monorepo** using **pnpm workspaces**.
 
-![Turborepo](https://img.shields.io/badge/Turborepo-2.11.5-black?style=flat-square&logo=turborepo)
-![Next.js](https://img.shields.io/badge/Next.js-14.2.14-black?style=flat-square&logo=next.js)
+![Turborepo](https://img.shields.io/badge/Turborepo-2.11.6-black?style=flat-square&logo=turborepo)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)
-![Express](https://img.shields.io/badge/Express-4.21-black?style=flat-square&logo=express)
-![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_8-green?style=flat-square&logo=mongodb)
+![Express](https://img.shields.io/badge/Express-5-black?style=flat-square&logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_9-green?style=flat-square&logo=mongodb)
 ![Socket.io](https://img.shields.io/badge/Socket.io-4.8-black?style=flat-square&logo=socket.io)
 
 ---
@@ -32,20 +32,20 @@ This repository is a **[Turborepo](https://turborepo.com) monorepo** using **pnp
 
 ## Packages
 
-| Package              | Path       | Description                                         |
-| -------------------- | ---------- | --------------------------------------------------- |
-| `@tech-tips-hub/web` | `apps/web` | Next.js 14 (App Router) web client                  |
-| `@tech-tips-hub/api` | `apps/api` | Express + TypeScript REST API and Socket.IO gateway |
+| Package              | Path       | Description                                           |
+| -------------------- | ---------- | ----------------------------------------------------- |
+| `@tech-tips-hub/web` | `apps/web` | Next.js 16 (App Router) web client                    |
+| `@tech-tips-hub/api` | `apps/api` | Express 5 + TypeScript REST API and Socket.IO gateway |
 
 ### Tech stack
 
-**Client** — Next.js 14.2.14 (App Router) · React 18 · TypeScript · NextUI v2 · Tailwind CSS 3.4 ·
-TanStack React Query 5 · NextAuth 4 (Google OAuth) · Socket.IO client 4.8 · Framer Motion ·
-Chart.js · Leaflet · Quill · pdfmake
+**Client** — Next.js 16 (App Router) · React 19 · TypeScript · HeroUI v2 · Tailwind CSS 4 ·
+TanStack React Query 5 · Auth.js v5 / NextAuth 5 beta (Google OAuth) · Socket.IO client 4.8 ·
+Framer Motion · Chart.js · Leaflet · Quill · pdfmake
 
-**Server** — Express 4.21 · TypeScript 5 · Mongoose 8 (MongoDB) · Socket.IO 4.8 · Zod ·
-jsonwebtoken · bcryptjs · Cloudinary + Multer · Meilisearch · Nodemailer (Gmail SMTP) + Handlebars ·
-AamarPay
+**Server** — Express 5 · TypeScript 5 · Mongoose 9 (MongoDB) · Socket.IO 4.8 · Zod 4 ·
+jsonwebtoken · bcryptjs · Cloudinary v2 + Multer 2 (custom storage engine) · Meilisearch ·
+Nodemailer (Gmail SMTP) + Handlebars · AamarPay
 
 ---
 
@@ -133,15 +133,15 @@ Variables marked _Feature_ are only needed when that feature is used (uploads, e
 
 ### `apps/web/.env.local`
 
-| Variable                 | Required | Purpose                                  |
-| ------------------------ | -------- | ---------------------------------------- |
-| `NEXT_PUBLIC_SERVER_URL` | Yes      | API origin; the client appends `/api/v1` |
-| `SERVER_URL`             | No       | Fallback origin on the server            |
-| `NEXTAUTH_SECRET`        | Yes      | NextAuth signing secret                  |
-| `NEXTAUTH_URL`           | Yes      | e.g. `http://localhost:3000`             |
-| `GOOGLE_ID`              | Feature  | Google OAuth client id                   |
-| `GOOGLE_SECRET`          | Feature  | Google OAuth client secret               |
-| `JWT_ACCESS_SECRET`      | Yes      | **Must match the server value**          |
+| Variable                 | Required | Purpose                                                      |
+| ------------------------ | -------- | ------------------------------------------------------------ |
+| `NEXT_PUBLIC_SERVER_URL` | Yes      | API origin; the client appends `/api/v1`                     |
+| `SERVER_URL`             | No       | Fallback origin on the server                                |
+| `AUTH_SECRET`            | Yes      | Auth.js signing secret (`NEXTAUTH_SECRET` works as fallback) |
+| `NEXTAUTH_URL`           | Yes      | e.g. `http://localhost:3000`                                 |
+| `GOOGLE_ID`              | Feature  | Google OAuth client id                                       |
+| `GOOGLE_SECRET`          | Feature  | Google OAuth client secret                                   |
+| `JWT_ACCESS_SECRET`      | Yes      | **Must match the server value**                              |
 
 > **`JWT_ACCESS_SECRET` must be identical in both apps.** `apps/web/src/middleware.ts` decodes
 > the access-token cookie with it to enforce role-based routing.
@@ -154,17 +154,18 @@ Variables marked _Feature_ are only needed when that feature is used (uploads, e
 
 ## Root Scripts
 
-| Script            | Description                                                     |
-| ----------------- | --------------------------------------------------------------- |
-| `pnpm dev`        | Run client + server dev servers in parallel                     |
-| `pnpm build`      | Build both packages (Turbo caches the output)                   |
-| `pnpm start`      | Start production servers for both packages                      |
-| `pnpm lint`       | Lint both packages (API currently fails on pre-existing errors) |
-| `pnpm lint:web`   | Lint the web app only (currently clean)                         |
-| `pnpm lint:api`   | Lint the API app only                                           |
-| `pnpm type-check` | Type-check both packages without emitting                       |
-| `pnpm clean`      | Remove build output, caches, and `node_modules`                 |
-| `pnpm format`     | Format the repo with Prettier                                   |
+| Script            | Description                                                               |
+| ----------------- | ------------------------------------------------------------------------- |
+| `pnpm dev`        | Run client + server dev servers in parallel                               |
+| `pnpm build`      | Build both packages (Turbo caches the output)                             |
+| `pnpm start`      | Start production servers for both packages                                |
+| `pnpm lint`       | Lint both packages (API reports pre-existing errors; web is warning-only) |
+| `pnpm lint:web`   | Lint the web app only (0 errors)                                          |
+| `pnpm lint:api`   | Lint the API app only (pre-existing errors)                               |
+| `pnpm test`       | Run Vitest suites in both packages                                        |
+| `pnpm type-check` | Type-check both packages without emitting                                 |
+| `pnpm clean`      | Remove build output, caches, and `node_modules`                           |
+| `pnpm format`     | Format the repo with Prettier                                             |
 
 Tasks are defined in `turbo.json`. `build` caches to `.next/` and `dist/`; `dev` and `start` are
 persistent and never cached.
@@ -206,7 +207,7 @@ tech-tips-and-tricks-hub/
 │               └── utils/       # seeding, email, Meilisearch, token helpers
 ├── package.json         # pnpm workspaces root
 ├── turbo.json           # task graph + cache config
-└── package-lock.json    # single lockfile for the whole workspace
+└── pnpm-lock.yaml       # single lockfile for the whole workspace
 ```
 
 **Request flow (client → server)**
@@ -351,18 +352,24 @@ Legacy remotes, kept for reference:
 
 ## Known Issues
 
-- **Deprecation warnings.** `@nextui-org/*` is deprecated in favour of `@heroui/*`, and the
-  pinned Next.js 14.2.14 has a published security advisory. Both are pre-existing and were left
-  as-is; upgrading is a separate change.
+- **Webpack build.** The web app builds with `next build --webpack`. The default Turbopack
+  build is deferred until the HeroUI v2 → v3 migration lands (v2 breaks under Turbopack with
+  React 19) plus a `force-dynamic` audit of data-fetching pages.
+- **HeroUI v3 pending.** The app uses `@heroui/react` v2 (API-compatible rename of NextUI).
+  v3 is a component-API rewrite (compound components, removed/renamed parts) and is intentionally
+  left for a file-by-file migration with visual checks.
+- **Auth.js v5 beta.** `next-auth@5` is still in beta; Google OAuth flows work, but watch the
+  upstream releases before treating auth as stable.
+- **Effect lint warnings.** The web app reports ~32 `react-hooks/set-state-in-effect` /
+  `immutability` warnings (downgraded from errors). These are legacy patterns to refactor
+  during the HeroUI v3 pass.
 - **Edge runtime warnings.** `apps/web/src/utils/jwt.decode.ts` imports `jsonwebtoken`, which
   uses Node APIs. The build warns but succeeds.
-- **Blocked install scripts.** npm skipped postinstall scripts for `sharp`, `core-js`, and
-  `unrs-resolver`. Run `npm install-scripts approve <pkg>` if you hit native-module errors.
-- **`pnpm lint` fails on the API.** `apps/api` has 41 pre-existing ESLint errors
-  (`no-explicit-any`, `no-unused-vars`, `prefer-const`, `no-unsafe-optional-chaining`) plus 26
-  `no-console` warnings. These are inherited from the original codebase, not introduced here.
-  `pnpm lint:web` is clean. Use `pnpm lint:api` / `pnpm lint:web` to target one package.
-- **No tests.** Neither package has a test suite configured.
+- **`pnpm lint` fails on the API.** `apps/api` reports pre-existing ESLint errors
+  (currently ~66 errors / ~28 warnings: `no-explicit-any`, `no-unused-vars`, etc.). These are
+  inherited from the original codebase. Use `pnpm lint:api` / `pnpm lint:web` to target one package.
+- **Minimal tests.** Both packages have Vitest wired up (`pnpm test`) with first sample suites
+  (`getRouteParam`, `generateNickname`). Coverage is still thin — add suites per feature.
 
 ### Changes made during the monorepo migration
 
@@ -383,7 +390,7 @@ per-package lockfiles were hiding.
 
 ```bash
 git checkout -b feature/my-change
-pnpm type-check && pnpm lint
+pnpm type-check && pnpm test && pnpm lint
 pnpm build
 ```
 
