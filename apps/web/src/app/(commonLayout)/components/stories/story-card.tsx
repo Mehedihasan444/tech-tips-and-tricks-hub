@@ -10,7 +10,7 @@ import {
   Button,
   useDisclosure,
   Avatar,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { CloudUpload } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";

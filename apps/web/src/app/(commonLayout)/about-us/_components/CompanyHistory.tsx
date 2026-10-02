@@ -1,5 +1,5 @@
 "use client";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 import Image from "next/image";
 import missionImage from "@/assets/mission-image.jpeg";
 

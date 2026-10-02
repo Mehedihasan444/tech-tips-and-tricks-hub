@@ -1,6 +1,6 @@
 "use client";
 import { TPost } from "@/types/TPost";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import React from "react";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";

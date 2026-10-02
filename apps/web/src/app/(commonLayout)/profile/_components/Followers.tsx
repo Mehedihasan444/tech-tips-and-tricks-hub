@@ -4,7 +4,7 @@ import { useUpdateUser } from "@/hooks/user.hook";
 import { IUser } from "@/types/IUser";
 import { TPost } from "@/types/TPost";
 import { useChatManager } from "@/components/ui/ChatManager";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { MessageCircle } from "lucide-react";
 import React from "react";
 

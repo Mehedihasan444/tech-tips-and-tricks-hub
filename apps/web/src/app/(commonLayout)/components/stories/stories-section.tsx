@@ -19,7 +19,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Progress,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 import { useDeleteStory } from "@/hooks/story.hook";
 import Image from "next/image";

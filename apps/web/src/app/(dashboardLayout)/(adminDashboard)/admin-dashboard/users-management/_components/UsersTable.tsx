@@ -10,7 +10,7 @@ import {
   User,
   Chip,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Eye } from "lucide-react";
 import { IUser } from "@/types/IUser";
 import Link from "next/link";

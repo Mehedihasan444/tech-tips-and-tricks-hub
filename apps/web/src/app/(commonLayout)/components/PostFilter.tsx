@@ -2,7 +2,7 @@
 import { postCategories } from "@/app/(dashboardLayout)/(userDashboard)/dashboard/create-post/constant";
 import { useGetFilteredPosts, useGetFilteredPostsByCategory } from "@/hooks/search.hook";
 import { TPost } from "@/types/TPost";
-import { Select, SelectItem, Chip } from "@nextui-org/react";
+import { Select, SelectItem, Chip } from "@heroui/react";
 import { Filter, TrendingUp } from "lucide-react";
 import React, { Dispatch, useEffect, useState } from "react";
 
@@ -77,9 +77,7 @@ const PostFilter = ({ setData }: { setData: Dispatch<TPost[]> }) => {
         }}
       >
         {postCategories?.map((item) => (
-          <SelectItem key={item} value={item}>
-            {item}
-          </SelectItem>
+          <SelectItem key={item}>{item}</SelectItem>
         ))}
       </Select>
 
@@ -98,15 +96,9 @@ const PostFilter = ({ setData }: { setData: Dispatch<TPost[]> }) => {
           value: "text-sm font-medium",
         }}
       >
-        <SelectItem key="latest" value="latest">
-          Latest First
-        </SelectItem>
-        <SelectItem key="upvoted" value="-likes">
-          Most Upvoted
-        </SelectItem>
-        <SelectItem key="downvoted" value="-dislikes">
-          Most Downvoted
-        </SelectItem>
+        <SelectItem key="latest">Latest First</SelectItem>
+        <SelectItem key="upvoted">Most Upvoted</SelectItem>
+        <SelectItem key="downvoted">Most Downvoted</SelectItem>
       </Select>
 
       {/* Active Filters Display */}

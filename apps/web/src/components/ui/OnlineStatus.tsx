@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Badge, Tooltip } from "@nextui-org/react";
+import { Badge, Tooltip } from "@heroui/react";
 import { useSocket } from "@/context/socket.provider";
 
 interface OnlineStatusProps {

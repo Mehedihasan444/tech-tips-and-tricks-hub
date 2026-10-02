@@ -1,5 +1,5 @@
 import { TPost } from "@/types/TPost";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import Image from "next/image";
 import React from "react";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Button, Chip } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Button, Chip } from "@heroui/react";
 import { Users, MessageCircle, Globe } from "lucide-react";
 import Image from "next/image";
 

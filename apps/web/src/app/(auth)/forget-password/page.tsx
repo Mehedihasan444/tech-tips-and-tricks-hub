@@ -1,6 +1,6 @@
 "use client";
 import { useForgetPassword } from "@/hooks/auth.hook";
-import { Button, Input, Spinner } from "@nextui-org/react";
+import { Button, Input, Spinner } from "@heroui/react";
 import { Mail, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";

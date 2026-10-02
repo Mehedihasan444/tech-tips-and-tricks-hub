@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Tooltip, Button, Divider } from "@nextui-org/react"; // For UI components
+import { User, Tooltip, Button, Divider } from "@heroui/react"; // For UI components
 import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { getPost } from "@/services/PostService";
 import Image from "next/image";

@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 import Link from "next/link";

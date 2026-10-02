@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
 import UsersTable from "./_components/UsersTable";
 import { getUsers } from "@/services/UserService";
-import { Pagination, Spinner } from "@nextui-org/react";
+import { Pagination, Spinner } from "@heroui/react";
 
 export default function ManageUsersTable() {
   const [users, setUsers] = useState([]);

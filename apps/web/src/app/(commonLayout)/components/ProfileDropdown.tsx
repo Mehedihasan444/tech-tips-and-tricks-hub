@@ -10,7 +10,7 @@ import {
   User,
   Avatar,
   Chip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   CrownIcon,
   SquareUser,

@@ -1,5 +1,5 @@
 "use client";
-import { Textarea } from "@nextui-org/react";
+import { Textarea } from "@heroui/react";
 import React, { useState, useEffect, useRef } from "react";
 import { SendHorizonal } from "lucide-react";
 import Image from "next/image";

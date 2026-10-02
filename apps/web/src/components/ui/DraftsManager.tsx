@@ -12,7 +12,7 @@ import {
   CardBody,
   Chip,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FileText, Trash2, Clock, Edit3, FolderOpen } from "lucide-react";
 import { PostDraft, getAllDrafts, deleteDraft } from "@/hooks/useDraftAutoSave";
 import ConfirmationModal from "./ConfirmationModal";

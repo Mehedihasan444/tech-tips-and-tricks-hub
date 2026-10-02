@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner } from "@heroui/react";
 import { LucideIcon } from "lucide-react";
 
 interface SubmitBtnProps {

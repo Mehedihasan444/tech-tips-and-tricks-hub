@@ -12,7 +12,7 @@ import {
   ModalFooter,
   Button,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Ellipsis, AlertTriangle, Trash2 } from "lucide-react";
 import { TComment } from "@/types/TComment";
 import { useDeleteComment } from "@/hooks/comment.hook";

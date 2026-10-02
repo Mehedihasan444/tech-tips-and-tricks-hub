@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input } from "@heroui/react";
 import { EyeIcon, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";

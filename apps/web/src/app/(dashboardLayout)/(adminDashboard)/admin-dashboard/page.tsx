@@ -16,7 +16,7 @@ import {
   ArcElement,
 } from "chart.js";
 import PageTitle from "../../components/_page-title/PageTitle";
-import { Card, CardBody, Spinner } from "@nextui-org/react";
+import { Card, CardBody, Spinner } from "@heroui/react";
 import { Users, FileText, MessageSquare, TrendingUp, DollarSign, Eye } from "lucide-react";
 import { getUsers } from "@/services/UserService";
 import { getPosts } from "@/services/PostService";

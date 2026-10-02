@@ -1,7 +1,7 @@
 "use client";
 import { useUpdateUser } from "@/hooks/user.hook";
 import { IUser } from "@/types/IUser";
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 import { Check, PenBoxIcon, X } from "lucide-react";
 import React, { useState } from "react";
 

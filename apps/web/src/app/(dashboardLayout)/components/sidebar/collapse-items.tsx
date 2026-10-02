@@ -1,6 +1,6 @@
 "use client";
 import React, { ReactNode } from "react";
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@heroui/react";
 
 import { ChevronRight } from "lucide-react";
 

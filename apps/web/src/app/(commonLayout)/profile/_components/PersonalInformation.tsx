@@ -4,7 +4,7 @@ import { Github, Globe, Linkedin, Twitter, Plus, X, PenBoxIcon } from "lucide-re
 import Link from "next/link";
 import { IUser } from "@/types/IUser";
 import { useUpdateUser } from "@/hooks/user.hook";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 
 type IEducation = {
   institution: string;

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from "react";
-import { Pagination, Button } from "@nextui-org/react";
+import { Pagination, Button } from "@heroui/react";
 import { TPost } from "@/types/TPost";
 const Paginate = ({ allPosts }: { allPosts: TPost[] }) => {
   const [currentPage, setCurrentPage] = useState(1);

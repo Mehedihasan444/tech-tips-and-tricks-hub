@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Card, CardHeader, CardBody, CardFooter, Avatar, Button, Chip } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Avatar, Button, Chip } from "@heroui/react";
 import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { useRouter } from "next/navigation";

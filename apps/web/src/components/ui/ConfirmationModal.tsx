@@ -8,7 +8,7 @@ import {
   ModalFooter,
   Button,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { AlertTriangle, Trash2, Info, CheckCircle, LucideIcon } from "lucide-react";
 
 type ConfirmationType = "danger" | "warning" | "info" | "success";

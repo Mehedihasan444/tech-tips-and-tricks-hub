@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card } from "@nextui-org/react";
+import { Card } from "@heroui/react";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram } from "lucide-react";
 // import MapSection from "./_components/MapSection";
 import ContactForm from "./_components/ContactForm";

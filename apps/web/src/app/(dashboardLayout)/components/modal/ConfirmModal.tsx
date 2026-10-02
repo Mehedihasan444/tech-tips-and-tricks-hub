@@ -12,7 +12,7 @@ import {
   useDisclosure,
   Tooltip,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Trash2, AlertTriangle } from "lucide-react";
 
 export default function DeleteConfirmationModal({ item, title }: { item: any; title: string }) {

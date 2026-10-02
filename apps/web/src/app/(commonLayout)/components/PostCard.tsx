@@ -12,7 +12,7 @@ import {
   Tooltip,
   Avatar,
   Badge,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   ThumbsDown,
   ThumbsUp,

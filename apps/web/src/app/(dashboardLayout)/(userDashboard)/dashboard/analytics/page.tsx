@@ -15,7 +15,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
+import { Card, CardBody, CardHeader, Spinner } from "@heroui/react";
 import { useUser } from "@/context/user.provider";
 import { getMyPosts } from "@/services/PostService";
 import { TPost } from "@/types/TPost";

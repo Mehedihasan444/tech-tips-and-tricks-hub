@@ -2,6 +2,7 @@ packages:
   - "apps/*"
 
 allowBuilds:
+  '@heroui/shared-utils': true
   core-js: true
   sharp: true
   unrs-resolver: true

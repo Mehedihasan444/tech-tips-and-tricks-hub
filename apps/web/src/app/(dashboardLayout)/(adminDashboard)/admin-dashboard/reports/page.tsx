@@ -19,7 +19,7 @@ import {
   Input,
   Select,
   SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   AlertTriangle,
   Flag,
@@ -254,18 +254,10 @@ export default function ReportsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">
-                All Status
-              </SelectItem>
-              <SelectItem key="pending" value="pending">
-                Pending
-              </SelectItem>
-              <SelectItem key="resolved" value="resolved">
-                Resolved
-              </SelectItem>
-              <SelectItem key="dismissed" value="dismissed">
-                Dismissed
-              </SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="pending">Pending</SelectItem>
+              <SelectItem key="resolved">Resolved</SelectItem>
+              <SelectItem key="dismissed">Dismissed</SelectItem>
             </Select>
           </div>
         </CardBody>

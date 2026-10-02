@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardBody, Button, Chip, Divider } from "@nextui-org/react";
+import { Card, CardBody, Button, Chip, Divider } from "@heroui/react";
 import { FileText, Trash2, Clock, Edit3, Plus, Search, RefreshCw } from "lucide-react";
 import { PostDraft, getAllDrafts, deleteDraft } from "@/hooks/useDraftAutoSave";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import EmptyState from "@/components/ui/EmptyState";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 
 export default function DraftsPage() {
   const router = useRouter();

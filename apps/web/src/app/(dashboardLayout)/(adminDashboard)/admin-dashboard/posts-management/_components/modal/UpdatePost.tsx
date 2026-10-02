@@ -13,7 +13,7 @@ import {
   Select,
   SelectItem,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useQuill } from "react-quilljs";
 import "quill/dist/quill.snow.css";
 import { toast } from "sonner";
@@ -166,9 +166,7 @@ export default function UpdatePost({ post }: { post: any }) {
                       onChange={handleCategoryChange}
                     >
                       {postCategories.map((item) => (
-                        <SelectItem key={item} value={item}>
-                          {item}
-                        </SelectItem>
+                        <SelectItem key={item}>{item}</SelectItem>
                       ))}
                     </Select>
                   </div>
@@ -185,9 +183,7 @@ export default function UpdatePost({ post }: { post: any }) {
                       onChange={handleSelectionChange}
                     >
                       {postTags.map((tag) => (
-                        <SelectItem key={tag} value={tag}>
-                          {tag}
-                        </SelectItem>
+                        <SelectItem key={tag}>{tag}</SelectItem>
                       ))}
                     </Select>
                   </div>

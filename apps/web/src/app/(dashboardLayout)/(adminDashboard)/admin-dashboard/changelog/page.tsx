@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, CardBody, Chip } from "@nextui-org/react";
+import { Card, CardBody, Chip } from "@heroui/react";
 import { Sparkles, Bug, Shield, Zap, Layout } from "lucide-react";
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
 

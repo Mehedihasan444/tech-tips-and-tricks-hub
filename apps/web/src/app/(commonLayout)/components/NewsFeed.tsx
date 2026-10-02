@@ -3,7 +3,7 @@
 // import React, { useState } from "react";
 // import CreatePost from "./modal/CreatePost";
 // import PostFilter from "./PostFilter";
-// import { Divider } from "@nextui-org/react";
+// import { Divider } from "@heroui/react";
 // import PostCard from "./PostCard";
 
 // const NewsFeed = ({ posts }: { posts: TPost[] }) => {

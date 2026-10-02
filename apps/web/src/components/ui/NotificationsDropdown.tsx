@@ -9,7 +9,7 @@ import {
   Badge,
   Avatar,
   ScrollShadow,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Bell, Heart, MessageCircle, UserPlus, AtSign, Reply, Check, Trash2 } from "lucide-react";
 import { useSocket, Notification } from "@/context/socket.provider";
 import { formatDistanceToNow } from "date-fns";

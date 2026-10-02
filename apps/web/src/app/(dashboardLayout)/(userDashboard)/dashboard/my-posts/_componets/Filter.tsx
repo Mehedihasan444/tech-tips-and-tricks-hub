@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState } from "react";
-import { Select, SelectItem, TimeInput, DateInput, Input } from "@nextui-org/react";
-import { CalendarDate, parseDate, Time } from "@internationalized/date";
+import { Select, SelectItem, TimeInput, DateInput, Input } from "@heroui/react";
 import { TPost } from "@/types/TPost";
 const Filter = ({ allPosts }: { allPosts: TPost[] }) => {
   const [filteredPosts, setFilteredPosts] = useState(allPosts);
@@ -59,20 +58,8 @@ const Filter = ({ allPosts }: { allPosts: TPost[] }) => {
       </Select>
       {/* Date Filter */}
       <div className="flex ">
-        <TimeInput
-          variant="underlined"
-          className="max-w-xs"
-          label="Event Time"
-          defaultValue={new Time(11, 45)}
-        />
-        <DateInput
-          variant="underlined"
-          className="max-w-xs"
-          label={"Event date"}
-          //   isDisabled
-          defaultValue={parseDate("2024-04-04")}
-          placeholderValue={new CalendarDate(1995, 11, 6)}
-        />
+        <TimeInput variant="underlined" className="max-w-xs" label="Event Time" />
+        <DateInput variant="underlined" className="max-w-xs" label={"Event date"} />
       </div>
     </>
   );

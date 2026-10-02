@@ -1,5 +1,5 @@
 "use client";
-import { Button, Card, CardBody, Divider, Input, Spinner } from "@nextui-org/react";
+import { Button, Card, CardBody, Divider, Input, Spinner } from "@heroui/react";
 import { useUpdateUser } from "@/hooks/user.hook";
 import { useUpdateProfilePhoto } from "@/hooks/user.hook";
 import { useState } from "react";

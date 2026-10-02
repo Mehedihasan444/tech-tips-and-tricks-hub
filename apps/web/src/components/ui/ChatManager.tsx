@@ -11,7 +11,7 @@ import {
   CardHeader,
   Divider,
   ScrollShadow,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MessageSquare, X, Users } from "lucide-react";
 import { useSocket } from "@/context/socket.provider";
 

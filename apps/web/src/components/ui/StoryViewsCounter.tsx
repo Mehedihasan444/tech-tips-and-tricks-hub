@@ -10,7 +10,7 @@ import {
   Avatar,
   useDisclosure,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Eye, Users } from "lucide-react";
 import { useStoryViews } from "@/hooks/useStoryViews";
 import { formatDistanceToNow } from "date-fns";

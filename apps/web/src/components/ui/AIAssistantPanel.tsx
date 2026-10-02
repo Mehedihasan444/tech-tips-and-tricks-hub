@@ -17,7 +17,7 @@ import {
   useDisclosure,
   Chip,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Sparkles,
   Wand2,

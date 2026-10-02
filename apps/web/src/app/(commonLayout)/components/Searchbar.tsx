@@ -2,7 +2,7 @@
 import useDebounce from "@/hooks/debounce.hook";
 import { useSearchPosts } from "@/hooks/search.hook";
 import { TPost } from "@/types/TPost";
-import { Button, Chip, Spinner } from "@nextui-org/react";
+import { Button, Chip, Spinner } from "@heroui/react";
 import { Search, X, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

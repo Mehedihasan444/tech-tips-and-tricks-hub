@@ -15,7 +15,7 @@ import {
   Tooltip,
   Checkbox,
   Chip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useQuill } from "react-quilljs";
 import "quill/dist/quill.snow.css";
 import { toast } from "sonner";
@@ -329,9 +329,7 @@ export default function UpdatePost({ post }: { post: any }) {
                       }}
                     >
                       {postCategories.map((item) => (
-                        <SelectItem key={item} value={item}>
-                          {item}
-                        </SelectItem>
+                        <SelectItem key={item}>{item}</SelectItem>
                       ))}
                     </Select>
                     <div className="flex items-center gap-2 h-14 px-4 border-2 border-default-200 rounded-xl hover:border-warning transition-colors">
@@ -381,9 +379,7 @@ export default function UpdatePost({ post }: { post: any }) {
                       )}
                     >
                       {postTags.map((tag) => (
-                        <SelectItem key={tag} value={tag}>
-                          #{tag}
-                        </SelectItem>
+                        <SelectItem key={tag}>#{tag}</SelectItem>
                       ))}
                     </Select>
                   </div>

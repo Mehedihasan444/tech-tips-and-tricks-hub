@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Input, Textarea, Button } from "@nextui-org/react";
+import { Input, Textarea, Button } from "@heroui/react";
 const ContactForm = () => {
   return (
     <div className="bg-default-50 p-6 rounded-lg shadow-lg">

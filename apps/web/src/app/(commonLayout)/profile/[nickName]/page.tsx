@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Badge, Divider } from "@nextui-org/react";
+import { Badge, Divider } from "@heroui/react";
 import { ClipboardPenLine } from "lucide-react";
 import CreatePost from "../../components/modal/CreatePost";
 import { getUser } from "@/services/UserService";

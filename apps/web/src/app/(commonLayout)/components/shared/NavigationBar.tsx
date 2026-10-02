@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Navbar, NavbarContent, NavbarItem, Badge } from "@nextui-org/react";
+import { Button, Navbar, NavbarContent, NavbarItem, Badge } from "@heroui/react";
 import Searchbar from "../Searchbar";
 import ProfileDropdown from "../ProfileDropdown";
 import { ThemeSwitcher } from "./ThemeSwitcher";

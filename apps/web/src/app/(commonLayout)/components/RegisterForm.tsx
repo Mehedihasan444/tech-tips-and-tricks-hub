@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import GoogleLoginBtn from "./shared/GoogleLoginBtn";
 import FormDivider from "./shared/FormDivider";
 import SubmitBtn from "./SubmitBtn";
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useUserLogin, useUserRegistration } from "@/hooks/auth.hook";
 import { useRouter, useSearchParams } from "next/navigation";

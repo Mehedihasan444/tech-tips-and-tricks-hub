@@ -12,7 +12,7 @@ import {
   Tooltip,
   Select,
   SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { FilePenLine, Loader2, Shield, UserCheck } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
@@ -150,7 +150,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                     }}
                   >
                     {roles.map((r) => (
-                      <SelectItem key={r.key} value={r.key} startContent={<r.icon size={16} />}>
+                      <SelectItem key={r.key} startContent={<r.icon size={16} />}>
                         {r.label}
                       </SelectItem>
                     ))}
@@ -172,9 +172,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                     }}
                   >
                     {statuses.map((s) => (
-                      <SelectItem key={s.key} value={s.key}>
-                        {s.label}
-                      </SelectItem>
+                      <SelectItem key={s.key}>{s.label}</SelectItem>
                     ))}
                   </Select>
                 </div>

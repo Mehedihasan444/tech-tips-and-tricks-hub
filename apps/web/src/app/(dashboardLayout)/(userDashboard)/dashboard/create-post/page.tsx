@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { FormEvent, useEffect, useState } from "react";
-import { Button, Checkbox, Input, Select, SelectItem } from "@nextui-org/react";
+import { Button, Checkbox, Input, Select, SelectItem } from "@heroui/react";
 import { useQuill } from "react-quilljs";
 import "quill/dist/quill.snow.css"; // Add css for snow theme
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
@@ -167,9 +167,7 @@ export default function CreatePost() {
               onChange={handleCategoryChange}
             >
               {postCategories.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
-                </SelectItem>
+                <SelectItem key={item}>{item}</SelectItem>
               ))}
             </Select>
             <Checkbox isSelected={isPremium} onValueChange={setIsPremium}>
@@ -191,9 +189,7 @@ export default function CreatePost() {
               onChange={handleSelectionChange}
             >
               {postTags.map((tag) => (
-                <SelectItem key={tag} value={tag}>
-                  {tag}
-                </SelectItem>
+                <SelectItem key={tag}>{tag}</SelectItem>
               ))}
             </Select>
           </div>

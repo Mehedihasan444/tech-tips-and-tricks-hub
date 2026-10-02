@@ -1,6 +1,6 @@
 "use client";
 import { useResetPassword } from "@/hooks/auth.hook";
-import { Button, Input, Spinner } from "@nextui-org/react";
+import { Button, Input, Spinner } from "@heroui/react";
 import { Lock, Eye, EyeOff, KeyRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { FormEvent, useState } from "react";

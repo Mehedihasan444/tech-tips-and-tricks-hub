@@ -5,7 +5,7 @@ import { ThemeSwitcher } from "@/app/(commonLayout)/components/shared/ThemeSwitc
 import NotificationsDropdown from "@/components/ui/NotificationsDropdown";
 import { useChatManager } from "@/components/ui/ChatManager";
 import { useSocket } from "@/context/socket.provider";
-import { Badge, Button, Tooltip } from "@nextui-org/react";
+import { Badge, Button, Tooltip } from "@heroui/react";
 import { MessageSquareText, Home } from "lucide-react";
 import Link from "next/link";
 import React, { ReactNode } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Chip, Tooltip } from "@nextui-org/react";
+import { Chip, Tooltip } from "@heroui/react";
 import { Cloud, CloudOff, Loader2 } from "lucide-react";
 
 interface DraftStatusProps {

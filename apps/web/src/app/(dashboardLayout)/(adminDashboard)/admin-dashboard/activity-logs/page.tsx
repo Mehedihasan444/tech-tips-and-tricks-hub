@@ -18,7 +18,7 @@ import {
   SelectItem,
   Pagination,
   Avatar,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Search,
   UserPlus,
@@ -290,11 +290,7 @@ export default function ActivityLogsPage() {
                 })),
               ]}
             >
-              {(item) => (
-                <SelectItem key={item.key} value={item.key}>
-                  {item.label}
-                </SelectItem>
-              )}
+              {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
             </Select>
           </div>
         </CardBody>

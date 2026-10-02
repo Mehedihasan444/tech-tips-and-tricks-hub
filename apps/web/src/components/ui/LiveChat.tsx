@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Button, Avatar, Input, Badge, Spinner, Tooltip } from "@nextui-org/react";
+import { Button, Avatar, Input, Badge, Spinner, Tooltip } from "@heroui/react";
 import { MessageCircle, Send, X, Minimize2 } from "lucide-react";
 import { useSocket, ChatMessage } from "@/context/socket.provider";
 import { useUser } from "@/context/user.provider";

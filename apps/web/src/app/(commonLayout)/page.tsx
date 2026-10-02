@@ -1,16 +1,7 @@
 "use client";
 import { TPost } from "@/types/TPost";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Chip,
-  Skeleton,
-} from "@nextui-org/react";
+import { Avatar, Button, Card, CardBody, CardHeader, Divider, Chip, Skeleton } from "@heroui/react";
 import { getPosts } from "@/services/PostService";
 import CreatePost from "./components/modal/CreatePost";
 import PostFilter from "./components/PostFilter";
