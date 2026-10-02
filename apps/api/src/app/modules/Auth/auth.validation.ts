@@ -3,57 +3,57 @@ import { z } from "zod";
 const registerValidationSchema = z.object({
   body: z.object({
     name: z.string({
-      required_error: "Name is required",
+      error: "Name is required",
     }),
     email: z.string({
-      required_error: "Email is required",
+      error: "Email is required",
     }),
-    password: z.string({ required_error: "Password is required" }),
-    mobileNumber: z.string({ required_error: "Mobile number is required" }).optional(),
+    password: z.string({ error: "Password is required" }),
+    mobileNumber: z.string({ error: "Mobile number is required" }).optional(),
     profilePhoto: z.string(),
-    nickName: z.string({ required_error: "Nick name is required" }),
+    nickName: z.string({ error: "Nick name is required" }),
   }),
 });
 
 const loginValidationSchema = z.object({
   body: z.object({
     email: z.string({
-      required_error: "Email is required",
+      error: "Email is required",
     }),
-    password: z.string({ required_error: "Password is required" }),
+    password: z.string({ error: "Password is required" }),
   }),
 });
 const socialLoginValidationSchema = z.object({
   body: z.object({
     email: z.string({
-      required_error: "Email is required",
+      error: "Email is required",
     }),
-    name: z.string({ required_error: "Name is required" }),
-    nickName: z.string({ required_error: "Nickname is required" }),
-    profilePhoto: z.string({ required_error: "Profile Photo is required" }),
+    name: z.string({ error: "Name is required" }),
+    nickName: z.string({ error: "Nickname is required" }),
+    profilePhoto: z.string({ error: "Profile Photo is required" }),
   }),
 });
 
 const changePasswordValidationSchema = z.object({
   body: z.object({
     oldPassword: z.string({
-      required_error: "Old password is required",
+      error: "Old password is required",
     }),
-    newPassword: z.string({ required_error: "Password is required" }),
+    newPassword: z.string({ error: "Password is required" }),
   }),
 });
 
 const refreshTokenValidationSchema = z.object({
   cookies: z.object({
     refreshToken: z.string({
-      required_error: "Refresh token is required!",
+      error: "Refresh token is required!",
     }),
   }),
 });
 const forgetPasswordValidationSchema = z.object({
   body: z.object({
     email: z.string({
-      required_error: "User email is required!",
+      error: "User email is required!",
     }),
   }),
 });
@@ -61,13 +61,13 @@ const forgetPasswordValidationSchema = z.object({
 const resetPasswordValidationSchema = z.object({
   body: z.object({
     userId: z.string({
-      required_error: "User id is required!",
+      error: "User id is required!",
     }),
     newPassword: z.string({
-      required_error: "New password is required!",
+      error: "New password is required!",
     }),
     oldPassword: z.string({
-      required_error: "Old password is required!",
+      error: "Old password is required!",
     }),
   }),
 });

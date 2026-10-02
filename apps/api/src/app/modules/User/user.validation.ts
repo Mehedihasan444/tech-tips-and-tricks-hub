@@ -5,23 +5,23 @@ import mongoose from "mongoose";
 const createUserValidationSchema = z.object({
   body: z.object({
     name: z.string({
-      required_error: "Name is required",
+      error: "Name is required",
     }),
     role: z.nativeEnum(USER_ROLE),
     email: z
       .string({
-        required_error: "Email is required",
+        error: "Email is required",
       })
       .email({
         message: "Invalid email",
       }),
     password: z.string({
-      required_error: "Password is required",
+      error: "Password is required",
     }),
     status: z.nativeEnum(USER_STATUS).default(USER_STATUS.ACTIVE),
     mobileNumber: z.string().optional(),
     nickName: z.string({
-      required_error: "Nickname is required",
+      error: "Nickname is required",
     }),
   }),
 });
@@ -64,7 +64,7 @@ const updateUserValidationSchema = z.object({
     shortBio: z.string().optional(),
     followers: z
       .string({
-        required_error: "User is required",
+        error: "User is required",
       })
       .refine((val) => {
         return mongoose.Types.ObjectId.isValid(val);
@@ -72,7 +72,7 @@ const updateUserValidationSchema = z.object({
       .optional(),
     following: z
       .string({
-        required_error: "User is required",
+        error: "User is required",
       })
       .refine((val) => {
         return mongoose.Types.ObjectId.isValid(val);

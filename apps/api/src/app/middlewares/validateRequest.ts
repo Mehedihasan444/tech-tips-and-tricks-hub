@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject } from "zod";
+import { ZodType } from "zod";
 import { catchAsync } from "../utils/catchAsync";
 
-const validateRequest = (schema: AnyZodObject) => {
+const validateRequest = (schema: ZodType<any>) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const parsedBody = await schema.parseAsync({
       body: req.body,
@@ -14,7 +14,7 @@ const validateRequest = (schema: AnyZodObject) => {
   });
 };
 
-export const validateRequestCookies = (schema: AnyZodObject) => {
+export const validateRequestCookies = (schema: ZodType<any>) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const parsedCookies = await schema.parseAsync({
       cookies: req.cookies,

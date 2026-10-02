@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createStoryValidationSchema = z.object({
   body: z.object({
     imageUrl: z.string({
-      required_error: "Story image URL is required",
+      error: "Story image URL is required",
     }),
   }),
 });
