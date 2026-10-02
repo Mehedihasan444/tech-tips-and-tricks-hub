@@ -16,6 +16,7 @@
     "lint:api": "pnpm --filter @tech-tips-hub/api lint",
     "lint:web": "pnpm --filter @tech-tips-hub/web lint",
     "type-check": "turbo run type-check",
+    "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules .turbo apps/*/.next apps/*/dist",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md}\"",

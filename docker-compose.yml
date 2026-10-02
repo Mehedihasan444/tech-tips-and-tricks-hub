@@ -1,0 +1,47 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    env_file:
+      - path: apps/api/.env
+        required: false
+    environment:
+      DB_URL: mongodb://mongo:27017/tech-tips-and-tricks-hub
+      CLIENT_URL: http://localhost:3000
+      SERVER_URL: http://localhost:5000
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SERVER_URL: http://localhost:5000
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_SERVER_URL: http://localhost:5000
+      NEXTAUTH_URL: http://localhost:3000
+
+volumes:
+  mongo-data:

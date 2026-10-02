@@ -1,0 +1,14 @@
+node_modules
+.turbo
+apps/*/.next
+apps/*/dist
+apps/*/.turbo
+.git
+.gitignore
+.env
+.env*.local
+Dockerfile
+.dockerignore
+README.md
+coverage
+.next
