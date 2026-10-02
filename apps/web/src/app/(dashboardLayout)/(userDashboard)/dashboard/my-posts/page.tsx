@@ -5,6 +5,7 @@ import { getMyPosts } from "@/services/PostService";
 import Filter from "./_componets/Filter";
 import Paginate from "./_componets/Paginate";
 import { TPost } from "@/types/TPost";
+import { sanitizeParse } from "@/utils/sanitizeHtml";
 
 const MyPosts = async () => {
   const { data: posts } = await getMyPosts("");
@@ -35,15 +36,13 @@ const MyPosts = async () => {
             />
             <div className="p-6 space-y-2">
               <h2 className="text-2xl font-semibold text-default-800 ">{post.title}</h2>
-              <div
-                className="text-default-600 "
-                dangerouslySetInnerHTML={{
-                  __html:
-                    post.content.length > 300
-                      ? post.content.slice(0, 200) + "..." // Slice to 250 characters and add ellipsis
-                      : post.content,
-                }}
-              />
+              <div className="text-default-600 ">
+                {sanitizeParse(
+                  post.content.length > 300
+                    ? post.content.slice(0, 200) + "..." // Slice to 250 characters and add ellipsis
+                    : post.content,
+                )}
+              </div>
 
               <p className="text-sm text-default-500">
                 <span className="font-semibold text-sm text-default-500">Posted at: </span>

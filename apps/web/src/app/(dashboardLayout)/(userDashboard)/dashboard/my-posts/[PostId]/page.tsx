@@ -4,6 +4,7 @@ import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { getPost } from "@/services/PostService";
 import Image from "next/image";
 import DownloadPdf from "@/app/(commonLayout)/posts/_components/DownloadPdf";
+import { sanitizeParse } from "@/utils/sanitizeHtml";
 
 interface IProps {
   params: Promise<{
@@ -46,11 +47,7 @@ const PostDetailPage = async ({ params }: IProps) => {
 
       {/* Post Content */}
       <section className="post-content">
-        <div
-          dangerouslySetInnerHTML={{
-            __html: post.content,
-          }}
-        ></div>
+        <div>{sanitizeParse(post.content)}</div>
 
         {/* Tags */}
         <div className="post-tags flex gap-3">

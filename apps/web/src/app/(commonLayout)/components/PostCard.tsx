@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import MediaGallery from "./MediaGallery";
-import parse from "html-react-parser";
 import { useUpdatePost } from "@/hooks/post.hook";
 import { useUser } from "@/context/user.provider";
 import { useRouter } from "next/navigation";
@@ -37,6 +36,7 @@ import { getAllCommentsOfASinglePost } from "@/services/CommentService";
 import { IUser } from "@/types/IUser";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/context/socket.provider";
+import { sanitizeParse } from "@/utils/sanitizeHtml";
 
 const CHARACTER_LIMIT = 300;
 
@@ -253,7 +253,7 @@ const PostCard = ({ post }: { post: any }) => {
             {isPremiumLocked ? (
               <>
                 <div className="prose prose-sm max-w-none text-default-700 blur-sm select-none line-clamp-4">
-                  {parse(post.content || "")}
+                  {sanitizeParse(post.content || "")}
                 </div>
                 <div className="flex flex-col items-center gap-3 py-4 bg-gradient-to-t from-warning-50 to-transparent rounded-lg mt-2">
                   <div className="flex items-center gap-2 text-warning">
@@ -276,10 +276,10 @@ const PostCard = ({ post }: { post: any }) => {
               <>
                 <div className="prose prose-sm max-w-none text-default-700">
                   {isExpanded ? (
-                    parse(post.content || "")
+                    sanitizeParse(post.content || "")
                   ) : (
                     <>
-                      {parse(post.content?.slice(0, CHARACTER_LIMIT) || "")}
+                      {sanitizeParse(post.content?.slice(0, CHARACTER_LIMIT) || "")}
                       {post.content?.length > CHARACTER_LIMIT && (
                         <span className="text-default-500">... </span>
                       )}
