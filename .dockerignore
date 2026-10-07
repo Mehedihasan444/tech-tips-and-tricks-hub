@@ -5,8 +5,13 @@ apps/*/dist
 apps/*/.turbo
 .git
 .gitignore
+# Never bake real secrets into images: match at any depth, not just repo root.
 .env
 .env*.local
+**/.env
+**/.env*.local
+apps/*/.env
+apps/*/.env*
 Dockerfile
 .dockerignore
 README.md

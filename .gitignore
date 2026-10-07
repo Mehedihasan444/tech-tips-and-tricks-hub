@@ -40,3 +40,6 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Mirror of @heroui/theme/dist consumed by Tailwind via @source (see apps/web/scripts)
+.heroui-theme/
