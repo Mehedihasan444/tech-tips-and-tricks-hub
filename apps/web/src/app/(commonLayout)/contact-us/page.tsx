@@ -48,22 +48,28 @@ const ContactUs = () => {
               <h3 className="text-2xl font-semibold  mb-4">Follow Us</h3>
               <div className="flex space-x-6 text-2xl">
                 <a
-                  href="#"
-                  aria-label="Follow us on Facebook"
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on Facebook (opens in a new tab)"
                   className="text-teal-600 hover:text-teal-800"
                 >
                   <FacebookIcon />
                 </a>
                 <a
-                  href="#"
-                  aria-label="Follow us on X"
+                  href="https://x.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on X (opens in a new tab)"
                   className="text-teal-600 hover:text-teal-800"
                 >
                   <XIcon />
                 </a>
                 <a
-                  href="#"
-                  aria-label="Follow us on Instagram"
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on Instagram (opens in a new tab)"
                   className="text-teal-600 hover:text-teal-800"
                 >
                   <InstagramIcon />

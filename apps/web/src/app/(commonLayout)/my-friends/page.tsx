@@ -2,56 +2,142 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Avatar, Button, Chip } from "@heroui/react";
-import { Users } from "lucide-react";
+import { Card, Avatar, Button, Chip, Divider } from "@heroui/react";
+import { Users, UserPlus } from "lucide-react";
 import { getFriends } from "@/services/FriendsService";
 import EmptyState from "@/components/ui/EmptyState";
 import { useRouter } from "next/navigation";
 import { UserCardSkeleton } from "@/components/ui/Skeleton";
+import { useSocket } from "@/context/socket.provider";
 
-// Define the Friend type
-interface Friend {
-  id: string;
+// Define the Friend type as returned by the API
+interface APIFriend {
+  _id: string;
+  nickName?: string;
   name: string;
-  status: string;
-  avatar: string;
-  profession: string;
-  mutualFriends: number;
+  profilePhoto?: string;
+  bio?: string;
+  followers?: any[];
 }
 
+interface Friend {
+  id: string;
+  nickName?: string;
+  name: string;
+  avatar: string;
+  profession: string;
+  followerCount: number;
+}
+
+const transformFriend = (friend: APIFriend): Friend => ({
+  id: friend._id,
+  nickName: friend.nickName,
+  name: friend.name || friend.nickName || "Unknown",
+  avatar: friend.profilePhoto || "",
+  profession: friend.bio || "Tech Enthusiast",
+  followerCount: friend.followers?.length || 0,
+});
+
+const FriendsSection = ({
+  title,
+  friends,
+  isOnline,
+  onViewProfile,
+}: {
+  title: string;
+  friends: Friend[];
+  isOnline: (id: string) => boolean;
+  onViewProfile: (nickName: string) => void;
+}) => {
+  if (friends.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        <span className="text-sm text-default-500">({friends.length})</span>
+      </div>
+      <Divider className="my-2" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {friends.map((friend) => (
+          <Card key={friend.id} className="p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={friend.avatar}
+                  alt={friend.name}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+                <div>
+                  <h4 className="text-xl font-semibold">{friend.name}</h4>
+                  <p className="text-sm text-gray-500">{friend.profession}</p>
+                </div>
+              </div>
+              <Chip
+                className={`${isOnline(friend.id) ? "bg-success-100 dark:bg-success-500/20 text-success-600 dark:text-success-300" : "bg-gray-100 dark:bg-default-500/10 text-gray-600 dark:text-default-600"}`}
+                size="sm"
+              >
+                {isOnline(friend.id) ? "Online" : "Offline"}
+              </Chip>
+            </div>
+
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <Users className="text-gray-400" />
+                <span className="text-sm text-gray-500">
+                  {friend.followerCount} {friend.followerCount === 1 ? "follower" : "followers"}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                color="primary"
+                onClick={() => onViewProfile(friend.nickName!)}
+                disabled={!friend.nickName}
+              >
+                View Profile
+              </Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const MyFriendsPage = () => {
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const [following, setFollowing] = useState<Friend[]>([]);
+  const [followers, setFollowers] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { onlineUsers } = useSocket();
+
+  const isOnline = (id: string) => onlineUsers.includes(id);
 
   useEffect(() => {
     const fetchFriends = async () => {
       try {
         setLoading(true);
         const response = await getFriends();
-        console.log(response);
 
-        // getFriends returns { success, data } from axios
         if (response?.success && response?.data) {
-          // Transform the data to match the Friend interface
-          const friendsData = response.data.map((friend: any) => ({
-            id: friend._id,
-            name: friend.name || friend.nickName || "Unknown",
-            status: "Offline", // You can implement online status check
-            avatar: friend.profilePhoto || `https://i.pravatar.cc/150?u=${friend._id}`,
-            profession: friend.bio || "Tech Enthusiast",
-            mutualFriends: friend.followers?.length || 0,
-          }));
-          setFriends(friendsData);
+          // API returns { following: [...], followers: [...] }
+          const followingData = (response.data.following || []).map(transformFriend);
+          const followersData = (response.data.followers || []).map(transformFriend);
+
+          setFollowing(followingData);
+          setFollowers(followersData);
           setError(null);
         } else {
-          setFriends([]);
+          setFollowing([]);
+          setFollowers([]);
         }
       } catch (err) {
         console.error("Error fetching friends:", err);
         setError("Failed to load friends. Please try again later.");
-        setFriends([]);
+        setFollowing([]);
+        setFollowers([]);
       } finally {
         setLoading(false);
       }
@@ -60,10 +146,16 @@ const MyFriendsPage = () => {
     fetchFriends();
   }, []);
 
+  const handleViewProfile = (nickName: string) => {
+    if (nickName) {
+      router.push(`/profile/${nickName}`);
+    }
+  };
+
   return (
     <div className="p-4 max-w-5xl mx-auto">
       <div className="flex items-center gap-2 mb-8">
-        <Users className="text-3xl text-primary" />
+        <Users className="text-3xl text-primary-fg" />
         <h1 className="text-3xl font-bold">My Friends</h1>
       </div>
 
@@ -80,7 +172,7 @@ const MyFriendsPage = () => {
             Try Again
           </Button>
         </div>
-      ) : friends.length === 0 ? (
+      ) : following.length === 0 && followers.length === 0 ? (
         <div className="bg-content1 rounded-2xl border border-divider">
           <EmptyState
             type="friends"
@@ -91,38 +183,19 @@ const MyFriendsPage = () => {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {friends.map((friend) => (
-            <Card key={friend.id} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <Avatar src={friend.avatar} className="w-16 h-16" alt={friend.name} />
-                  <div>
-                    <h4 className="text-xl font-semibold">{friend.name}</h4>
-                    <p className="text-sm text-gray-500">{friend.profession}</p>
-                  </div>
-                </div>
-                <Chip
-                  className={`${friend.status === "Online" ? "bg-success-100 text-success-600" : "bg-gray-100 text-gray-600"}`}
-                  size="sm"
-                >
-                  {friend.status}
-                </Chip>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center gap-2">
-                  <Users className="text-gray-400" />
-                  <span className="text-sm text-gray-500">
-                    {friend.mutualFriends} mutual friends
-                  </span>
-                </div>
-                <Button size="sm" variant="flat" color="primary" href={`/profile/${friend.id}`}>
-                  View Profile
-                </Button>
-              </div>
-            </Card>
-          ))}
+        <div className="space-y-8">
+          <FriendsSection
+            title="Following"
+            friends={following}
+            isOnline={isOnline}
+            onViewProfile={handleViewProfile}
+          />
+          <FriendsSection
+            title="Followers"
+            friends={followers}
+            isOnline={isOnline}
+            onViewProfile={handleViewProfile}
+          />
         </div>
       )}
     </div>

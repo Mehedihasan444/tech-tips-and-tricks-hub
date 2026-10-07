@@ -2,7 +2,7 @@ import React from "react";
 import CompanyHistory from "./_components/CompanyHistory";
 import TeamMembers from "./_components/TeamMembers";
 import OurFleet from "./_components/OurFleet";
-import { Button } from "@heroui/react";
+import { Button } from "@/components/ui/heroui";
 import ValuesCommitment from "./_components/ValuesCommitment";
 import aboutUs from "@/assets/aboutUs.jpg";
 
@@ -11,15 +11,19 @@ const AboutPage = () => {
     <div className="min-h-screen p-4">
       {/* Header */}
       <header
-        className="text-white py-20 text-center bg-center bg-cover bg-no-repeat"
+        className="text-white py-20 text-center bg-center bg-cover bg-no-repeat relative"
         style={{
           backgroundImage: `url(${aboutUs.src})`,
         }}
       >
-        <h1 className="text-5xl font-bold">About Tech Tips & Tricks Hub</h1>
-        <p className="mt-4 text-xl">
-          Empowering tech enthusiasts with knowledge, tutorials, and insights
-        </p>
+        {/* Scrim so the headline stays readable on any photo brightness */}
+        <div aria-hidden="true" className="absolute inset-0 bg-black/55" />
+        <div className="relative">
+          <h1 className="text-5xl font-bold">About Tech Tips & Tricks Hub</h1>
+          <p className="mt-4 text-xl">
+            Empowering tech enthusiasts with knowledge, tutorials, and insights
+          </p>
+        </div>
       </header>
 
       {/* Company History */}
@@ -41,7 +45,7 @@ const AboutPage = () => {
           Whether you’re a beginner or a pro, our community has something for everyone. Let’s grow
           and innovate together!
         </p>
-        <Button className="bg-teal-600 text-white hover:bg-teal-500" href="/contact">
+        <Button as="a" color="primary" href="/contact-us">
           Contact Us
         </Button>
       </section>
