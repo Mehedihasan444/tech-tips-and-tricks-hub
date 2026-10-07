@@ -18,6 +18,7 @@ export interface IUser {
   mobileNumber: string;
   profilePhoto: string;
   bio?: string;
+  profession?: string;
   nickName?: string;
   shortBio?: string;
   dateOfBirth?: string;
@@ -44,6 +45,7 @@ export interface IUserData {
   mobileNumber?: string;
   profilePhoto?: string;
   bio?: string;
+  profession?: string;
   nickName?: string;
   shortBio?: string;
   dateOfBirth?: string;

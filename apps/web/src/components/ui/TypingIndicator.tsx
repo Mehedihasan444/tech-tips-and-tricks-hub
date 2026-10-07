@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useMemo } from "react";
 import { useSocket, TypingIndicator as TypingData } from "@/context/socket.provider";
 
 interface TypingIndicatorProps {
@@ -10,15 +10,15 @@ interface TypingIndicatorProps {
 
 export default function TypingIndicator({ postId, className = "" }: TypingIndicatorProps) {
   const { typingUsers } = useSocket();
-  const [typingList, setTypingList] = useState<TypingData[]>([]);
 
-  useEffect(() => {
-    // Filter typing users for this specific post
-    const usersTypingInPost = Array.from(typingUsers.values()).filter(
-      (user) => user.postId === postId && user.isTyping,
-    );
-    setTypingList(usersTypingInPost);
-  }, [typingUsers, postId]);
+  // Derived, not mirrored into state: `typingUsers` is a Map replaced on every
+  // keystroke of every user, so the previous effect fired an extra render each
+  // time just to compute a filter.
+  const typingList: TypingData[] = useMemo(
+    () =>
+      Array.from(typingUsers.values()).filter((user) => user.postId === postId && user.isTyping),
+    [typingUsers, postId],
+  );
 
   if (typingList.length === 0) return null;
 

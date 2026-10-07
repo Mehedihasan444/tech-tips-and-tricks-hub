@@ -135,25 +135,24 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   const displayActionLabel = actionLabel || config.actionLabel;
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      {/* Illustration/Icon */}
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      {/* Illustration/Icon (decorative) */}
       {showIllustration && (
-        <div className="relative mb-6">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full blur-2xl opacity-50 scale-150" />
+        <div className="relative mb-6" aria-hidden="true">
+          {/* Ambient bloom behind the icon: gives the empty state depth instead
+              of a flat dashed circle sitting on the page. */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/25 via-primary-400/15 to-secondary-500/25 rounded-full blur-3xl scale-150" />
 
           {/* Main icon container */}
-          <div
-            className={`relative w-24 h-24 rounded-full bg-default-100 flex items-center justify-center border-2 border-dashed border-default-300`}
-          >
-            <Icon className="w-10 h-10 text-default-400" strokeWidth={1.5} />
+          <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-default-100 to-default-200/70 dark:from-default-500/15 dark:to-default-500/5 flex items-center justify-center border border-default-300/80 shadow-card">
+            <Icon className="w-10 h-10 text-default-500" strokeWidth={1.5} />
           </div>
 
-          {/* Floating decorations */}
-          <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
+          {/* Floating accents */}
+          <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-primary-500/15 flex items-center justify-center animate-float-slow motion-reduce:animate-none">
             <div className="w-2 h-2 rounded-full bg-primary-400" />
           </div>
-          <div className="absolute -bottom-1 -left-3 w-4 h-4 rounded-full bg-secondary-100 flex items-center justify-center">
+          <div className="absolute -bottom-1 -left-2 w-5 h-5 rounded-full bg-secondary-500/15 flex items-center justify-center">
             <div className="w-1.5 h-1.5 rounded-full bg-secondary-400" />
           </div>
         </div>
@@ -161,17 +160,18 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 
       {/* Content */}
       <div className="max-w-sm space-y-2">
-        <h3 className="text-xl font-semibold text-foreground">{displayTitle}</h3>
+        <h3 className="text-xl font-bold tracking-tight text-foreground">{displayTitle}</h3>
         <p className="text-default-500 text-sm leading-relaxed">{displayDescription}</p>
       </div>
 
       {/* Actions */}
       {(displayActionLabel || secondaryActionLabel) && (
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3 mt-7">
           {secondaryActionLabel && onSecondaryAction && (
             <Button
               variant="flat"
               color="default"
+              radius="full"
               onPress={onSecondaryAction}
               startContent={<RefreshCw className="w-4 h-4" />}
             >
@@ -181,9 +181,10 @@ const EmptyState: React.FC<EmptyStateProps> = ({
           {displayActionLabel && onAction && (
             <Button
               color="primary"
+              radius="full"
               onPress={onAction}
               startContent={<Plus className="w-4 h-4" />}
-              className="font-medium"
+              className="font-medium shadow-glow-primary"
             >
               {displayActionLabel}
             </Button>

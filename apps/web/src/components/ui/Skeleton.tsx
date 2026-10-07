@@ -10,7 +10,19 @@ interface SkeletonProps {
 // Base skeleton component
 export const Skeleton: React.FC<SkeletonProps> = ({ className = "", animated = true }) => {
   return (
-    <div className={cn("bg-default-200 rounded-lg", animated && "animate-pulse", className)} />
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-lg bg-default-200",
+        // Each block only gets its own `animate-pulse` when it is the root of the
+        // skeleton. Children pass `animated={false}` so a card of ~15 blocks
+        // does not run 15 independent opacity pulses that drift out of phase and
+        // read as flickering rather than loading.
+        animated && "motion-safe:animate-pulse",
+        className,
+      )}
+    >
+      {animated && <span aria-hidden="true" className="shimmer absolute inset-0" />}
+    </div>
   );
 };
 
@@ -30,12 +42,14 @@ export const SkeletonCircle: React.FC<SkeletonProps & { size?: "sm" | "md" | "lg
   return (
     <div
       className={cn(
-        "rounded-full bg-default-200",
-        animated && "animate-pulse",
+        "relative overflow-hidden rounded-full bg-default-200",
+        animated && "motion-safe:animate-pulse",
         sizeClasses[size],
         className,
       )}
-    />
+    >
+      {animated && <span aria-hidden="true" className="shimmer absolute inset-0" />}
+    </div>
   );
 };
 
@@ -51,11 +65,16 @@ export const SkeletonText: React.FC<SkeletonProps & { lines?: number; lastLineWi
       {Array.from({ length: lines }).map((_, index) => (
         <div
           key={index}
-          className={cn("h-4 bg-default-200 rounded", animated && "animate-pulse")}
+          className={cn(
+            "relative h-4 overflow-hidden rounded bg-default-200",
+            animated && "motion-safe:animate-pulse",
+          )}
           style={{
             width: index === lines - 1 && lines > 1 ? lastLineWidth : "100%",
           }}
-        />
+        >
+          {animated && <span aria-hidden="true" className="shimmer absolute inset-0" />}
+        </div>
       ))}
     </div>
   );
@@ -71,7 +90,7 @@ export const SkeletonCard: React.FC<SkeletonProps & { children?: React.ReactNode
     <div
       className={cn(
         "bg-content1 rounded-2xl border border-divider p-6",
-        animated && "animate-pulse",
+        animated && "motion-safe:animate-pulse",
         className,
       )}
     >
@@ -80,13 +99,16 @@ export const SkeletonCard: React.FC<SkeletonProps & { children?: React.ReactNode
   );
 };
 
-// Post Card Skeleton
+// Post Card Skeleton. Decorative on purpose: the busy state belongs on the
+// surrounding container (see `aria-busy`), so a grid of these is not announced
+// once per row.
 export const PostCardSkeleton: React.FC<{ animated?: boolean }> = ({ animated = true }) => {
   return (
     <div
+      aria-hidden="true"
       className={cn(
         "bg-content1 rounded-2xl border border-divider p-6 space-y-4",
-        animated && "animate-pulse",
+        animated && "motion-safe:animate-pulse",
       )}
     >
       {/* Header */}
@@ -141,7 +163,9 @@ export const PostCardSkeleton: React.FC<{ animated?: boolean }> = ({ animated = 
 // Story Skeleton
 export const StorySkeleton: React.FC<{ animated?: boolean }> = ({ animated = true }) => {
   return (
-    <div className={cn("flex flex-col items-center gap-2", animated && "animate-pulse")}>
+    <div
+      className={cn("flex flex-col items-center gap-2", animated && "motion-safe:animate-pulse")}
+    >
       <div className="w-16 h-16 rounded-full bg-default-200 ring-2 ring-default-200" />
       <Skeleton className="h-3 w-14" animated={false} />
     </div>
@@ -151,7 +175,7 @@ export const StorySkeleton: React.FC<{ animated?: boolean }> = ({ animated = tru
 // Stories Section Skeleton
 export const StoriesSectionSkeleton: React.FC<{ count?: number }> = ({ count = 6 }) => {
   return (
-    <div className="flex gap-4 p-4 overflow-hidden animate-pulse">
+    <div aria-hidden="true" className="flex gap-4 p-4 overflow-hidden motion-safe:animate-pulse">
       {Array.from({ length: count }).map((_, index) => (
         <StorySkeleton key={index} animated={false} />
       ))}
@@ -162,7 +186,10 @@ export const StoriesSectionSkeleton: React.FC<{ count?: number }> = ({ count = 6
 // User Card Skeleton
 export const UserCardSkeleton: React.FC<{ animated?: boolean }> = ({ animated = true }) => {
   return (
-    <div className={cn("flex items-center gap-3 p-3", animated && "animate-pulse")}>
+    <div
+      aria-hidden="true"
+      className={cn("flex items-center gap-3 p-3", animated && "motion-safe:animate-pulse")}
+    >
       <SkeletonCircle size="md" animated={false} />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-24" animated={false} />
@@ -176,7 +203,7 @@ export const UserCardSkeleton: React.FC<{ animated?: boolean }> = ({ animated = 
 // Comment Skeleton
 export const CommentSkeleton: React.FC<{ animated?: boolean }> = ({ animated = true }) => {
   return (
-    <div className={cn("flex gap-3", animated && "animate-pulse")}>
+    <div aria-hidden="true" className={cn("flex gap-3", animated && "motion-safe:animate-pulse")}>
       <SkeletonCircle size="sm" animated={false} />
       <div className="flex-1 space-y-2">
         <div className="bg-default-100 rounded-lg p-3 space-y-2">
@@ -200,9 +227,10 @@ export const TableRowSkeleton: React.FC<{ columns?: number; animated?: boolean }
 }) => {
   return (
     <div
+      aria-hidden="true"
       className={cn(
         "flex items-center gap-4 p-4 border-b border-divider",
-        animated && "animate-pulse",
+        animated && "motion-safe:animate-pulse",
       )}
     >
       {Array.from({ length: columns }).map((_, index) => (
@@ -215,7 +243,7 @@ export const TableRowSkeleton: React.FC<{ columns?: number; animated?: boolean }
 // Sidebar Skeleton
 export const SidebarSkeleton: React.FC = () => {
   return (
-    <div className="space-y-4 p-4 animate-pulse">
+    <div aria-hidden="true" className="space-y-4 p-4 motion-safe:animate-pulse">
       {/* Profile section */}
       <div className="flex items-center gap-3 p-3">
         <SkeletonCircle size="lg" animated={false} />
@@ -242,9 +270,10 @@ export const SidebarSkeleton: React.FC = () => {
 export const DashboardCardSkeleton: React.FC<{ animated?: boolean }> = ({ animated = true }) => {
   return (
     <div
+      aria-hidden="true"
       className={cn(
         "bg-content1 rounded-2xl border border-divider p-6 space-y-4",
-        animated && "animate-pulse",
+        animated && "motion-safe:animate-pulse",
       )}
     >
       <div className="flex items-center justify-between">

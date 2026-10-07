@@ -15,6 +15,18 @@ export default function DraftStatus({
   hasUnsavedChanges,
   lastSavedText,
 }: DraftStatusProps) {
+  return (
+    <span role="status" aria-live="polite" className="inline-flex">
+      <DraftChip
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
+        lastSavedText={lastSavedText}
+      />
+    </span>
+  );
+}
+
+function DraftChip({ isSaving, hasUnsavedChanges, lastSavedText }: DraftStatusProps) {
   if (isSaving) {
     return (
       <Tooltip content="Saving draft...">

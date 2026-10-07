@@ -38,8 +38,16 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
   const handleDeleteDraft = (id: string) => {
     deleteDraft(id);
     setDrafts(getAllDrafts());
+    setDraftCount(getAllDrafts().length);
     setDraftToDelete(null);
   };
+
+  // null until mounted, so SSR and the first client render agree.
+  const [draftCount, setDraftCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    setDraftCount(getAllDrafts().length);
+  }, [drafts]);
 
   const handleLoadDraft = (draft: PostDraft) => {
     onLoadDraft(draft);
@@ -54,16 +62,25 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
     }
   };
 
-  const stripHtml = (html: string) => {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
-  };
+  // Regex-based so it is safe during SSR/prerender (the previous
+  // `document.createElement` version only avoided crashing because `drafts`
+  // happened to be empty on the server).
+  const stripHtml = (html: string) =>
+    html
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s+/g, " ")
+      .trim();
 
   return (
     <>
       {trigger ? (
-        <div onClick={onOpen}>{trigger}</div>
+        React.cloneElement(trigger as React.ReactElement<{ onClick?: () => void }>, {
+          onClick: onOpen,
+        })
       ) : (
         <Button
           variant="bordered"
@@ -73,9 +90,7 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
           onPress={onOpen}
           className="font-medium"
         >
-          Drafts{" "}
-          {(drafts.length || getAllDrafts().length) > 0 &&
-            `(${drafts.length || getAllDrafts().length})`}
+          Drafts{(draftCount ?? 0) > 0 && ` (${draftCount})`}
         </Button>
       )}
 
@@ -84,7 +99,7 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <FileText className="text-primary" size={20} />
+                <FileText className="text-primary-fg" size={20} />
                 <span>Saved Drafts</span>
                 {drafts.length > 0 && (
                   <Chip size="sm" color="primary" variant="flat">
@@ -97,19 +112,14 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
                   <div className="text-center py-12">
                     <FileText className="mx-auto text-default-300 mb-4" size={48} />
                     <p className="text-default-500">No saved drafts</p>
-                    <p className="text-sm text-default-400 mt-1">
+                    <p className="text-sm text-default-600 mt-1">
                       Your drafts will appear here when you start writing
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {drafts.map((draft) => (
-                      <Card
-                        key={draft.id}
-                        isPressable
-                        onPress={() => handleLoadDraft(draft)}
-                        className="hover:bg-default-100 transition-colors"
-                      >
+                      <Card key={draft.id} className="transition-colors">
                         <CardBody className="p-4">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
@@ -130,7 +140,7 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
                                     Premium
                                   </Chip>
                                 )}
-                                <span className="text-xs text-default-400 flex items-center gap-1">
+                                <span className="text-xs text-default-600 flex items-center gap-1">
                                   <Clock size={12} />
                                   {formatDate(draft.lastSaved)}
                                 </span>
@@ -151,12 +161,10 @@ export default function DraftsManager({ onLoadDraft, trigger }: DraftsManagerPro
                                 color="danger"
                                 variant="light"
                                 isIconOnly
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDraftToDelete(draft.id);
-                                }}
+                                aria-label={`Delete draft "${draft.title ?? "Untitled"}"`}
+                                onPress={() => setDraftToDelete(draft.id)}
                               >
-                                <Trash2 size={14} />
+                                <Trash2 size={14} aria-hidden="true" />
                               </Button>
                             </div>
                           </div>

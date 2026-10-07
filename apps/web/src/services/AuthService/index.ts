@@ -4,8 +4,12 @@
 
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 import axiosInstance from "@/config/axios.config";
 import { revalidateTag } from "next/cache";
+import { authCookieOptions, ACCESS_TOKEN_MAX_AGE } from "@/config/authCookies";
+import { toErrorMessage } from "@/utils/toError";
+import envConfig from "@/config/envConfig";
 import { getUser } from "../UserService";
 
 export const registerUser = async (userData: Record<string, unknown>) => {
@@ -14,8 +18,16 @@ export const registerUser = async (userData: Record<string, unknown>) => {
 
     if (data.success) {
       const cookieStore = await cookies();
-      cookieStore.set("accessToken", data?.data?.accessToken);
-      cookieStore.set("refreshToken", data?.data?.refreshToken);
+      cookieStore.set(
+        "accessToken",
+        data?.data?.accessToken,
+        authCookieOptions(ACCESS_TOKEN_MAX_AGE),
+      );
+      cookieStore.set(
+        "refreshToken",
+        data?.data?.refreshToken,
+        authCookieOptions(ACCESS_TOKEN_MAX_AGE),
+      );
       revalidateTag("users", "max");
     }
 
@@ -24,7 +36,7 @@ export const registerUser = async (userData: Record<string, unknown>) => {
     if (error?.response?.data?.success === false) {
       return error?.response?.data;
     } else {
-      throw new Error(error);
+      throw new Error(toErrorMessage(error, "Request failed"));
     }
   }
 };
@@ -35,8 +47,16 @@ export const loginUser = async (userData: Record<string, unknown>) => {
 
     if (data.success) {
       const cookieStore = await cookies();
-      cookieStore.set("accessToken", data?.data?.accessToken);
-      cookieStore.set("refreshToken", data?.data?.refreshToken);
+      cookieStore.set(
+        "accessToken",
+        data?.data?.accessToken,
+        authCookieOptions(ACCESS_TOKEN_MAX_AGE),
+      );
+      cookieStore.set(
+        "refreshToken",
+        data?.data?.refreshToken,
+        authCookieOptions(ACCESS_TOKEN_MAX_AGE),
+      );
     }
 
     return data;
@@ -44,7 +64,7 @@ export const loginUser = async (userData: Record<string, unknown>) => {
     if (error?.response?.data?.success === false) {
       return error?.response?.data;
     } else {
-      throw new Error(error);
+      throw new Error(toErrorMessage(error, "Request failed"));
     }
   }
 };
@@ -59,7 +79,7 @@ export const forgetPassword = async (userData: Record<string, unknown>) => {
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(toErrorMessage(error, "Request failed"));
   }
 };
 export const resetPassword = async (userData: Record<string, unknown>) => {
@@ -67,14 +87,14 @@ export const resetPassword = async (userData: Record<string, unknown>) => {
     const { token, ...newData } = userData;
     if (typeof token === "string") {
       const cookieStore = await cookies();
-      cookieStore.set("accessToken", token);
+      cookieStore.set("accessToken", token, authCookieOptions(ACCESS_TOKEN_MAX_AGE));
     }
 
     const { data } = await axiosInstance.post("/auth/reset-password", newData);
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(toErrorMessage(error, "Request failed"));
   }
 };
 
@@ -91,10 +111,16 @@ export const getCurrentUser = async () => {
   let decodedToken = null;
 
   if (accessToken) {
-    decodedToken = await jwtDecode(accessToken);
+    try {
+      decodedToken = await jwtDecode(accessToken);
+    } catch {
+      // A malformed cookie must not 500 the page; treat it as "signed out".
+      return null;
+    }
+
     if (decodedToken) {
-      const user = await getUser(decodedToken?.nickName);
-      return user?.data;
+      const user = await getUser(decodedToken?.nickName).catch(() => null);
+      return user?.data ?? null;
     }
   }
 
@@ -106,9 +132,15 @@ export const getNewAccessToken = async () => {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get("refreshToken")?.value;
 
-    const res = await axiosInstance({
-      url: "/auth/refresh-token",
-      method: "POST",
+    // Deliberately a bare `axios` call rather than `axiosInstance`.
+    //
+    // The shared instance's 401 interceptor calls this very function, so
+    // routing the refresh through it means a 401 from the refresh endpoint
+    // re-enters that interceptor with a fresh config (the `sent` guard is per
+    // config, not global) and recurses until the stack blows. It also must not
+    // inherit the request interceptor's Authorization header: this endpoint
+    // authenticates with the refresh cookie only.
+    const res = await axios.post(`${envConfig.baseApi}/auth/refresh-token`, undefined, {
       withCredentials: true,
       headers: {
         cookie: `refreshToken=${refreshToken}`,

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import Link from "next/link";
 import LiveChat from "./LiveChat";
 import {
   Button,
@@ -11,9 +12,11 @@ import {
   CardHeader,
   Divider,
   ScrollShadow,
+  Spinner,
 } from "@heroui/react";
 import { MessageSquare, X, Users } from "lucide-react";
 import { useSocket } from "@/context/socket.provider";
+import { getSuggestedUsers } from "@/services/UserService";
 
 interface ChatUser {
   _id: string;
@@ -38,7 +41,47 @@ const ChatManagerContext = createContext<ChatManagerContextValue | undefined>(un
 export function ChatManagerProvider({ children }: { children: ReactNode }) {
   const [activeChats, setActiveChats] = useState<ChatUser[]>([]);
   const [isChatListOpen, setIsChatListOpen] = useState(false);
+  const [directory, setDirectory] = useState<Map<string, ChatUser>>(new Map());
+  const [loadingDirectory, setLoadingDirectory] = useState(false);
   const { onlineUsers, isConnected } = useSocket();
+
+  // Resolve real names/photos for online IDs so the popup never shows "User ab12".
+  useEffect(() => {
+    if (!isChatListOpen || onlineUsers.length === 0) return;
+    const missing = onlineUsers.filter((id) => !directory.has(id));
+    if (missing.length === 0) return;
+    let cancelled = false;
+    const fetchDirectory = async () => {
+      try {
+        setLoadingDirectory(true);
+        const res = await getSuggestedUsers(20);
+        const list = res?.data?.data ?? res?.data ?? [];
+        if (cancelled || !Array.isArray(list)) return;
+        setDirectory((prev) => {
+          const next = new Map(prev);
+          list.forEach((u: Record<string, unknown>) => {
+            const id = String(u._id ?? "");
+            if (!id) return;
+            next.set(id, {
+              _id: id,
+              name: String(u.name ?? u.nickName ?? "Unknown"),
+              profilePhoto: String(u.profilePhoto ?? ""),
+              nickName: typeof u.nickName === "string" ? u.nickName : undefined,
+            });
+          });
+          return next;
+        });
+      } catch {
+        // keep placeholder names on failure
+      } finally {
+        if (!cancelled) setLoadingDirectory(false);
+      }
+    };
+    void fetchDirectory();
+    return () => {
+      cancelled = true;
+    };
+  }, [isChatListOpen, onlineUsers, directory]);
 
   const openChat = useCallback((user: ChatUser) => {
     setActiveChats((prev) => {
@@ -75,15 +118,20 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
               <Users size={18} />
               <h4 className="font-semibold">Messages</h4>
             </div>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              onPress={() => setIsChatListOpen(false)}
-              aria-label="Close chat list"
-            >
-              <X size={16} />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button size="sm" variant="flat" color="primary" as={Link} href="/messages">
+                Open all
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => setIsChatListOpen(false)}
+                aria-label="Close chat list"
+              >
+                <X size={16} />
+              </Button>
+            </div>
           </CardHeader>
           <Divider />
           <CardBody className="p-0">
@@ -96,39 +144,56 @@ export function ChatManagerProvider({ children }: { children: ReactNode }) {
                 <div className="p-4 text-center text-default-500">
                   <MessageSquare size={32} className="mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No users online</p>
-                  <p className="text-xs text-default-400 mt-1">Online users will appear here</p>
+                  <p className="text-xs text-default-600 mt-1">Online users will appear here</p>
                 </div>
               ) : (
                 <div className="p-2">
                   <p className="text-xs text-default-500 px-2 mb-2">
                     {onlineUsers.length} user(s) online
+                    {loadingDirectory ? " · loading names..." : ""}
                   </p>
-                  {/* Note: In a real app, you'd fetch user details from the online user IDs */}
-                  {onlineUsers.map((userId) => (
-                    <div
-                      key={userId}
-                      className="flex items-center gap-3 p-2 hover:bg-default-100 rounded-lg cursor-pointer transition-colors"
-                      onClick={() =>
-                        openChat({
-                          _id: userId,
-                          name: `User ${userId.slice(-4)}`,
-                          profilePhoto: "",
-                        })
-                      }
-                    >
-                      <Badge content="" color="success" size="sm" placement="bottom-right">
-                        <Avatar
-                          size="sm"
-                          name={userId.slice(-2).toUpperCase()}
-                          className="bg-primary text-white"
-                        />
-                      </Badge>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">User {userId.slice(-4)}</p>
-                        <p className="text-xs text-success">Online</p>
-                      </div>
+                  {onlineUsers.map((userId) => {
+                    const known = directory.get(userId);
+                    const displayName = known?.name ?? `User ${userId.slice(-4)}`;
+                    return (
+                      <button
+                        type="button"
+                        key={userId}
+                        className="w-full flex items-center gap-3 p-2 hover:bg-default-100 rounded-lg text-left transition-colors"
+                        onClick={() =>
+                          openChat({
+                            _id: userId,
+                            name: displayName,
+                            profilePhoto: known?.profilePhoto ?? "",
+                            nickName: known?.nickName,
+                          })
+                        }
+                      >
+                        <Badge content="" color="success" size="sm" placement="bottom-right">
+                          {known?.profilePhoto ? (
+                            <Avatar size="sm" src={known.profilePhoto} name={displayName} />
+                          ) : (
+                            <Avatar
+                              size="sm"
+                              name={(displayName?.trim() ? displayName : userId)
+                                .slice(0, 2)
+                                .toUpperCase()}
+                              className="bg-primary text-white"
+                            />
+                          )}
+                        </Badge>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{displayName}</p>
+                          <p className="text-xs text-success">Online</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {loadingDirectory && (
+                    <div className="flex justify-center py-2">
+                      <Spinner size="sm" />
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </ScrollShadow>

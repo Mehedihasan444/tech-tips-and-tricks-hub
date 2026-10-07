@@ -28,6 +28,11 @@ export const getPosts = async (page = 1, limit = 10) => {
   };
 
   const res = await fetch(`${envConfig.baseApi}/posts?page=${page}&limit=${limit}`, fetchOption);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch posts (${res.status})`);
+  }
+
   return res.json();
 };
 

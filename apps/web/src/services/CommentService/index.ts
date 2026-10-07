@@ -82,5 +82,9 @@ export const getAllCommentsOfASinglePost = async (postId: string) => {
 
   const res = await fetch(`${envConfig.baseApi}/comments?postId=${postId}`, fetchOption);
 
+  if (!res.ok) {
+    throw new Error(`Failed to fetch comments (${res.status})`);
+  }
+
   return res.json();
 };

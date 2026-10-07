@@ -1,6 +1,10 @@
+// SERVER-ONLY: uses `next/headers` (cookies). Import only from `"use server"`
+// service modules or route handlers — never from `"use client"` components.
 import axios from "axios";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import envConfig from "./envConfig";
+import { authCookieOptions, ACCESS_TOKEN_MAX_AGE } from "./authCookies";
 import { getNewAccessToken } from "@/services/AuthService";
 
 const axiosInstance = axios.create({
@@ -37,12 +41,21 @@ axiosInstance.interceptors.response.use(
 
       config.headers["Authorization"] = accessToken;
       const cookieStore = await cookies();
-      cookieStore.set("accessToken", accessToken);
+      cookieStore.set("accessToken", accessToken, authCookieOptions(ACCESS_TOKEN_MAX_AGE));
 
       return axiosInstance(config);
-    } else {
-      return Promise.reject(error);
     }
+
+    // If we get here, the request is still unauthorized after refresh (or refresh failed).
+    // The session is genuinely dead — clear cookies and force re-login.
+    if (error?.response?.status === 401) {
+      const cookieStore = await cookies();
+      cookieStore.delete("accessToken");
+      cookieStore.delete("refreshToken");
+      redirect("/login?session=expired");
+    }
+
+    return Promise.reject(error);
   },
 );
 

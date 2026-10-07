@@ -47,15 +47,23 @@ export default function StoryViewsCounter({
 
   return (
     <>
-      <Button
-        variant="light"
-        size="sm"
-        startContent={<Eye size={16} />}
-        onPress={showViewers ? onOpen : undefined}
-        className="text-white/90 hover:text-white"
-      >
-        {displayCount} {displayCount === 1 ? "view" : "views"}
-      </Button>
+      {showViewers ? (
+        <Button
+          variant="light"
+          size="sm"
+          aria-label={`${displayCount} ${displayCount === 1 ? "view" : "views"}. Show viewers`}
+          startContent={<Eye size={16} aria-hidden="true" />}
+          onPress={onOpen}
+          className="text-white/90 hover:text-white"
+        >
+          {displayCount} {displayCount === 1 ? "view" : "views"}
+        </Button>
+      ) : (
+        <span className="inline-flex items-center gap-1 text-white/90 text-sm">
+          <Eye size={16} aria-hidden="true" />
+          {displayCount} {displayCount === 1 ? "view" : "views"}
+        </span>
+      )}
 
       {showViewers && (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="sm">
@@ -63,9 +71,9 @@ export default function StoryViewsCounter({
             {() => (
               <>
                 <ModalHeader className="flex items-center gap-2">
-                  <Users size={20} className="text-primary" />
+                  <Users size={20} className="text-primary-fg" />
                   <span>Story Views</span>
-                  <span className="text-default-400 text-sm font-normal">({displayCount})</span>
+                  <span className="text-default-600 text-sm font-normal">({displayCount})</span>
                 </ModalHeader>
                 <ModalBody className="pb-6">
                   {isLoading ? (
@@ -87,7 +95,7 @@ export default function StoryViewsCounter({
                           <Avatar src={viewer.viewerPhoto} name={viewer.viewerName} size="sm" />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium truncate">{viewer.viewerName}</p>
-                            <p className="text-xs text-default-400">
+                            <p className="text-xs text-default-600">
                               {formatTime(viewer.viewedAt)}
                             </p>
                           </div>

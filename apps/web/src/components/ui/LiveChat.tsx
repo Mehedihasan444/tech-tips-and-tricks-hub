@@ -31,13 +31,40 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
   const [isLoading, setIsLoading] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const isRecipientOnline = onlineUsers.includes(recipient._id);
 
   // Scroll to bottom of messages
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  // scrollIntoView on every inbound message yanked the viewport even when the
+  // user had scrolled up to read history; only follow when already near the end.
+  const isNearBottom = () => {
+    const el = messagesEndRef.current?.parentElement;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  };
+
+  const trackScroll = useCallback((fn: () => void) => {
+    const id = setTimeout(fn, 100);
+    scrollTimersRef.current.push(id);
+  }, []);
+
+  // Every timer this component starts is tracked so unmount can clear it.
+  useEffect(() => {
+    const timers = [
+      ...scrollTimersRef.current,
+      ...(typingTimeoutRef.current ? [typingTimeoutRef.current] : []),
+    ];
+    return () => {
+      timers.forEach((id) => clearTimeout(id));
+      scrollTimersRef.current = [];
+      typingTimeoutRef.current = null;
+    };
   }, []);
 
   // Load chat history and setup listeners
@@ -56,7 +83,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
     const handleChatHistory = (history: ChatMessage[]) => {
       setMessages(history);
       setIsLoading(false);
-      setTimeout(scrollToBottom, 100);
+      trackScroll(scrollToBottom);
     };
 
     // Listen for new messages
@@ -65,6 +92,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
         (message.senderId === recipient._id && message.receiverId === user._id) ||
         (message.senderId === user._id && message.receiverId === recipient._id)
       ) {
+        const shouldFollow = isNearBottom();
         // Only add if it's from the recipient (not our own message which was already added optimistically)
         // Or if it's our message from another device/tab
         setMessages((prev) => {
@@ -90,7 +118,9 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
 
           return [...prev, message];
         });
-        setTimeout(scrollToBottom, 100);
+        if (shouldFollow) {
+          trackScroll(scrollToBottom);
+        }
 
         // Mark as read if it's from the recipient
         if (message.senderId === recipient._id) {
@@ -115,7 +145,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
       socket.off("chat-message", handleNewMessage);
       socket.off("user-typing-chat", handleTyping);
     };
-  }, [socket, isOpen, user, recipient._id, scrollToBottom]);
+  }, [socket, isOpen, user, recipient._id, scrollToBottom, trackScroll]);
 
   // Handle sending message
   const handleSend = () => {
@@ -134,7 +164,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
     };
     setMessages((prev) => [...prev, optimisticMessage]);
     setNewMessage("");
-    setTimeout(scrollToBottom, 100);
+    trackScroll(scrollToBottom);
 
     // Stop typing indicator
     if (typingTimeoutRef.current) {
@@ -242,8 +272,14 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="h-72 overflow-y-auto p-3 space-y-3 bg-default-50">
+      {/* Messages. role="log" + aria-live so incoming messages are announced. */}
+      <div
+        role="log"
+        aria-live="polite"
+        aria-label={`Conversation with ${recipient.name}`}
+        aria-busy={isLoading}
+        className="h-72 overflow-y-auto p-3 space-y-3 bg-default-50"
+      >
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <Spinner size="sm" />
@@ -252,7 +288,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
           <div className="flex flex-col items-center justify-center h-full text-center">
             <MessageCircle className="text-default-300 mb-2" size={32} />
             <p className="text-sm text-default-500">No messages yet</p>
-            <p className="text-xs text-default-400">Start the conversation!</p>
+            <p className="text-xs text-default-600">Start the conversation!</p>
           </div>
         ) : (
           <>
@@ -267,7 +303,7 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
                   >
                     <p className="text-sm break-words">{msg.message}</p>
                     <p
-                      className={`text-[10px] mt-1 ${isMe ? "text-white/70" : "text-default-400"}`}
+                      className={`text-[10px] mt-1 ${isMe ? "text-white/70" : "text-default-600"}`}
                     >
                       {formatTime(msg.createdAt)}
                     </p>
@@ -276,7 +312,11 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
               );
             })}
             {isTyping && (
-              <div className="flex items-center gap-2 text-default-400">
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex items-center gap-2 text-default-600"
+              >
                 <div className="flex gap-1">
                   <span className="w-2 h-2 bg-default-400 rounded-full animate-bounce" />
                   <span
@@ -314,7 +354,9 @@ export default function LiveChat({ recipient, isOpen, onClose }: LiveChatProps) 
               handleTypingStart();
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              // `isComposing` is true while an IME owns the keystroke; without
+              // this guard Enter sent half-composed CJK text.
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 handleSend();
               }

@@ -6,12 +6,12 @@ import { IUserData } from "@/types/IUser";
 import { revalidateTag } from "next/cache";
 
 export const getUsers = async (page: number = 1, limit: number = 8) => {
+  // Cached and tagged so the revalidateTag("users") calls in the write actions
+  // actually have something to invalidate. `cache: "no-store"` cannot be combined
+  // with `next.tags`: the response never enters the Data Cache, so the tag is
+  // never registered and every revalidateTag became a silent no-op.
   const fetchOptions = {
-    next: {
-      revalidate: 10,
-      cache: "force-cache" as RequestCache,
-      tags: ["users"],
-    },
+    next: { revalidate: 30, tags: ["users"] },
   };
 
   const res = await fetch(`${envConfig.baseApi}/users?page=${page}&limit=${limit}`, fetchOptions);
@@ -22,11 +22,21 @@ export const getUsers = async (page: number = 1, limit: number = 8) => {
 
   return res.json();
 };
-export const getUser = async (nickName: string) => {
-  let fetchOptions = {};
+export const getSuggestedUsers = async (limit = 5) => {
+  const res = await fetch(`${envConfig.baseApi}/users?limit=${limit}`, {
+    next: { revalidate: 60, tags: ["users"] },
+  });
 
-  fetchOptions = {
-    cache: "no-store" as RequestCache,
+  if (!res.ok) {
+    throw new Error(`Failed to fetch suggested users (${res.status})`);
+  }
+
+  return res.json();
+};
+
+export const getUser = async (nickName: string) => {
+  const fetchOptions = {
+    next: { revalidate: 30, tags: ["users", `user:${nickName}`] },
   };
 
   const res = await fetch(`${envConfig.baseApi}/users/${nickName}`, fetchOptions);

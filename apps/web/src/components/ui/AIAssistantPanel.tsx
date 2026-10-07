@@ -206,7 +206,7 @@ export default function AIAssistantPanel({
             {(onClose) => (
               <>
                 <ModalHeader className="flex items-center gap-2">
-                  <Sparkles className="text-secondary" size={20} />
+                  <Sparkles className="text-secondary-fg" size={20} />
                   <span>Setup AI Assistant</span>
                 </ModalHeader>
                 <ModalBody>
@@ -225,19 +225,21 @@ export default function AIAssistantPanel({
                         variant="light"
                         size="sm"
                         isIconOnly
-                        onPress={() => setShowApiKey(!showApiKey)}
+                        aria-label={showApiKey ? "Hide API key" : "Show API key"}
+                        aria-pressed={showApiKey}
+                        onPress={() => setShowApiKey((v) => !v)}
                       >
-                        {showApiKey ? "🙈" : "👁️"}
+                        <span aria-hidden="true">{showApiKey ? "🙈" : "👁️"}</span>
                       </Button>
                     }
                   />
-                  <p className="text-xs text-default-400 mt-2">
+                  <p className="text-xs text-default-600 mt-2">
                     Get your free API key from{" "}
                     <a
                       href="https://makersuite.google.com/app/apikey"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary underline"
+                      className="text-primary-fg underline"
                     >
                       Google AI Studio
                     </a>
@@ -334,7 +336,7 @@ export default function AIAssistantPanel({
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Settings className="text-secondary" size={20} />
+                <Settings className="text-secondary-fg" size={20} />
                 <span>AI Settings</span>
               </ModalHeader>
               <ModalBody>
@@ -347,7 +349,7 @@ export default function AIAssistantPanel({
                     Remove
                   </Button>
                 </div>
-                <p className="text-xs text-default-400 mt-2">
+                <p className="text-xs text-default-600 mt-2">
                   Your API key is stored locally in your browser.
                 </p>
               </ModalBody>
@@ -372,7 +374,7 @@ export default function AIAssistantPanel({
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Sparkles className="text-secondary" size={20} />
+                <Sparkles className="text-secondary-fg" size={20} />
                 <span>
                   {resultType === "titles" && "Title Suggestions"}
                   {resultType === "tags" && "Tag Suggestions"}
@@ -528,7 +530,7 @@ export default function AIAssistantPanel({
                     {qualityResult.suggestions.length > 0 && (
                       <div>
                         <h4 className="font-medium mb-2 flex items-center gap-2">
-                          <Lightbulb size={16} className="text-primary" />
+                          <Lightbulb size={16} className="text-primary-fg" />
                           Suggestions
                         </h4>
                         <ul className="space-y-1">
@@ -537,7 +539,7 @@ export default function AIAssistantPanel({
                               key={index}
                               className="text-sm text-default-600 flex items-start gap-2"
                             >
-                              <span className="text-primary">•</span>
+                              <span className="text-primary-fg">•</span>
                               {suggestion}
                             </li>
                           ))}

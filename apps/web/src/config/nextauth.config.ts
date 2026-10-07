@@ -30,8 +30,19 @@ export const authConfig = {
 
           if (response.data.data.accessToken || response.data.data.refreshToken) {
             const cookieStore = await cookies();
-            cookieStore.set("accessToken", response.data.data.accessToken);
-            cookieStore.set("refreshToken", response.data.data.refreshToken);
+            const secure = process.env.NODE_ENV === "production";
+            cookieStore.set("accessToken", response.data.data.accessToken, {
+              httpOnly: true,
+              secure,
+              sameSite: "lax",
+              path: "/",
+            });
+            cookieStore.set("refreshToken", response.data.data.refreshToken, {
+              httpOnly: true,
+              secure,
+              sameSite: secure ? "none" : "lax",
+              path: "/",
+            });
             return true;
           } else {
             return false;

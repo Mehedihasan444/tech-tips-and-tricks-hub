@@ -51,7 +51,7 @@ const typeConfig: Record<
     color: "primary",
     icon: Info,
     bgColor: "bg-primary-100",
-    iconColor: "text-primary",
+    iconColor: "text-primary-fg",
   },
   success: {
     color: "success",
