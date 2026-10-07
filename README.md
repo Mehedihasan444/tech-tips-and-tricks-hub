@@ -159,9 +159,9 @@ Variables marked _Feature_ are only needed when that feature is used (uploads, e
 | `pnpm dev`        | Run client + server dev servers in parallel                               |
 | `pnpm build`      | Build both packages (Turbo caches the output)                             |
 | `pnpm start`      | Start production servers for both packages                                |
-| `pnpm lint`       | Lint both packages (API reports pre-existing errors; web is warning-only) |
+| `pnpm lint`       | Lint both packages (0 errors; web keeps ~32 effect-pattern warnings)      |
 | `pnpm lint:web`   | Lint the web app only (0 errors)                                          |
-| `pnpm lint:api`   | Lint the API app only (pre-existing errors)                               |
+| `pnpm lint:api`   | Lint the API app only (0 errors; `no-explicit-any` is warn during typing) |
 | `pnpm test`       | Run Vitest suites in both packages                                        |
 | `pnpm type-check` | Type-check both packages without emitting                                 |
 | `pnpm clean`      | Remove build output, caches, and `node_modules`                           |
@@ -316,19 +316,34 @@ Both apps deploy independently. In a monorepo, set **Root Directory** on each pl
 
 - Root Directory: `apps/web`
 - Build Command: `pnpm build`
-- Install Command: `pnpm install`
-- Environment: the `apps/web` variables above
+- Install Command: `pnpm install --frozen-lockfile`
+- Environment: the `apps/web` variables above (`NEXT_PUBLIC_SERVER_URL` must be
+  set at build time — it is inlined into the client bundle)
 
-**Server (Railway / Render / Fly.io)**
+**Server (Railway / Render / Fly.io — needs persistent Node + WebSockets)**
 
 - Root Directory: `apps/api`
 - Build Command: `pnpm build`
-- Start Command: `pnpm start:prod`
+- Start Command: `pnpm start` (alias of `pnpm start:prod` → `node ./dist/server.js`)
 - Environment: the `apps/api` variables above
 - Requires a hosted MongoDB
+- Health probe: `GET /api/health` (200 when MongoDB is connected, 503 otherwise)
 
-> `apps/api/vercel.json` targets `@vercel/node` with `dist/server.js`. Long-lived Socket.IO
-> connections need a host that supports WebSockets; a plain serverless function will drop them.
+> The API keeps long-lived Socket.IO connections and therefore needs a host with
+> WebSocket support. Do not deploy it as a plain serverless function — serverless
+> will drop sockets and exhaust MongoDB connections.
+
+**Docker Compose (local prod-like)**
+
+```bash
+cp apps/api/.env.example apps/api/.env   # fill in secrets (compose requires it)
+# optional: cp apps/web/.env.example apps/web/.env.local
+docker compose up --build
+```
+
+- `NEXT_PUBLIC_SERVER_URL` is baked at web build time: override with
+  `NEXT_PUBLIC_SERVER_URL=https://api.example.com docker compose up --build`.
+- `CLIENT_URL` accepts a comma-separated allow-list for preview + prod origins.
 
 ---
 
@@ -363,11 +378,19 @@ Legacy remotes, kept for reference:
 - **Effect lint warnings.** The web app reports ~32 `react-hooks/set-state-in-effect` /
   `immutability` warnings (downgraded from errors). These are legacy patterns to refactor
   during the HeroUI v3 pass.
-- **Edge runtime warnings.** `apps/web/src/utils/jwt.decode.ts` imports `jsonwebtoken`, which
-  uses Node APIs. The build warns but succeeds.
-- **`pnpm lint` fails on the API.** `apps/api` reports pre-existing ESLint errors
-  (currently ~33 errors / ~28 warnings: `no-explicit-any`, `no-unsafe-optional-chaining`, etc.). These are
-  inherited from the original codebase. Use `pnpm lint:api` / `pnpm lint:web` to target one package.
+- **Edge runtime.** `apps/web/src/middleware.ts` (Edge) imports only the `jwt-decode`
+  based `./utils/jwt.decode.edge` helper — the Node `jsonwebtoken` verifier lives in
+  `./utils/jwt.verify` for server-only use. Middleware also rejects expired tokens
+  and denies cross-role dashboard access explicitly (no fallthrough).
+- **`pnpm lint` is green.** API `no-explicit-any` legacy usages are downgraded to
+  warn (see `apps/api/eslint.config.mjs`) so CI stays green while modules are typed
+  incrementally; `no-unsafe-optional-chaining` and real bugs are still errors.
+- **Deploy hardening.** Reset-password links are well-formed single-query URLs, SMTP
+  uses STARTTLS on 587 without disabling cert verification, refresh cookies use
+  `SameSite=Lax` (dev) / `None+Secure` (prod) with `HttpOnly`, Socket.IO CORS uses
+  the validated `CLIENT_URL` (no wildcard+credentials), error responses no longer
+  leak driver internals, and payment callbacks accept GET+POST with verification
+  failures returning 400 instead of a false success page.
 - **Minimal tests.** Both packages have Vitest wired up (`pnpm test`) with first sample suites
   (`getRouteParam`, `generateNickname`). Coverage is still thin — add suites per feature.
 
@@ -400,5 +423,4 @@ Use conventional commit prefixes (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:
 
 ## License
 
-No `LICENSE` file exists in this repository. The earlier per-app READMEs referenced MIT and linked
-to a file that was never committed — add a `LICENSE` file before distributing this code.
+MIT — see [`LICENSE`](./LICENSE).
