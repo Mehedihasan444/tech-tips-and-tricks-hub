@@ -36,24 +36,25 @@ const paymentConfirmation = async ({
   transactionId: string;
   userId: string;
 }) => {
-  let payment;
   const verifyResponse = await verifyPayment(transactionId);
-  if (verifyResponse && verifyResponse.pay_status === "Successful") {
-    payment = await Payment.create({
-      userId: new Types.ObjectId(userId),
-      transactionId,
-    } as any);
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          isPremium: true,
-          subscriptionStartDate: new Date(),
-        },
-      },
-      { returnDocument: "after" },
-    );
+  if (!verifyResponse || verifyResponse.pay_status !== "Successful") {
+    throw new AppError(httpStatus.BAD_REQUEST, "Payment verification failed");
   }
+  const payment = await Payment.create({
+    userId: new Types.ObjectId(userId),
+    transactionId,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        isPremium: true,
+        subscriptionStartDate: new Date(),
+      },
+    },
+    { returnDocument: "after" },
+  );
 
   return payment;
 };
@@ -64,24 +65,10 @@ const getAllPaymentsFromDB = async (query: Record<string, unknown>) => {
   // query = (await SearchPaymentByDateRangeQueryMaker(query)) || query;
 
   const userId = query.userId;
-  let result;
   if (userId) {
-    result = Payment.find({ userId }).populate("userId");
-  } else {
-    result = Payment.find().populate("userId");
+    return Payment.find({ userId }).populate("userId");
   }
-  // const paymentQuery = new QueryBuilder(
-  // query
-  // )
-  //   .filter()
-  //   .search(paymentSearchableFields)
-  //   .sort()
-  //   .paginate()
-  //   .fields();
-
-  // const result = await paymentQuery.modelQuery;
-
-  return result;
+  return Payment.find().populate("userId");
 };
 
 export const PaymentServices = {

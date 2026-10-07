@@ -4,15 +4,23 @@ import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthServices } from "./auth.service";
 
+const isProduction = config.NODE_ENV === "production";
+
+// Cross-site deploys (Vercel web + separate API host) need SameSite=None + Secure,
+// otherwise the browser never sends the refresh cookie. Same-origin dev keeps Lax.
+const refreshCookieOptions = {
+  secure: isProduction,
+  httpOnly: true,
+  sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7d, matches JWT_REFRESH_EXPIRES_IN default
+};
+
 const registerUser = catchAsync(async (req, res) => {
   const result = await AuthServices.registerUser(req.body);
   const { refreshToken, accessToken } = result;
 
-  res.cookie("refreshToken", refreshToken, {
-    secure: config.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: true,
-  });
+  res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -29,11 +37,7 @@ const loginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.loginUser(req.body);
   const { refreshToken, accessToken } = result;
 
-  res.cookie("refreshToken", refreshToken, {
-    secure: config.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: true,
-  });
+  res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -49,11 +53,7 @@ const socialLoginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.socialLoginUser(req.body);
   const { refreshToken, accessToken } = result;
 
-  res.cookie("refreshToken", refreshToken, {
-    secure: config.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: true,
-  });
+  res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -81,7 +81,6 @@ const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
   const result = await AuthServices.refreshToken(refreshToken);
 
-  console.log("accessToken", result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

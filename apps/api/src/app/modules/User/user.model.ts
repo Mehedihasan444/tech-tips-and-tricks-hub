@@ -48,6 +48,7 @@ const userSchema = new Schema<TUser, IUserModel>(
     gender: { type: String, default: "" },
     maritalStatus: { type: String, default: "" },
     bio: { type: String, default: "" },
+    profession: { type: String, default: "" },
     shortBio: { type: String, default: "" },
     nickName: { type: String, unique: true, sparse: true },
     education: [

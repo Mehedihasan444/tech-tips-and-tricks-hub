@@ -36,6 +36,7 @@ const updateUserValidationSchema = z.object({
     mobileNumber: z.string().optional(),
     profilePhoto: z.string().optional().nullable(),
     bio: z.string().optional().nullable(),
+    profession: z.string().max(100).optional().nullable(),
     dateOfBirth: z.string().optional().nullable(),
     gender: z.string().optional().nullable(),
     maritalStatus: z.string().optional().nullable(),

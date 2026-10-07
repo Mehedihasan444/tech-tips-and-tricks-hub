@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import AppError from "../../errors/AppError";
-import { createToken } from "../../utils/verifyJWT";
+import { createToken, verifyToken } from "../../utils/verifyJWT";
 import { TLoginUser, TRegisterUser } from "./auth.interface";
 import { User } from "../User/user.model";
 import { USER_ROLE } from "../User/user.constant";
@@ -14,7 +14,7 @@ const registerUser = async (payload: TRegisterUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
 
   if (user) {
-    throw new AppError(httpStatus.NOT_FOUND, "This user is already exist!");
+    throw new AppError(httpStatus.CONFLICT, "This user is already exist!");
   }
 
   payload.role = USER_ROLE.USER;
@@ -155,7 +155,7 @@ const loginUser = async (payload: TLoginUser) => {
   //checking if the password is correct
 
   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
-    throw new AppError(httpStatus.FORBIDDEN, "Password do not matched");
+    throw new AppError(httpStatus.UNAUTHORIZED, "Password do not matched");
 
   //create token and sent to the  client
 
@@ -231,7 +231,13 @@ const resetPassword = async (userId: string, oldPassword: string, newPassword: s
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  const decoded = jwt.verify(token, config.jwt_refresh_secret as string) as JwtPayload;
+  //
+  // `verifyToken` maps an expired or malformed JWT to AppError(401). Calling
+  // `jwt.verify` directly let `TokenExpiredError` escape, and `globalErrorHandler`
+  // has no case for it — so a routine, expired refresh token was reported as a
+  // 500 server fault. Clients then could not distinguish "your session ended,
+  // sign in again" from "the server is broken", and simply retried forever.
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string) as JwtPayload;
 
   const { email, iat } = decoded;
 
@@ -303,9 +309,14 @@ const forgetPassword = async (email: string) => {
   };
   const resetToken = createToken(jwtPayload, config.jwt_access_secret as string, "10m");
 
-  const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken} `;
+  // reset_pass_ui_link is `${CLIENT_URL}${RESET_PASS_UI_LINK}` where the default
+  // RESET_PASS_UI_LINK is now just a path (e.g. `/reset-password`). Append
+  // credentials as a single well-formed query string.
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken}`;
 
-  EmailHelper.sendEmail(user?.email, resetUILink);
+  // Await so SMTP failures surface here (caught by catchAsync -> 502) instead
+  // of becoming an unhandled rejection that takes down the whole process.
+  await EmailHelper.sendEmail(user?.email, resetUILink);
   return null;
 };
 export const AuthServices = {

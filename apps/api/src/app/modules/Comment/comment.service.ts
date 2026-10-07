@@ -27,7 +27,7 @@ const createCommentIntoDB = async (payload: any) => {
 
       // Traverse the children to find the target parent comment
       if (parentComment?.children) {
-        for (const child of parentComment?.children) {
+        for (const child of parentComment.children) {
           const foundComment = findImmediateParent(child as any, targetCommentId);
           if (foundComment) {
             return foundComment;

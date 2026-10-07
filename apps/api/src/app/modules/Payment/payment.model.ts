@@ -12,6 +12,8 @@ const PaymentSchema = new Schema<IPayment>(
     transactionId: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
   },
   {

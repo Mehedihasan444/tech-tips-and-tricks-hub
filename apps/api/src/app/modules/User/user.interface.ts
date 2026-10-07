@@ -25,6 +25,7 @@ export type TUser = {
   createdAt?: Date;
   updatedAt?: Date;
   bio?: string;
+  profession?: string;
   dateOfBirth?: string;
   gender?: string;
   maritalStatus?: string;
@@ -47,6 +48,7 @@ export interface TUserData {
   mobileNumber?: string;
   profilePhoto?: string;
   bio?: string;
+  profession?: string;
   nickName?: string;
   shortBio?: string;
   dateOfBirth?: string;

@@ -13,8 +13,16 @@ router.post(
   validateRequest(PaymentValidation.createPaymentValidationSchema),
   PaymentControllers.createPayment,
 );
-router.get("/", PaymentControllers.getAllPayments);
-router.post("/confirmation", PaymentControllers.paymentConfirmation);
-router.post("/failed", PaymentControllers.paymentFailed);
+router.get("/", auth(USER_ROLE.USER, USER_ROLE.ADMIN), PaymentControllers.getAllPayments);
+// AamarPay redirects the customer's browser to success/fail URLs (GET) and may also
+// POST server-to-server callbacks. Accept both so confirmation is never a 404.
+router
+  .route("/confirmation")
+  .get(PaymentControllers.paymentConfirmation)
+  .post(PaymentControllers.paymentConfirmation);
+router
+  .route("/failed")
+  .get(PaymentControllers.paymentFailed)
+  .post(PaymentControllers.paymentFailed);
 
 export const PaymentRoutes = router;
