@@ -59,39 +59,41 @@ export function StoriesSection() {
   const [stories, setStories] = useState<TStory[]>([createStoryItem]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { mutate: handleDeleteStory, isPending: isStoryLoading } = useDeleteStory();
   const [storyToDelete, setStoryToDelete] = useState<string | null>(null);
   const [storyProgress, setStoryProgress] = useState(0);
+  const [imgError, setImgError] = useState(false);
   const { user } = useUser();
 
+  const fetchStories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getStories();
+
+      const fetchedStories = response.data.map((story: any) => ({
+        id: story.id,
+        imageUrl: story.imageUrl,
+        userId: story.userId,
+        userImage: story.userImage,
+        username: story.username,
+        timestamp: story.timestamp,
+      }));
+
+      setStories([createStoryItem, ...fetchedStories]);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching stories:", err);
+      setError("Failed to load stories");
+      setStories([createStoryItem]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        setLoading(true);
-        const response = await getStories();
-
-        const fetchedStories = response.data.map((story: any) => ({
-          id: story.id,
-          imageUrl: story.imageUrl,
-          userId: story.userId,
-          userImage: story.userImage,
-          username: story.username,
-          timestamp: story.timestamp,
-        }));
-
-        setStories([createStoryItem, ...fetchedStories]);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching stories:", err);
-        setError("Failed to load stories");
-        setStories([createStoryItem]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStories();
+    void fetchStories();
   }, []);
 
   // Auto-progress story viewing
@@ -124,6 +126,10 @@ export function StoriesSection() {
   };
 
   const handleStoryClick = (story: TStory) => {
+    // The create tile opens the upload modal (its own button) — never the
+    // viewer, which would show a placeholder image as a "story".
+    if (story.isAddStory) return;
+    setImgError(false);
     setSelectedStory(story);
   };
 
@@ -144,6 +150,8 @@ export function StoriesSection() {
         {
           onSuccess: () => {
             setStories((prevStories) => prevStories.filter((story) => story.id !== storyToDelete));
+            setStoryToDelete(null);
+            onClose();
             closeStoryView();
           },
         },
@@ -151,10 +159,25 @@ export function StoriesSection() {
     }
   };
 
+  // Close the viewer with Escape; lock body scroll while open.
+  useEffect(() => {
+    if (!selectedStory) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeStoryView();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedStory]);
+
   return (
     <div className="relative w-full px-4 py-6">
       {loading ? (
-        <div className="flex gap-3 overflow-x-hidden">
+        <div className="flex gap-3 overflow-x-hidden" role="status" aria-label="Loading stories...">
           <StoryCardSkeleton />
           {Array(5)
             .fill(0)
@@ -165,14 +188,27 @@ export function StoriesSection() {
       ) : (
         <>
           {error && (
-            <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-xl text-sm mb-4">
-              {error}
+            <div
+              role="alert"
+              className="bg-danger-50 dark:bg-danger-500/10 border border-danger-200 text-danger-700 dark:text-danger-300 px-4 py-3 rounded-xl text-sm mb-4 flex items-center justify-between gap-3"
+            >
+              <span>{error}</span>
+              <Button size="sm" variant="flat" color="danger" onPress={() => void fetchStories()}>
+                Retry
+              </Button>
             </div>
           )}
           <div className="relative group">
             <div
               ref={scrollContainerRef}
-              className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+              tabIndex={0}
+              role="region"
+              aria-label="Stories. Use left and right arrow keys to scroll."
+              onKeyDown={(e) => {
+                if (e.key === "ArrowLeft") scroll("left");
+                if (e.key === "ArrowRight") scroll("right");
+              }}
+              className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth pb-2 focus-visible:outline-2 focus-visible:outline-primary"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {stories.map((story) => (
@@ -194,7 +230,8 @@ export function StoriesSection() {
                   isIconOnly
                   size="sm"
                   variant="flat"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 
+                  aria-label="Scroll stories left"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 max-md:opacity-100 
                            transition-opacity shadow-lg bg-white hover:bg-default-50 z-10"
                   onClick={() => scroll("left")}
                 >
@@ -205,7 +242,8 @@ export function StoriesSection() {
                   isIconOnly
                   size="sm"
                   variant="flat"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 
+                  aria-label="Scroll stories right"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 max-md:opacity-100 
                            transition-opacity shadow-lg bg-white hover:bg-default-50 z-10"
                   onClick={() => scroll("right")}
                 >
@@ -219,7 +257,12 @@ export function StoriesSection() {
 
       {/* Story Viewer Modal */}
       {selectedStory && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selectedStory.username}'s story`}
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200"
+        >
           {/* Progress Bar */}
           <div className="absolute top-4 left-0 right-0 px-16 z-10">
             <Progress
@@ -234,6 +277,7 @@ export function StoriesSection() {
           <Button
             isIconOnly
             variant="light"
+            aria-label="Close story viewer"
             onClick={closeStoryView}
             className="absolute top-6 right-6 text-white hover:bg-white/10 z-10"
           >
@@ -242,25 +286,42 @@ export function StoriesSection() {
 
           {/* Story Content */}
           <div className="relative max-w-lg w-full h-[85vh] mx-4">
-            <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src={selectedStory.imageUrl}
-                alt={`${selectedStory.username}'s story`}
-                className="w-full h-full object-cover"
-                fill
-              />
+            <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl bg-default-900">
+              {!imgError && selectedStory.imageUrl ? (
+                <Image
+                  src={selectedStory.imageUrl}
+                  alt={`${selectedStory.username}'s story`}
+                  className="w-full h-full object-cover"
+                  fill
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-white/70 p-8 text-center">
+                  <p className="font-semibold">This story can&apos;t be displayed.</p>
+                  <p className="text-sm">The image may have been removed.</p>
+                </div>
+              )}
 
               {/* Story Header */}
               <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={selectedStory.userImage}
-                      alt={selectedStory.username}
-                      className="w-12 h-12 rounded-full border-2 border-white ring-2 ring-white/20"
-                      height={48}
-                      width={48}
-                    />
+                    {selectedStory.userImage ? (
+                      <Image
+                        src={selectedStory.userImage}
+                        alt={selectedStory.username}
+                        className="w-12 h-12 rounded-full border-2 border-white ring-2 ring-white/20"
+                        height={48}
+                        width={48}
+                      />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="flex w-12 h-12 rounded-full border-2 border-white ring-2 ring-white/20 items-center justify-center bg-white/20 text-white font-bold"
+                      >
+                        {(selectedStory.username ?? "?").charAt(0)}
+                      </span>
+                    )}
                     <div className="text-white">
                       <div className="font-semibold text-base">{selectedStory.username}</div>
                       <div className="text-sm opacity-90 flex items-center gap-1">
@@ -274,7 +335,12 @@ export function StoriesSection() {
                   {!selectedStory.isAddStory && selectedStory.userId === user?._id && (
                     <Dropdown placement="bottom-end">
                       <DropdownTrigger>
-                        <Button isIconOnly variant="light" className="text-white hover:bg-white/10">
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          aria-label="Story actions"
+                          className="text-white hover:bg-white/10"
+                        >
                           <EllipsisVertical size={20} />
                         </Button>
                       </DropdownTrigger>

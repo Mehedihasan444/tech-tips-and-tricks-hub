@@ -2,14 +2,15 @@
 import { useUser } from "@/context/user.provider";
 import { logout } from "@/services/AuthService";
 import {
+  Avatar,
+  Button,
+  Chip,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownSection,
   DropdownItem,
   User,
-  Avatar,
-  Chip,
 } from "@heroui/react";
 import {
   CrownIcon,
@@ -39,6 +40,16 @@ export default function ProfileDropdown() {
     router.push(path);
   };
 
+  // Guests get a sign-in CTA instead of a menu full of broken links
+  // (/profile/undefined, dashboard, drafts) that assume a logged-in user.
+  if (!user) {
+    return (
+      <Button color="primary" variant="flat" onPress={() => router.push("/login")}>
+        Sign In
+      </Button>
+    );
+  }
+
   return (
     <Dropdown
       showArrow
@@ -51,6 +62,7 @@ export default function ProfileDropdown() {
       <DropdownTrigger>
         <Avatar
           as="button"
+          aria-label={`Open profile menu for ${user?.name ?? "your account"}`}
           color="primary"
           size="md"
           src={user?.profilePhoto}
@@ -70,7 +82,7 @@ export default function ProfileDropdown() {
             "data-[hover=true]:text-foreground",
             "data-[hover=true]:bg-primary/10",
             "data-[hover=true]:scale-[0.98]",
-            "data-[selectable=true]:focus:text-primary",
+            "data-[selectable=true]:focus:text-primary-fg",
             "data-[pressed=true]:opacity-70",
             "data-[focus-visible=true]:ring-2",
             "data-[focus-visible=true]:ring-primary",
@@ -112,8 +124,8 @@ export default function ProfileDropdown() {
         <DropdownSection aria-label="Navigation" showDivider>
           <DropdownItem
             key="my-profile"
-            startContent={<SquareUser size={18} className="text-primary" />}
-            endContent={<ChevronRight size={16} className="text-default-400" />}
+            startContent={<SquareUser size={18} className="text-primary-fg" />}
+            endContent={<ChevronRight size={16} className="text-default-600" />}
             onClick={() => handleNavigation(`/profile/${user?.nickName}`)}
             className="py-3"
           >
@@ -121,8 +133,8 @@ export default function ProfileDropdown() {
           </DropdownItem>
           <DropdownItem
             key="dashboard"
-            startContent={<LayoutDashboard size={18} className="text-secondary" />}
-            endContent={<ChevronRight size={16} className="text-default-400" />}
+            startContent={<LayoutDashboard size={18} className="text-secondary-fg" />}
+            endContent={<ChevronRight size={16} className="text-default-600" />}
             onClick={() =>
               handleNavigation(user?.role === "USER" ? "/dashboard" : "/admin-dashboard")
             }
@@ -133,7 +145,7 @@ export default function ProfileDropdown() {
           <DropdownItem
             key="drafts"
             startContent={<FileText size={18} className="text-warning" />}
-            endContent={<ChevronRight size={16} className="text-default-400" />}
+            endContent={<ChevronRight size={16} className="text-default-600" />}
             onClick={() => handleNavigation("/dashboard/drafts")}
             className="py-3"
           >

@@ -8,17 +8,17 @@ import React, { useState } from "react";
 const ShortBio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean }) => {
   const [shortBioEditMode, setShortBioEditMode] = useState(false); // State to control bio edit mode
   const [shortBio, setShortBio] = useState(user?.shortBio || ""); // State to manage shortBio content
-  const { mutate: handleUserUpdate } = useUpdateUser();
+  const { mutate: handleUserUpdate, isPending: isSaving } = useUpdateUser();
 
-  // Handle saving shortBio changes
+  // Handle saving shortBio changes (stays in edit mode until the server confirms).
   const handleSaveShortBio = () => {
-    // Simulate save functionality, this can be replaced with an API call
-    console.log("Saving updated shortBio:", shortBio);
     const userData = {
       shortBio,
     };
-    handleUserUpdate({ userId: user._id, userData });
-    setShortBioEditMode(false); // Exit edit mode after saving
+    handleUserUpdate(
+      { userId: user._id, userData },
+      { onSuccess: () => setShortBioEditMode(false) },
+    );
   };
 
   return (
@@ -30,18 +30,26 @@ const ShortBio = ({ user, showEditOption }: { user: IUser; showEditOption: boole
             variant={"flat"}
             size="sm"
             labelPlacement="outside"
+            aria-label="Short bio"
             placeholder="Enter your description"
             className="col-span-12 md:col-span-8 mb-6 md:mb-0"
             value={shortBio}
             onChange={(e) => setShortBio(e.target.value)}
           />
           <div className="flex justify-end mt-2 ">
-            <button onClick={handleSaveShortBio} className=" text-sm text-default-500 underline">
+            <button
+              onClick={handleSaveShortBio}
+              disabled={isSaving}
+              aria-label="Save short bio"
+              className=" text-sm text-default-500 underline disabled:opacity-50"
+            >
               <Check />
             </button>
             <button
               onClick={() => setShortBioEditMode(false)}
-              className=" text-sm text-default-500 underline"
+              disabled={isSaving}
+              aria-label="Cancel short bio editing"
+              className=" text-sm text-default-500 underline disabled:opacity-50"
             >
               <X />
             </button>
@@ -55,6 +63,7 @@ const ShortBio = ({ user, showEditOption }: { user: IUser; showEditOption: boole
             {showEditOption && (
               <button
                 onClick={() => setShortBioEditMode(!shortBioEditMode)}
+                aria-label={shortBioEditMode ? "Cancel short bio editing" : "Edit short bio"}
                 className=" text-sm text-default-500 underline"
               >
                 {shortBioEditMode ? <X /> : <PenBoxIcon />}

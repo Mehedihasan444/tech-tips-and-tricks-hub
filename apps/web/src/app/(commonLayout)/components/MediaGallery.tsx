@@ -50,67 +50,84 @@ const getSpecialClasses = (index: number, count: number) => {
 
 const renderMedia = (media: string[], maxVisible: number = 5) => {
   const visibleMedia = media.slice(0, maxVisible);
-  const remainingCount = media.length - maxVisible;
+  const hiddenMedia = media.slice(maxVisible);
+  const remainingCount = hiddenMedia.length;
 
-  return visibleMedia.map((item, index) => {
-    const isLast = index === maxVisible - 1 && remainingCount > 0;
+  return (
+    <>
+      {visibleMedia.map((item, index) => {
+        const isLast = index === maxVisible - 1 && remainingCount > 0;
 
-    return (
-      <a
-        key={index}
-        href={item}
-        data-lg-size="1600-2400"
-        data-sub-html={`<h4>Image ${index + 1} of ${media.length}</h4>`}
-        className={`
-          relative overflow-hidden rounded-xl group cursor-pointer
-          ${getSpecialClasses(index, media.length)}
-          transition-transform duration-200 hover:scale-[0.98]
-        `}
-      >
-        <div className="relative w-full h-full">
-          <Image
-            width={800}
-            height={800}
-            src={item}
-            alt={`Image ${index + 1}`}
+        return (
+          <a
+            key={index}
+            href={item}
+            aria-label={`Open image ${index + 1} of ${media.length}`}
+            data-lg-size="1600-2400"
+            data-sub-html={`<h4>Image ${index + 1} of ${media.length}</h4>`}
             className={`
-              w-full object-cover
-              ${getImageHeight(index, media.length)}
-              transition-all duration-300
-              group-hover:brightness-95
+              relative overflow-hidden rounded-xl group cursor-pointer
+              ${getSpecialClasses(index, media.length)}
+              transition-transform duration-200 hover:scale-[0.98]
             `}
-            priority={index < 2}
-          />
+          >
+            <div className="relative w-full h-full">
+              <Image
+                width={800}
+                height={800}
+                src={item}
+                alt={`Post image ${index + 1} of ${media.length}`}
+                className={`
+                  w-full object-cover
+                  ${getImageHeight(index, media.length)}
+                  transition-all duration-300
+                  group-hover:brightness-95
+                `}
+                priority={index === 0}
+              />
 
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
 
-          {/* Zoom Icon on Hover */}
-          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="bg-black/60 backdrop-blur-sm rounded-full p-2">
-              <ImageIcon className="w-5 h-5 text-white" />
-            </div>
-          </div>
-
-          {/* Remaining Images Overlay */}
-          {isLast && (
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
-              <div className="text-center text-white">
-                <div className="text-4xl font-bold">+{remainingCount}</div>
-                <div className="text-sm font-medium mt-1">More Images</div>
+              {/* Zoom Icon on Hover */}
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="bg-black/60 backdrop-blur-sm rounded-full p-2">
+                  <ImageIcon className="w-5 h-5 text-white" />
+                </div>
               </div>
+
+              {/* Remaining Images Overlay */}
+              {isLast && (
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="text-4xl font-bold">+{remainingCount}</div>
+                    <div className="text-sm font-medium mt-1">More Images</div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </a>
-    );
-  });
+          </a>
+        );
+      })}
+      {/* Hidden items so the lightbox can navigate to every image, not just the visible five */}
+      {hiddenMedia.map((item, offset) => (
+        <a
+          key={`hidden-${offset}`}
+          href={item}
+          aria-hidden="true"
+          tabIndex={-1}
+          data-lg-size="1600-2400"
+          data-sub-html={`<h4>Image ${maxVisible + offset + 1} of ${media.length}</h4>`}
+          className="hidden"
+        />
+      ))}
+    </>
+  );
 };
 
 const MediaGallery = ({ media }: { media: string[] }) => {
   if (!media || media.length === 0) return null;
 
-  console.log(media);
   return (
     <div className="MediaGallery w-full">
       <LightGallery
@@ -123,7 +140,6 @@ const MediaGallery = ({ media }: { media: string[] }) => {
         speed={500}
         download={false}
         counter={true}
-        licenseKey="your-license-key"
         mobileSettings={{
           controls: true,
           showCloseIcon: true,

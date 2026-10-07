@@ -3,6 +3,8 @@ import { TPost } from "@/types/TPost";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Avatar, Button, Card, CardBody, CardHeader, Divider, Chip, Skeleton } from "@heroui/react";
 import { getPosts } from "@/services/PostService";
+import { getSuggestedUsers } from "@/services/UserService";
+import { useRouter } from "next/navigation";
 import CreatePost from "./components/modal/CreatePost";
 import PostFilter from "./components/PostFilter";
 import PostCard from "./components/PostCard";
@@ -12,8 +14,8 @@ import EmptyState from "@/components/ui/EmptyState";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import { useUser } from "@/context/user.provider";
 import { useUpdateUser } from "@/hooks/user.hook";
+import { POSTS_CHANGED_EVENT } from "@/hooks/post.hook";
 import { IUser } from "@/types/IUser";
-import envConfig from "@/config/envConfig";
 
 interface SuggestedUser {
   _id: string;
@@ -35,7 +37,12 @@ const NewsFeed = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
+  const [suggestionsError, setSuggestionsError] = useState(false);
+  const [followingId, setFollowingId] = useState<string | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Dynamic data states
   const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
@@ -46,13 +53,16 @@ const NewsFeed = () => {
   const { user: loggedInUser } = useUser();
   const { mutate: handleUserUpdate } = useUpdateUser();
 
-  // Fetch suggested users using fetch API (client-safe)
+  // Suggested users come from a Server Action: calling the API from the browser
+  // sent no Authorization header (the token lives in an httpOnly cookie) and
+  // exposed the internal base URL.
   useEffect(() => {
+    let cancelled = false;
     const fetchSuggestedUsers = async () => {
       try {
         setLoadingSuggestions(true);
-        const response = await fetch(`${envConfig.baseApi}/users?limit=5`);
-        const result = await response.json();
+        setSuggestionsError(false);
+        const result = await getSuggestedUsers(5);
         const users = result?.data?.data || result?.data || [];
         // Filter out the logged-in user and users already followed
         const filteredUsers = users
@@ -62,20 +72,31 @@ const NewsFeed = () => {
               !loggedInUser?.following?.some((f: IUser) => f._id === u._id),
           )
           .slice(0, 3);
-        setSuggestedUsers(filteredUsers);
+        if (!cancelled) setSuggestedUsers(filteredUsers);
       } catch (error) {
         console.error("Error fetching suggested users:", error);
-        setSuggestedUsers([]);
+        if (!cancelled) {
+          setSuggestedUsers([]);
+          setSuggestionsError(true);
+        }
       } finally {
-        setLoadingSuggestions(false);
+        if (!cancelled) setLoadingSuggestions(false);
       }
     };
 
     fetchSuggestedUsers();
+    return () => {
+      cancelled = true;
+    };
   }, [loggedInUser]);
 
-  // Calculate trending topics from posts
+  // Calculate trending topics from loaded posts (real counts only — no filler).
   useEffect(() => {
+    if (data.length === 0) {
+      setTrendingTopics([]);
+      setLoadingTrending(false);
+      return;
+    }
     const calculateTrendingTopics = () => {
       setLoadingTrending(true);
       try {
@@ -102,78 +123,75 @@ const NewsFeed = () => {
           .slice(0, 5)
           .map(([tag, count]) => ({ tag, count }));
 
-        // If we have less than 5, add some defaults
-        const defaultTopics = [
-          "#WebDevelopment",
-          "#JavaScript",
-          "#React",
-          "#TypeScript",
-          "#Programming",
-        ];
-        while (sortedTopics.length < 5) {
-          const defaultTag = defaultTopics[sortedTopics.length];
-          if (!sortedTopics.find((t) => t.tag === defaultTag)) {
-            sortedTopics.push({ tag: defaultTag, count: Math.floor(Math.random() * 5000) + 1000 });
-          }
-        }
-
         setTrendingTopics(sortedTopics);
       } catch (error) {
         console.error("Error calculating trending topics:", error);
-        setTrendingTopics([
-          { tag: "#WebDevelopment", count: 10200 },
-          { tag: "#JavaScript", count: 9400 },
-          { tag: "#React", count: 8100 },
-          { tag: "#TypeScript", count: 6500 },
-          { tag: "#Programming", count: 4200 },
-        ]);
+        setTrendingTopics([]);
       } finally {
         setLoadingTrending(false);
       }
     };
 
-    if (data.length > 0) {
-      calculateTrendingTopics();
-    }
+    calculateTrendingTopics();
   }, [data]);
 
   const handleFollow = (userId: string) => {
-    if (!loggedInUser) return;
+    if (!loggedInUser || followingId) return;
+    const removed = suggestedUsers.find((u) => u._id === userId);
     const userData = {
       loggedInUserId: loggedInUser._id,
     };
-    handleUserUpdate({ userId, userData });
-    // Remove from suggestions after following
+    setFollowingId(userId);
+    // Optimistic remove; restore on failure so a failed follow never vanishes.
     setSuggestedUsers((prev) => prev.filter((u) => u._id !== userId));
+    handleUserUpdate(
+      { userId, userData },
+      {
+        onError: () => {
+          if (removed) setSuggestedUsers((prev) => [removed, ...prev]);
+        },
+        onSettled: () => setFollowingId(null),
+      },
+    );
   };
 
   // Initial fetch on mount
-  useEffect(() => {
-    const fetchInitialPosts = async () => {
-      try {
-        setInitialLoading(true);
-        const limit = 10;
-        const response = await getPosts(1, limit);
-        const { data: postsData } = response?.data || {};
-        const newPosts = postsData || [];
-        setData(newPosts);
-        setPage(2);
-        setHasMore(newPosts.length >= limit);
-      } catch (error) {
-        console.error("Error fetching initial posts:", error);
-        setData([]);
-      } finally {
-        setInitialLoading(false);
-        setLoading(false);
-      }
-    };
-
-    fetchInitialPosts();
+  const fetchFirstPage = useCallback(async () => {
+    try {
+      setInitialLoading(true);
+      setFeedError(false);
+      const limit = 10;
+      const response = await getPosts(1, limit);
+      const { data: postsData } = response?.data || {};
+      const newPosts = postsData || [];
+      setData(newPosts);
+      setPage(2);
+      setHasMore(newPosts.length >= limit);
+    } catch (error) {
+      console.error("Error fetching initial posts:", error);
+      setData([]);
+      setFeedError(true);
+    } finally {
+      setInitialLoading(false);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void fetchFirstPage();
+  }, [fetchFirstPage]);
+
+  // Refetch when a post is created/updated/deleted. Previously this never
+  // happened: the invalidation targeted a query key nothing registered.
+  useEffect(() => {
+    window.addEventListener(POSTS_CHANGED_EVENT, fetchFirstPage);
+    return () => window.removeEventListener(POSTS_CHANGED_EVENT, fetchFirstPage);
+  }, [fetchFirstPage]);
 
   const loadMorePosts = useCallback(async () => {
     if (loading || !hasMore || initialLoading) return;
     setLoading(true);
+    setLoadMoreError(false);
     try {
       const limit = 10;
       const response = await getPosts(page, limit);
@@ -186,6 +204,7 @@ const NewsFeed = () => {
       setHasMore(newPosts.length >= limit);
     } catch (error) {
       console.error("Error loading more posts:", error);
+      setLoadMoreError(true);
     } finally {
       setLoading(false);
     }
@@ -274,12 +293,12 @@ const NewsFeed = () => {
             )}
 
             {/* Stories Section */}
-            <div className="bg-content1 rounded-2xl shadow-sm border border-divider overflow-hidden">
+            <div className="bg-content1 rounded-2xl surface overflow-hidden">
               <StoriesSection />
             </div>
 
             {/* Create Post & Filter Section */}
-            <div className="bg-content1 rounded-2xl shadow-sm border border-divider p-4">
+            <div className="bg-content1 rounded-2xl surface p-4">
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 <div className="flex-shrink-0">
                   <CreatePost />
@@ -293,18 +312,28 @@ const NewsFeed = () => {
             {/* Posts Section */}
             <div className="space-y-4">
               {initialLoading ? (
-                <div className="space-y-4">
+                <div className="space-y-4" role="status" aria-label="Loading posts...">
                   {/* Skeleton loaders for initial load */}
                   {[1, 2, 3].map((i) => (
                     <PostCardSkeleton key={i} />
                   ))}
+                </div>
+              ) : feedError ? (
+                <div className="bg-content1 rounded-2xl surface overflow-hidden">
+                  <EmptyState
+                    type="posts"
+                    title="Couldn't load posts"
+                    description="Something went wrong while loading the feed. Check your connection and try again."
+                    actionLabel="Try Again"
+                    onAction={() => void fetchFirstPage()}
+                  />
                 </div>
               ) : (
                 <>
                   {data?.length > 0 ? (
                     data?.map((post: TPost) => <PostCard key={post._id} post={post} />)
                   ) : (
-                    <div className="bg-content1 rounded-2xl border border-divider">
+                    <div className="bg-content1 rounded-2xl surface overflow-hidden">
                       <EmptyState
                         type="posts"
                         title="No Posts Found"
@@ -323,15 +352,39 @@ const NewsFeed = () => {
               </div>
             )}
 
+            {/* Load-more failure */}
+            {loadMoreError && !loading && (
+              <div className="bg-content1 rounded-2xl surface p-6 text-center">
+                <p className="text-sm text-default-500 mb-3">
+                  Couldn&apos;t load more posts. Check your connection.
+                </p>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  onPress={() => void loadMorePosts()}
+                >
+                  Retry
+                </Button>
+              </div>
+            )}
+
+            {/* End of feed */}
+            {!initialLoading && !feedError && !hasMore && data?.length > 0 && (
+              <p className="text-center text-sm text-default-600 py-2">
+                You&apos;re all caught up 🎉
+              </p>
+            )}
+
             {/* Infinite scroll trigger */}
             <div ref={loaderRef} className="h-10"></div>
           </div>
 
           {/* Right Sidebar - Friend Suggestions */}
-          <aside className="hidden xl:block w-80 sticky top-20 h-fit">
-            <Card className="shadow-sm border border-divider">
+          <aside className="hidden xl:block w-80 sticky top-20 h-fit space-y-4">
+            <Card className="surface overflow-hidden">
               <CardHeader className="flex justify-between items-center pb-3">
-                <h3 className="text-lg font-semibold">Suggested For You</h3>
+                <h3 className="text-lg font-semibold tracking-tight">Suggested For You</h3>
                 <Chip size="sm" variant="flat" color="primary">
                   New
                 </Chip>
@@ -351,6 +404,18 @@ const NewsFeed = () => {
                       <Skeleton className="h-8 w-16 rounded" />
                     </div>
                   ))
+                ) : suggestionsError ? (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-default-500 mb-2">Couldn&apos;t load suggestions</p>
+                    <Button
+                      size="sm"
+                      variant="light"
+                      color="primary"
+                      onPress={() => window.location.reload()}
+                    >
+                      Retry
+                    </Button>
+                  </div>
                 ) : suggestedUsers.length === 0 ? (
                   <div className="text-center py-4 text-default-500">
                     <p className="text-sm">No suggestions available</p>
@@ -360,19 +425,19 @@ const NewsFeed = () => {
                     <div key={user._id} className="flex items-start gap-3 group">
                       <Avatar
                         src={user.profilePhoto}
-                        name={user.name?.charAt(0)}
+                        name={user.name?.trim() ? user.name : "?"}
                         size="md"
-                        className="flex-shrink-0 ring-2 ring-transparent group-hover:ring-primary/20 transition-all"
+                        className="flex-shrink-0 ring-2 ring-transparent group-hover:ring-primary/30 transition-all duration-200"
                         isBordered
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                        <p className="text-sm font-semibold truncate group-hover:text-primary-fg transition-colors">
                           {user.name}
                         </p>
                         <p className="text-xs text-default-500 truncate">
                           {user.profession || user.nickName}
                         </p>
-                        <p className="text-xs text-default-400 mt-1">
+                        <p className="text-xs text-default-600 mt-1">
                           {user.followers?.length || 0} followers
                         </p>
                       </div>
@@ -382,9 +447,11 @@ const NewsFeed = () => {
                         variant="flat"
                         startContent={<UserPlus size={14} />}
                         className="flex-shrink-0"
+                        isLoading={followingId === user._id}
+                        isDisabled={followingId !== null}
                         onPress={() => handleFollow(user._id)}
                       >
-                        Follow
+                        {followingId === user._id ? "Following" : "Follow"}
                       </Button>
                     </div>
                   ))
@@ -395,6 +462,7 @@ const NewsFeed = () => {
                 <Button
                   variant="light"
                   color="primary"
+                  radius="full"
                   className="w-full font-semibold"
                   as="a"
                   href="/community"
@@ -405,47 +473,59 @@ const NewsFeed = () => {
             </Card>
 
             {/* Trending Topics Card */}
-            <Card className="shadow-sm border border-divider mt-4">
+            <Card className="surface overflow-hidden">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={18} className="text-primary" />
-                  <h3 className="text-lg font-semibold">Trending Topics</h3>
+                  <TrendingUp size={18} className="text-primary-fg" />
+                  <h3 className="text-lg font-semibold tracking-tight">Trending Topics</h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody className="gap-3 p-4">
-                {loadingTrending
-                  ? // Loading skeleton for trending
-                    [...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center justify-between p-2">
-                        <div className="space-y-2">
-                          <Skeleton className="h-3 w-28 rounded" />
-                          <Skeleton className="h-2 w-16 rounded" />
-                        </div>
-                        <Skeleton className="h-6 w-8 rounded" />
+                {loadingTrending ? (
+                  // Loading skeleton for trending
+                  [...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between p-2">
+                      <div className="space-y-2">
+                        <Skeleton className="h-3 w-28 rounded" />
+                        <Skeleton className="h-2 w-16 rounded" />
                       </div>
-                    ))
-                  : trendingTopics.map((topic, index) => (
-                      <button
-                        key={topic.tag}
-                        className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors text-left group w-full"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold group-hover:text-primary transition-colors">
-                            {topic.tag}
-                          </p>
-                          <p className="text-xs text-default-400">
-                            {topic.count >= 1000
-                              ? `${(topic.count / 1000).toFixed(1)}K`
-                              : topic.count}{" "}
-                            posts
-                          </p>
-                        </div>
-                        <Chip size="sm" variant="flat" color="warning">
-                          #{index + 1}
-                        </Chip>
-                      </button>
-                    ))}
+                      <Skeleton className="h-6 w-8 rounded" />
+                    </div>
+                  ))
+                ) : trendingTopics.length === 0 ? (
+                  <p className="text-sm text-default-600 text-center py-2">
+                    No trending topics yet — check back after more posts are published.
+                  </p>
+                ) : (
+                  trendingTopics.map((topic, index) => (
+                    <button
+                      key={topic.tag}
+                      onClick={() =>
+                        router.push(
+                          `/posts?query=${encodeURIComponent(topic.tag.replace(/^#/, ""))}`,
+                        )
+                      }
+                      aria-label={`Search posts about ${topic.tag}`}
+                      className="flex items-center justify-between p-2.5 rounded-xl transition-colors duration-200 text-left group w-full hover:bg-default-200/60 focus-visible:outline-2 focus-visible:outline-primary"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold group-hover:text-primary-fg transition-colors">
+                          {topic.tag}
+                        </p>
+                        <p className="text-xs text-default-600">
+                          {topic.count >= 1000
+                            ? `${(topic.count / 1000).toFixed(1)}K`
+                            : topic.count}{" "}
+                          posts
+                        </p>
+                      </div>
+                      <Chip size="sm" variant="flat" color="warning">
+                        #{index + 1}
+                      </Chip>
+                    </button>
+                  ))
+                )}
               </CardBody>
             </Card>
           </aside>

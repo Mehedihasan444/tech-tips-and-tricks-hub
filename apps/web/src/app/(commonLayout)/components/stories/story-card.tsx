@@ -33,16 +33,25 @@ export function StoryCard({
   timestamp,
   onClick,
 }: StoryCardProps) {
+  const safeInitial = (username ?? "?").charAt(0) || "?";
+  // View tiles are real buttons (keyboard + screen-reader operable). The
+  // create tile is a plain container: its upload modal owns the interaction.
+  const Wrapper = isAddStory ? "div" : "button";
   return (
-    <div
-      onClick={!isAddStory ? onClick : undefined}
-      className="relative flex-shrink-0 cursor-pointer group w-[120px] h-[200px] rounded-xl overflow-hidden transition-transform duration-200 ease-in-out hover:scale-[1.02]"
+    <Wrapper
+      {...(!isAddStory
+        ? {
+            onClick,
+            "aria-label": `View ${username}'s story`,
+          }
+        : {})}
+      className="relative flex-shrink-0 cursor-pointer group w-[120px] h-[200px] rounded-xl overflow-hidden transition-transform duration-200 ease-in-out hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-primary text-left"
     >
       <Image
         width={100}
         height={200}
         src={imageUrl}
-        alt={`${username}'s story`}
+        alt={isAddStory ? "Create a story" : `${username}'s story`}
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
@@ -54,7 +63,7 @@ export function StoryCard({
               <Avatar
                 src={userImage}
                 className="w-10 h-10 border-2 border-white"
-                fallback={username[0]}
+                fallback={safeInitial}
               />
             </div>
           </div>
@@ -71,7 +80,7 @@ export function StoryCard({
           <p className="text-sm font-medium">Create Story</p>
         </div>
       )}
-    </div>
+    </Wrapper>
   );
 }
 
@@ -80,21 +89,37 @@ const AddStoryModal = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const {
-    mutate: handleCreateStory,
-    isPending: isCreateStoryPending,
-    isSuccess,
-  } = useCreateStory();
+  const { mutate: handleCreateStory, isPending: isCreateStoryPending } = useCreateStory();
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
+    if (!selectedFile.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setError("Image must be smaller than 5MB.");
+      return;
+    }
+
+    setError(null);
+    if (preview) URL.revokeObjectURL(preview);
     setFile(selectedFile);
 
     // Create preview URL
     const previewUrl = URL.createObjectURL(selectedFile);
     setPreview(previewUrl);
+  };
+
+  const resetSelection = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+    setFile(null);
   };
 
   // Handle story upload
@@ -106,23 +131,20 @@ const AddStoryModal = () => {
 
     try {
       setError(null);
-      console.log(file, "file");
       // Create form data
       const formData = new FormData();
       formData.append("image", file);
 
-      handleCreateStory(formData);
-
-      if (isSuccess) {
-        toast.success("Story added successfully!");
-      }
-      // Close modal and reset state
-      onClose();
-      setFile(null);
-      setPreview(null);
-
-      // Refresh stories list (you might want to implement this through a callback)
-      // window.location.reload();
+      handleCreateStory(formData, {
+        onSuccess: () => {
+          toast.success("Story added successfully!");
+          resetSelection();
+          onClose();
+        },
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : "Failed to upload story");
+        },
+      });
     } catch (err) {
       console.error("Error uploading story:", err);
       setError(err instanceof Error ? err.message : "Failed to upload story");
@@ -166,7 +188,11 @@ const AddStoryModal = () => {
             <>
               <ModalHeader className="flex flex-col gap-1">Add Story</ModalHeader>
               <ModalBody>
-                {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+                {error && (
+                  <div role="alert" className="text-red-500 text-sm mb-2">
+                    {error}
+                  </div>
+                )}
 
                 {preview ? (
                   <div className="relative w-full h-[240px] rounded-lg mb-2 overflow-hidden">
@@ -175,11 +201,9 @@ const AddStoryModal = () => {
                       isIconOnly
                       color="danger"
                       size="sm"
+                      aria-label="Remove selected image"
                       className="absolute top-2 right-2"
-                      onClick={() => {
-                        setPreview(null);
-                        setFile(null);
-                      }}
+                      onClick={resetSelection}
                     >
                       ✕
                     </Button>
@@ -189,6 +213,7 @@ const AddStoryModal = () => {
                     <input
                       type="file"
                       accept="image/*"
+                      aria-label="Choose a story image"
                       onChange={handleFileChange}
                       className="absolute inset-0 opacity-0 cursor-pointer z-10"
                     />

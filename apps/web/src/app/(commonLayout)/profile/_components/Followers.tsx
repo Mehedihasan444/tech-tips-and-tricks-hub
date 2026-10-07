@@ -10,14 +10,14 @@ import React from "react";
 
 const Followers = ({ user, posts }: { user: IUser; posts: TPost[] }) => {
   const { user: loggedInUser } = useUser();
-  const { mutate: handleUserUpdate } = useUpdateUser();
+  const { mutate: handleUserUpdate, isPending: isFollowPending } = useUpdateUser();
   const { openChat } = useChatManager();
 
-  const isFollower = () => {
-    if (!loggedInUser || !user) return false; // Ensure loggedInUser and user are not null
-    const res = user?.followers?.find((i) => i._id === loggedInUser._id);
-    return res;
-  };
+  const followerEntry =
+    !loggedInUser?._id || !user
+      ? undefined
+      : user?.followers?.find((i) => i._id === loggedInUser._id);
+  const isFollower = Boolean(followerEntry);
 
   const handleFollowAndUnfollow = () => {
     if (!loggedInUser) return; // Ensure loggedInUser is not null
@@ -52,14 +52,24 @@ const Followers = ({ user, posts }: { user: IUser; posts: TPost[] }) => {
         <h2 className="text-lg font-semibold ">Following</h2>
       </div>
       <div className="sm:ml-5 flex gap-2">
-        {loggedInUser?.nickName != user?.nickName ? (
+        {loggedInUser?.nickName !== user?.nickName ? (
           <>
-            <button
-              onClick={handleFollowAndUnfollow}
-              className="bg-secondary text-default-50 px-4 py-2 rounded-md"
+            <Button
+              color="secondary"
+              variant="flat"
+              onPress={handleFollowAndUnfollow}
+              isLoading={isFollowPending}
+              isDisabled={isFollowPending || !loggedInUser}
+              aria-pressed={isFollower}
+              aria-label={
+                isFollower
+                  ? `Unfollow ${user?.name ?? "this user"}`
+                  : `Follow ${user?.name ?? "this user"}`
+              }
+              className="px-4 py-2 font-medium"
             >
-              {isFollower() ? "Following" : "Follow"}
-            </button>
+              {isFollower ? "Following" : "Follow"}
+            </Button>
             <Button
               isIconOnly
               color="primary"

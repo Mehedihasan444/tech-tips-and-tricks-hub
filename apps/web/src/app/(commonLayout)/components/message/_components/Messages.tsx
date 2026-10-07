@@ -1,9 +1,11 @@
 "use client";
 import { getAllCommentsOfASinglePost } from "@/services/CommentService";
 import React, { Dispatch, useEffect, useState } from "react";
+import { Button } from "@heroui/react";
 import { TPost } from "@/types/TPost";
 import { TComment } from "@/types/TComment";
 import Comment from "./Comment";
+import { CommentSkeleton } from "@/components/ui/Skeleton";
 
 const Messages = ({
   post,
@@ -12,6 +14,8 @@ const Messages = ({
   setComment,
   setText,
   setUpdateComment,
+  refreshKey,
+  onCountChange,
 }: {
   post: TPost;
   setReplyTo: Dispatch<string>;
@@ -19,68 +23,82 @@ const Messages = ({
   seeMore: boolean;
   setText: Dispatch<string>;
   setUpdateComment: Dispatch<boolean>;
+  refreshKey?: number;
+  onCountChange?: (count: number) => void;
 }) => {
   const [comments, setComments] = useState<TComment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<boolean>(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchComments = async () => {
       try {
+        setLoading(true);
+        setLoadError(false);
         const { data } = await getAllCommentsOfASinglePost(post?._id);
-        setComments(data || []);
-        setLoading(false);
+        if (!cancelled) setComments(data || []);
       } catch (error) {
         console.error("Failed to fetch comments:", error);
+        if (!cancelled) setLoadError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     if (post?._id) {
-      fetchComments(); // Call the API to fetch comments only once when the component mounts
+      void fetchComments(); // Call the API to fetch comments only once when the component mounts
     }
-  }, [post]);
+    return () => {
+      cancelled = true;
+    };
+  }, [post?._id, refreshKey, attempt]);
+
+  useEffect(() => {
+    onCountChange?.(comments.length);
+  }, [comments.length, onCountChange]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-3" role="status" aria-label="Loading comments...">
+        <CommentSkeleton />
+        <CommentSkeleton />
+      </div>
+    );
   }
+
+  if (loadError) {
+    return (
+      <div className="text-center py-4">
+        <p className="text-sm text-default-500 mb-2">Couldn&apos;t load comments.</p>
+        <Button size="sm" variant="flat" color="primary" onPress={() => setAttempt((a) => a + 1)}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  const visible = seeMore ? comments : comments.slice(0, 2);
 
   return (
     <div className="pl-7">
       {comments?.length > 0 ? (
         <div className="">
-          {seeMore ? (
-            <div className="">
-              {comments?.map((comment: TComment) => (
-                <Comment
-                  key={comment._id}
-                  comment={comment}
-                  setReplyTo={setReplyTo}
-                  setComment={setComment}
-                  setText={setText}
-                  setUpdateComment={setUpdateComment}
-                  post={post}
-                />
-              ))}
-            </div>
-          ) : (
-            <div>
-              {comments?.slice(0, 2)?.map((comment: TComment) => (
-                <Comment
-                  key={comment._id}
-                  comment={comment}
-                  setReplyTo={setReplyTo}
-                  setComment={setComment}
-                  setText={setText}
-                  setUpdateComment={setUpdateComment}
-                  post={post}
-                />
-              ))}
-            </div>
-          )}
+          {visible?.map((comment: TComment) => (
+            <Comment
+              key={comment._id}
+              comment={comment}
+              setReplyTo={setReplyTo}
+              setComment={setComment}
+              setText={setText}
+              setUpdateComment={setUpdateComment}
+              post={post}
+            />
+          ))}
         </div>
       ) : (
-        <div>No comments yet.</div>
+        <div className="text-sm text-default-500 py-2">No comments yet. Be the first!</div>
       )}
     </div>
   );

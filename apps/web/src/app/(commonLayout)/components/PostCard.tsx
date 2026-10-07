@@ -8,11 +8,11 @@ import {
   CardHeader,
   Chip,
   Divider,
-  Link,
   Tooltip,
   Avatar,
   Badge,
 } from "@heroui/react";
+import Link from "next/link";
 import {
   ThumbsDown,
   ThumbsUp,
@@ -22,28 +22,36 @@ import {
   Clock,
   Crown,
   TrendingUp,
-  MoreVertical,
-  Eye,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MediaGallery from "./MediaGallery";
 import { useUpdatePost } from "@/hooks/post.hook";
 import { useUser } from "@/context/user.provider";
 import { useRouter } from "next/navigation";
 import Message from "./message/Message";
 import { toast } from "sonner";
-import { getAllCommentsOfASinglePost } from "@/services/CommentService";
 import { IUser } from "@/types/IUser";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/context/socket.provider";
 import { sanitizeParse } from "@/utils/sanitizeHtml";
+import { isPostSaved, toggleSavedPost } from "@/utils/bookmarks";
 
 const CHARACTER_LIMIT = 300;
 
+/** Never let a missing/malformed timestamp crash the feed. */
+const formatPostDate = (value: unknown): string => {
+  try {
+    const date = new Date(value as string);
+    if (Number.isNaN(date.getTime())) return "Recently";
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch {
+    return "Recently";
+  }
+};
+
 const PostCard = ({ post }: { post: any }) => {
   const [messageOpen, setMessageOpen] = useState(false);
-  const [numberOfComments, setNumberOfComments] = useState(0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(() => isPostSaved(post?._id));
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const { user: loggedInUser } = useUser();
@@ -60,20 +68,25 @@ const PostCard = ({ post }: { post: any }) => {
     post?.author?.nickName !== loggedInUser?.nickName;
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
+    const url = `${window.location.origin}/posts/${post._id}`;
+    try {
+      if (navigator.share) {
         await navigator.share({
           title: post.title,
           text: post.description,
-          url: `${window.location.origin}/posts/${post._id}`,
+          url,
         });
         toast.success("Post shared successfully!");
-      } catch (error) {
-        console.log("Error sharing:", error);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard!");
+      } else {
+        toast.error("Sharing is not supported in this browser.");
       }
-    } else {
-      await navigator.clipboard.writeText(`${window.location.origin}/posts/${post._id}`);
-      toast.success("Link copied to clipboard!");
+    } catch (error) {
+      // User dismissing the share sheet throws AbortError — not a failure.
+      if (error instanceof Error && error.name === "AbortError") return;
+      toast.error("Could not share this post. Please try again.");
     }
   };
 
@@ -86,25 +99,24 @@ const PostCard = ({ post }: { post: any }) => {
   };
 
   const handleLikesAndDislikes = (type: "like" | "dislike") => {
-    if (type === "like") {
-      setIsLiked(!isLiked);
-      if (isDisliked) setIsDisliked(false);
-    } else {
-      setIsDisliked(!isDisliked);
-      if (isLiked) setIsLiked(false);
-    }
+    // Base counts from the server never include this device's vote, so toggling
+    // off returns to the base instead of incrementing again.
+    const nextLiked = type === "like" ? !isLiked : false;
+    const nextDisliked = type === "dislike" ? !isDisliked : false;
+    setIsLiked(nextLiked);
+    setIsDisliked(nextDisliked);
 
     const formData = new FormData();
     const updatedPostData: { likes?: number; dislikes?: number } = {};
 
     if (type === "dislike") {
-      updatedPostData.dislikes = post.dislikes + 1;
+      updatedPostData.dislikes = post.dislikes + (nextDisliked ? 1 : 0);
     } else if (type === "like") {
-      updatedPostData.likes = post.likes + 1;
+      updatedPostData.likes = post.likes + (nextLiked ? 1 : 0);
     }
 
     formData.append("data", JSON.stringify(updatedPostData));
-    handleUpdatePost({ formData, postId: post._id });
+    handleUpdatePost({ formData, postId: post._id, silent: true });
   };
 
   const handleMessage = () => {
@@ -112,59 +124,77 @@ const PostCard = ({ post }: { post: any }) => {
   };
 
   const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    toast.success(isBookmarked ? "Removed from bookmarks" : "Added to bookmarks");
+    // Persisted on this device so Saved Posts survives refresh.
+    const nowSaved = toggleSavedPost(post);
+    setIsBookmarked(nowSaved);
+    toast.success(nowSaved ? "Added to bookmarks" : "Removed from bookmarks");
   };
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const { data } = await getAllCommentsOfASinglePost(post._id);
-        setNumberOfComments(data?.length || 0);
-      } catch (error) {
-        console.error("Failed to fetch comments:", error);
-      }
-    };
-
-    if (post._id) {
-      fetchComments();
-    }
-  }, [post]);
+  // `TPost.comments` already holds the comment ids, so the count is free.
+  // Fetching the full comment body here only to read `.length` cost one extra
+  // request per card and could resolve after unmount.
+  const numberOfComments = post?.comments?.length ?? 0;
 
   return (
     <div className="w-full">
-      <Card className="w-full bg-content1 shadow-sm hover:shadow-lg transition-all duration-300 border border-divider">
+      <Card className="w-full bg-content1 surface hover-lift overflow-hidden">
         {/* Header */}
         <CardHeader className="flex-col gap-3 px-6 pt-6">
           <div className="flex justify-between items-start w-full">
             {/* User Info */}
-            <div className="flex gap-3 flex-1">
-              <Link href={`/profile/${user?.nickName}`}>
-                <Badge
-                  content=""
-                  color="success"
-                  size="sm"
-                  placement="bottom-right"
-                  isInvisible={!isAuthorOnline}
-                  shape="circle"
+            <div className="flex gap-3 flex-1 min-w-0">
+              {user?.nickName ? (
+                <Link
+                  href={`/profile/${user.nickName}`}
+                  aria-label={`View ${user?.name ?? "author"}'s profile`}
+                  className="rounded-full transition-transform duration-300 hover:scale-105 motion-reduce:hover:scale-100"
                 >
-                  <Avatar
-                    src={user?.profilePhoto}
-                    size="lg"
-                    isBordered
-                    color={user?.isPremium ? "warning" : "primary"}
-                    className="flex-shrink-0 hover:scale-105 transition-transform cursor-pointer"
-                  />
-                </Badge>
-              </Link>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/profile/${user?.nickName}`}
-                    className="font-semibold text-foreground hover:text-primary transition-colors"
+                  <Badge
+                    content=""
+                    color="success"
+                    size="sm"
+                    placement="bottom-right"
+                    isInvisible={!isAuthorOnline}
+                    shape="circle"
+                    // `badge` is the dot element itself; `base` wraps the whole
+                    // avatar, so the pulse has to go on `badge` or it would
+                    // scale the avatar too.
+                    classNames={{ badge: isAuthorOnline ? "animate-pulse-soft" : "" }}
                   >
-                    {user?.name}
-                  </Link>
+                    <Avatar
+                      name={user?.name?.trim() ? user.name : "?"}
+                      src={user?.profilePhoto}
+                      size="lg"
+                      isBordered
+                      color={user?.isPremium ? "warning" : "primary"}
+                      className="flex-shrink-0"
+                    />
+                  </Badge>
+                </Link>
+              ) : (
+                <Avatar
+                  name={user?.name?.trim() ? user.name : "?"}
+                  src={user?.profilePhoto}
+                  size="lg"
+                  isBordered
+                  color={user?.isPremium ? "warning" : "primary"}
+                  className="flex-shrink-0"
+                />
+              )}
+              <div className="flex flex-col gap-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  {user?.nickName ? (
+                    <Link
+                      href={`/profile/${user.nickName}`}
+                      className="font-semibold text-foreground hover:text-primary-fg transition-colors duration-200"
+                    >
+                      {user?.name ?? "Unknown author"}
+                    </Link>
+                  ) : (
+                    <span className="font-semibold text-foreground">
+                      {user?.name ?? "Unknown author"}
+                    </span>
+                  )}
                   {user?.isPremium && (
                     <Tooltip content="Premium User" placement="top">
                       <Crown className="w-4 h-4 text-warning fill-warning" />
@@ -172,12 +202,16 @@ const PostCard = ({ post }: { post: any }) => {
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-default-500">
-                  <Link
-                    href={`/profile/${user?.nickName}`}
-                    className="hover:text-primary transition-colors"
-                  >
-                    @{user?.nickName}
-                  </Link>
+                  {user?.nickName ? (
+                    <Link
+                      href={`/profile/${user.nickName}`}
+                      className="hover:text-primary-fg transition-colors duration-200"
+                    >
+                      @{user.nickName}
+                    </Link>
+                  ) : (
+                    <span>@unknown</span>
+                  )}
                   {user?.profession && (
                     <>
                       <span>•</span>
@@ -187,7 +221,7 @@ const PostCard = ({ post }: { post: any }) => {
                   <span>•</span>
                   <span className="flex items-center gap-1">
                     <Clock size={12} />
-                    {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                    {formatPostDate(post.createdAt)}
                   </span>
                 </div>
               </div>
@@ -217,16 +251,18 @@ const PostCard = ({ post }: { post: any }) => {
                   Trending
                 </Chip>
               )}
-              <Button isIconOnly variant="light" size="sm" className="hover:bg-default-100">
-                <MoreVertical size={18} />
-              </Button>
             </div>
           </div>
 
           {/* Category Badge */}
           {post.category && (
             <div className="flex w-full">
-              <Chip variant="bordered" size="sm" color="secondary" className="font-medium">
+              <Chip
+                variant="flat"
+                size="sm"
+                color="secondary"
+                className="font-medium uppercase tracking-wide text-[11px]"
+              >
                 {post.category}
               </Chip>
             </div>
@@ -238,10 +274,12 @@ const PostCard = ({ post }: { post: any }) => {
           {/* Title */}
           <div className="space-y-2">
             {isPremiumLocked ? (
-              <h3 className="text-2xl font-bold text-foreground leading-tight">{post.title}</h3>
+              <h3 className="text-2xl font-bold text-foreground leading-[1.2] tracking-tight text-balance">
+                {post.title}
+              </h3>
             ) : (
-              <Link href={`/posts/${post._id}`} className="group">
-                <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+              <Link href={`/posts/${post._id}`} className="group inline-block">
+                <h3 className="text-2xl font-bold text-foreground leading-[1.2] tracking-tight text-balance transition-colors duration-200 group-hover:text-primary-fg">
                   {post.title}
                 </h3>
               </Link>
@@ -252,7 +290,10 @@ const PostCard = ({ post }: { post: any }) => {
           <div className="relative">
             {isPremiumLocked ? (
               <>
-                <div className="prose prose-sm max-w-none text-default-700 blur-sm select-none line-clamp-4">
+                <div
+                  className="prose prose-sm max-w-none text-default-700 blur-sm select-none line-clamp-4"
+                  aria-hidden="true"
+                >
                   {sanitizeParse(post.content || "")}
                 </div>
                 <div className="flex flex-col items-center gap-3 py-4 bg-gradient-to-t from-warning-50 to-transparent rounded-lg mt-2">
@@ -287,8 +328,10 @@ const PostCard = ({ post }: { post: any }) => {
                   )}
                   {post.content?.length > CHARACTER_LIMIT && (
                     <button
+                      type="button"
                       onClick={handleReadMore}
-                      className="text-default-600 hover:text-primary font-semibold ml-1 transition-colors"
+                      aria-expanded={isExpanded}
+                      className="text-primary-700 dark:text-primary-300 hover:text-primary-fg font-semibold ml-1 transition-colors"
                     >
                       {isExpanded ? "See less" : "See more"}
                     </button>
@@ -314,7 +357,7 @@ const PostCard = ({ post }: { post: any }) => {
                   size="sm"
                   variant="flat"
                   color="primary"
-                  className="text-xs cursor-pointer hover:bg-primary/20 transition-colors"
+                  className="text-xs cursor-pointer transition-transform duration-200 hover:bg-primary/20 hover:scale-105 motion-reduce:hover:scale-100"
                 >
                   #{tag}
                 </Chip>
@@ -329,18 +372,21 @@ const PostCard = ({ post }: { post: any }) => {
         <CardFooter className="px-6 py-4">
           <div className="flex justify-between items-center w-full">
             {/* Action Buttons */}
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1 rounded-full border border-divider bg-default-100/60 p-1">
               <Tooltip content={isLiked ? "Unlike" : "Like"}>
                 <Button
-                  variant="light"
+                  variant={isLiked ? "flat" : "light"}
                   size="sm"
+                  color={isLiked ? "primary" : "default"}
+                  aria-label={isLiked ? "Unlike this post" : "Like this post"}
+                  aria-pressed={isLiked}
                   startContent={
                     <ThumbsUp
-                      className={`w-5 h-5 transition-colors ${isLiked ? "fill-primary text-primary" : "text-default-500"}`}
+                      className={`w-5 h-5 transition-colors ${isLiked ? "fill-current" : "text-default-500"}`}
                     />
                   }
                   onClick={() => handleLikesAndDislikes("like")}
-                  className={`font-semibold ${isLiked ? "text-primary" : "text-default-600"}`}
+                  className={`font-semibold rounded-full transition-transform duration-200 active:scale-95 ${isLiked ? "" : "text-default-600"}`}
                 >
                   {post.likes + (isLiked ? 1 : 0)}
                 </Button>
@@ -348,15 +394,18 @@ const PostCard = ({ post }: { post: any }) => {
 
               <Tooltip content={isDisliked ? "Remove dislike" : "Dislike"}>
                 <Button
-                  variant="light"
+                  variant={isDisliked ? "flat" : "light"}
                   size="sm"
+                  color={isDisliked ? "danger" : "default"}
+                  aria-label={isDisliked ? "Remove dislike" : "Dislike this post"}
+                  aria-pressed={isDisliked}
                   startContent={
                     <ThumbsDown
-                      className={`w-5 h-5 transition-colors ${isDisliked ? "fill-danger text-danger" : "text-default-500"}`}
+                      className={`w-5 h-5 transition-colors ${isDisliked ? "fill-current" : "text-default-500"}`}
                     />
                   }
                   onClick={() => handleLikesAndDislikes("dislike")}
-                  className={`font-semibold ${isDisliked ? "text-danger" : "text-default-600"}`}
+                  className={`font-semibold rounded-full transition-transform duration-200 active:scale-95 ${isDisliked ? "" : "text-default-600"}`}
                 >
                   {post.dislikes + (isDisliked ? 1 : 0)}
                 </Button>
@@ -364,58 +413,55 @@ const PostCard = ({ post }: { post: any }) => {
 
               <Tooltip content="Comments">
                 <Button
-                  variant="light"
+                  variant={messageOpen ? "flat" : "light"}
                   size="sm"
+                  color={messageOpen ? "primary" : "default"}
+                  aria-label="Toggle comments"
+                  aria-describedby="post-card-comment-count"
+                  aria-pressed={messageOpen}
+                  aria-expanded={messageOpen}
                   startContent={
                     <MessageCircle
-                      className={`w-5 h-5 ${messageOpen ? "text-primary" : "text-default-500"}`}
+                      className={`w-5 h-5 ${messageOpen ? "text-primary-fg" : "text-default-500"}`}
                     />
                   }
-                  onClick={handleMessage}
-                  className={`font-semibold ${messageOpen ? "text-primary" : "text-default-600"}`}
+                  onPress={handleMessage}
+                  className={`font-semibold rounded-full transition-transform duration-200 active:scale-95 ${messageOpen ? "" : "text-default-600"}`}
                 >
-                  {numberOfComments}
-                </Button>
-              </Tooltip>
-
-              <Tooltip content="Views">
-                <Button
-                  variant="light"
-                  size="sm"
-                  startContent={<Eye className="w-5 h-5 text-default-500" />}
-                  isDisabled
-                  className="font-semibold text-default-600"
-                >
-                  {post.views || 0}
+                  <span id="post-card-comment-count">{numberOfComments}</span>
                 </Button>
               </Tooltip>
             </div>
 
             {/* Share & Bookmark */}
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1">
               <Tooltip content="Share">
                 <Button
+                  isIconOnly
                   variant="flat"
                   size="sm"
                   color="primary"
-                  startContent={<Share2 className="w-4 h-4" />}
-                  onClick={handleShare}
-                  className="font-semibold"
+                  aria-label="Share this post"
+                  onPress={handleShare}
+                  className="rounded-full transition-transform duration-200 active:scale-95"
                 >
-                  Share
+                  <Share2 className="w-4 h-4" />
                 </Button>
               </Tooltip>
 
               <Tooltip content={isBookmarked ? "Remove bookmark" : "Bookmark"}>
                 <Button
                   isIconOnly
-                  variant="light"
+                  variant={isBookmarked ? "flat" : "light"}
                   size="sm"
-                  onClick={handleBookmark}
-                  className="hover:bg-default-100"
+                  color={isBookmarked ? "primary" : "default"}
+                  aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this post"}
+                  aria-pressed={isBookmarked}
+                  onPress={handleBookmark}
+                  className={`rounded-full transition-transform duration-200 active:scale-95 ${isBookmarked ? "" : "text-default-500"}`}
                 >
                   <Bookmark
-                    className={`w-5 h-5 transition-all ${isBookmarked ? "fill-primary text-primary" : "text-default-500"}`}
+                    className={`w-5 h-5 transition-all ${isBookmarked ? "fill-current" : ""}`}
                   />
                 </Button>
               </Tooltip>
@@ -427,7 +473,7 @@ const PostCard = ({ post }: { post: any }) => {
         {messageOpen && (
           <>
             <Divider />
-            <div className="px-6 py-4 bg-default-50">
+            <div className="px-6 py-4 bg-default-50 animate-fade-up">
               <Message user={loggedInUser as IUser} post={post} />
             </div>
           </>

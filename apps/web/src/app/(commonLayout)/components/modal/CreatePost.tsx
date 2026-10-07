@@ -46,6 +46,7 @@ function QuillEditor({
   onContentChange?: (content: string) => void;
 }) {
   const { quill, quillRef } = useQuill();
+  const quillCleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (quill) {
@@ -75,24 +76,33 @@ function QuillEditor({
       // Enable/disable editor based on isDisabled prop
       quill.enable(!isDisabled);
 
-      // Set initial content if provided
+      // `root.innerHTML = ...` writes the DOM directly and leaves Quill's internal
+      // Delta untouched, so getText()/getSemanticHTML() still saw the empty document.
+      // `clipboard.dangerouslyPasteHTML` goes through Quill's own pipeline.
       if (initialContent && quill.root.innerHTML === "<p><br></p>") {
-        quill.root.innerHTML = initialContent;
+        quill.clipboard.dangerouslyPasteHTML(initialContent);
       }
 
       // Listen for content changes
       if (onContentChange) {
-        quill.on("text-change", () => {
-          onContentChange(quill.root.innerHTML);
-        });
+        const handleTextChange = () => onContentChange(quill.root.innerHTML);
+        quill.on("text-change", handleTextChange);
+        // Without this, every `initialContent` change added another listener
+        // because it is in the effect's dependency array.
+        quillCleanupRef.current = () => quill.off("text-change", handleTextChange);
       }
     }
+
+    return () => {
+      quillCleanupRef.current?.();
+      quillCleanupRef.current = null;
+    };
   }, [quill, onImagesAdded, isDisabled, externalQuillRef, initialContent, onContentChange]);
 
   return (
     <div
       ref={quillRef}
-      className="flex-1 bg-white"
+      className="flex-1 bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100"
       style={{
         minHeight: "280px",
         maxHeight: "280px",
@@ -108,6 +118,16 @@ export default function CreatePost() {
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set([]));
   const [isPremium, setIsPremium] = useState(false);
   const [pictures, setPictures] = useState<File[]>([]);
+
+  // Object URLs must be created once per file and revoked on change; creating
+  // them inline during render minted a new URL per render, so typing one
+  // character in the title re-decoded every preview.
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  useEffect(() => {
+    const urls = pictures.map((file: File) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    return () => urls.forEach((url: string) => URL.revokeObjectURL(url));
+  }, [pictures]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editorKey, setEditorKey] = useState(0); // Key to force remount
   const [editorContent, setEditorContent] = useState("");
@@ -176,9 +196,12 @@ export default function CreatePost() {
     setPictures((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-  // Memoized handler for category changes
-  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
+  // HeroUI v2 Select is driven by `selectedKeys`/`onSelectionChange`; the v1
+  // `value`/`onChange` pair is silently dropped, leaving the control uncontrolled.
+  const handleCategoryChange = useCallback((keys: "all" | Set<React.Key> | React.Key[]) => {
+    if (keys === "all") return;
+    const first = Array.from(keys as Set<React.Key>)[0];
+    setSelectedCategory(first === undefined ? "" : String(first));
   }, []);
 
   // Reset form function
@@ -364,7 +387,7 @@ export default function CreatePost() {
             <>
               <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[90vh]">
                 <ModalHeader className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-                  <PenSquare className="text-primary" size={20} />
+                  <PenSquare className="text-primary-fg" size={20} />
                   <span className="text-xl font-bold">Create Your Post</span>
                   <div className="flex-1" />
                   <DraftStatus
@@ -386,7 +409,7 @@ export default function CreatePost() {
                     }}
                   />
                   {(isSubmitting || isPending) && (
-                    <Loader2 className="animate-spin text-primary" size={20} />
+                    <Loader2 className="animate-spin text-primary-fg" size={20} />
                   )}
                 </ModalHeader>
 
@@ -421,8 +444,8 @@ export default function CreatePost() {
                       variant="bordered"
                       label="Category"
                       placeholder="Select a category"
-                      value={selectedCategory}
-                      onChange={handleCategoryChange}
+                      selectedKeys={selectedCategory ? [selectedCategory] : []}
+                      onSelectionChange={handleCategoryChange}
                       size="lg"
                       className="flex-1"
                       isDisabled={isSubmitting || isPending}
@@ -437,7 +460,7 @@ export default function CreatePost() {
                     <div className="flex items-center gap-2 h-14 px-4 border-2 border-default-200 rounded-xl hover:border-warning transition-colors">
                       <Crown
                         size={18}
-                        className={isPremium ? "text-warning" : "text-default-400"}
+                        className={isPremium ? "text-warning" : "text-default-600"}
                       />
                       <Checkbox
                         isSelected={isPremium}
@@ -520,8 +543,8 @@ export default function CreatePost() {
                       {pictures.map((image, index) => (
                         <div key={index} className="relative group">
                           <Image
-                            src={URL.createObjectURL(image)}
-                            alt={`preview-${index}`}
+                            src={previewUrls[index]}
+                            alt={`Selected image ${index + 1}`}
                             width={50}
                             height={50}
                             className="object-cover rounded-lg border-2 border-default-200"
@@ -530,11 +553,12 @@ export default function CreatePost() {
                             type="button"
                             onClick={() => removeImage(index)}
                             disabled={isSubmitting || isPending}
+                            aria-label={`Remove image ${index + 1}`}
                             className="absolute -top-1.5 -right-1.5 bg-danger text-white rounded-full p-0.5 
-                                     opacity-0 group-hover:opacity-100 transition-opacity shadow-lg
+                                     opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity shadow-lg
                                      disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <X size={12} />
+                            <X size={12} aria-hidden="true" />
                           </button>
                         </div>
                       ))}

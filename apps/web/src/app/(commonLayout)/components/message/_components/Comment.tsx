@@ -24,13 +24,22 @@ const Comment = ({
       {/* Render the main comment */}
       <div className="flex gap-2">
         <div>
-          <Image
-            src={comment?.commentUser?.photo}
-            alt={comment?.commentUser?.name}
-            width={30}
-            height={30}
-            className="rounded-full h-[30px] w-[30px] object-cover"
-          />
+          {comment?.commentUser?.photo ? (
+            <Image
+              src={comment.commentUser.photo}
+              alt={comment?.commentUser?.name ?? "Comment author"}
+              width={30}
+              height={30}
+              className="rounded-full h-[30px] w-[30px] object-cover"
+            />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="flex rounded-full h-[30px] w-[30px] items-center justify-center bg-default-200 text-xs font-bold text-default-500"
+            >
+              {(comment?.commentUser?.name ?? "?").charAt(0)}
+            </span>
+          )}
         </div>
         <div>
           <CommentMenu
@@ -46,7 +55,7 @@ const Comment = ({
 
       {/* Recursively render children if there are any */}
       {comment?.children?.length > 0 && (
-        <div className="ml-6">
+        <div className="ml-3 sm:ml-6">
           {comment.children.map((childComment: TComment) => (
             <Comment
               key={childComment._id} // Use a unique identifier for the key

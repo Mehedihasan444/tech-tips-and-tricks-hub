@@ -1,24 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { Button, Navbar, NavbarContent, NavbarItem, Badge } from "@heroui/react";
 import Searchbar from "../Searchbar";
 import ProfileDropdown from "../ProfileDropdown";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { MessageSquareText } from "lucide-react";
+import { Compass, MessageSquareText } from "lucide-react";
 import NotificationsDropdown from "@/components/ui/NotificationsDropdown";
-import { useChatManager } from "@/components/ui/ChatManager";
 import { useSocket } from "@/context/socket.provider";
 
 export default function NavigationBar() {
-  const { toggleChatList } = useChatManager();
   const { isConnected } = useSocket();
 
   return (
     <Navbar
       maxWidth="full"
-      className="border-b border-divider backdrop-blur-md bg-background/70 py-2"
+      className="glass sticky top-0 z-40 border-b border-divider/70 py-2"
       position="sticky"
-      isBordered
     >
       <NavbarContent className="hidden sm:flex gap-4 w-full flex-1" justify="center">
         {/* Search bar - now takes more space */}
@@ -27,7 +25,22 @@ export default function NavigationBar() {
         </div>
       </NavbarContent>
 
-      <NavbarContent justify="end" className="gap-2">
+      <NavbarContent justify="end" className="gap-1.5">
+        {/* Explore */}
+        <NavbarItem className="hidden md:block">
+          <Button
+            as={Link}
+            href="/explore"
+            isIconOnly
+            variant="light"
+            radius="full"
+            className="text-default-600 transition-all duration-200 hover:bg-default-200/60 hover:text-foreground active:scale-95"
+            aria-label="Explore"
+          >
+            <Compass size={20} />
+          </Button>
+        </NavbarItem>
+
         {/* Theme Switcher */}
         <NavbarItem>
           <ThemeSwitcher />
@@ -38,7 +51,7 @@ export default function NavigationBar() {
           <NotificationsDropdown />
         </NavbarItem>
 
-        {/* Messages - Opens Chat Manager */}
+        {/* Messages - full-page chat */}
         <NavbarItem>
           <Badge
             content=""
@@ -50,14 +63,15 @@ export default function NavigationBar() {
             isDot
           >
             <Button
+              as={Link}
+              href="/messages"
               isIconOnly
               variant="light"
               radius="full"
-              className="hover:bg-default-100 transition-colors"
+              className="text-default-600 transition-all duration-200 hover:bg-default-200/60 hover:text-foreground active:scale-95"
               aria-label="Messages"
-              onPress={toggleChatList}
             >
-              <MessageSquareText size={20} className="text-default-600" />
+              <MessageSquareText size={20} />
             </Button>
           </Badge>
         </NavbarItem>

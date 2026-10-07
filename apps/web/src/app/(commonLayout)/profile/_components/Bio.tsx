@@ -7,17 +7,14 @@ import React, { useState } from "react";
 const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean }) => {
   const [bioEditMode, setBioEditMode] = useState(false); // State to control bio edit mode
   const [bio, setBio] = useState(user?.bio || ""); // State to manage bio content
-  const { mutate: handleUserUpdate } = useUpdateUser();
+  const { mutate: handleUserUpdate, isPending: isSaving } = useUpdateUser();
 
-  // Handle saving bio changes
+  // Handle saving bio changes (stays in edit mode until the server confirms).
   const handleSaveBio = () => {
-    // Simulate save functionality, this can be replaced with an API call
-    console.log("Saving updated bio:", bio);
     const userData = {
       bio,
     };
-    handleUserUpdate({ userId: user._id, userData });
-    setBioEditMode(false); // Exit edit mode after saving
+    handleUserUpdate({ userId: user._id, userData }, { onSuccess: () => setBioEditMode(false) });
   };
 
   return (
@@ -27,6 +24,7 @@ const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean })
         {showEditOption && (
           <button
             onClick={() => setBioEditMode(!bioEditMode)}
+            aria-label={bioEditMode ? "Cancel bio editing" : "Edit bio"}
             className="mb-4 text-sm text-default-500 underline"
           >
             {bioEditMode ? <X /> : <PenBoxIcon />}
@@ -37,7 +35,11 @@ const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean })
 
       {bioEditMode ? (
         <div className="mb-4">
+          <label htmlFor="bio-textarea" className="sr-only">
+            Bio
+          </label>
           <textarea
+            id="bio-textarea"
             className="w-full p-2 border border-gray-300 rounded-md"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -46,13 +48,15 @@ const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean })
           <div className="flex justify-end mt-2">
             <button
               onClick={handleSaveBio}
-              className="px-4 py-2 bg-blue-500 text-default-50 rounded-md mr-2"
+              disabled={isSaving}
+              className="px-4 py-2 bg-blue-500 text-default-50 rounded-md mr-2 disabled:opacity-50"
             >
-              Save
+              {isSaving ? "Saving..." : "Save"}
             </button>
             <button
               onClick={() => setBioEditMode(false)}
-              className="px-4 py-2 bg-gray-500 text-default-50 rounded-md"
+              disabled={isSaving}
+              className="px-4 py-2 bg-gray-500 text-default-50 rounded-md disabled:opacity-50"
             >
               Cancel
             </button>

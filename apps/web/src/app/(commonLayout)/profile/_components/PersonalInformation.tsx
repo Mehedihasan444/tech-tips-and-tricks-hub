@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Globe, Plus, X, PenBoxIcon } from "lucide-react";
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/BrandIcons";
 import Link from "next/link";
@@ -39,6 +39,27 @@ const PersonalInformation = ({
     education: user?.education || [],
     socialMedia: user?.socialMedia || [],
   });
+
+  // Resync when the user object arrives/changes (it loads async after first render).
+  useEffect(() => {
+    setFormData({
+      email: user?.email || "",
+      mobileNumber: user?.mobileNumber || "",
+      dateOfBirth: (user?.dateOfBirth || "").slice(0, 10),
+      gender: user?.gender || "",
+      maritalStatus: user?.maritalStatus || "",
+      education: user?.education || [],
+      socialMedia: user?.socialMedia || [],
+    });
+  }, [
+    user?.email,
+    user?.mobileNumber,
+    user?.dateOfBirth,
+    user?.gender,
+    user?.maritalStatus,
+    user?.education,
+    user?.socialMedia,
+  ]);
 
   const genderOptions = ["Male", "Female", "Other"];
   const maritalStatusOptions = ["Single", "Married"];
@@ -89,8 +110,7 @@ const PersonalInformation = ({
 
   const handleSave = () => {
     const userData = { ...formData };
-    handleUserUpdate({ userId: user._id, userData });
-    setEditMode(false);
+    handleUserUpdate({ userId: user._id, userData }, { onSuccess: () => setEditMode(false) });
   };
 
   return (
@@ -100,6 +120,9 @@ const PersonalInformation = ({
         {showEditOption && (
           <button
             onClick={() => setEditMode(!editMode)}
+            aria-label={
+              editMode ? "Cancel editing personal information" : "Edit personal information"
+            }
             className="mb-4 text-sm text-default-500 underline"
           >
             {editMode ? <X /> : <PenBoxIcon />}
@@ -134,6 +157,7 @@ const PersonalInformation = ({
               value={formData.gender}
               onChange={(e) => handleChange(e, "gender")}
             >
+              <option value="">Select gender</option>
               {genderOptions.map((gender) => (
                 <option key={gender} value={gender}>
                   {gender}
@@ -148,6 +172,7 @@ const PersonalInformation = ({
               value={formData.maritalStatus}
               onChange={(e) => handleChange(e, "maritalStatus")}
             >
+              <option value="">Select marital status</option>
               {maritalStatusOptions.map((status) => (
                 <option key={status} value={status}>
                   {status}
@@ -247,7 +272,8 @@ const PersonalInformation = ({
 
           <button
             onClick={handleSave}
-            className="mt-4 bg-blue-500 text-default-50 px-4 py-2 rounded-md"
+            disabled={isPending}
+            className="mt-4 bg-blue-500 text-default-50 px-4 py-2 rounded-md disabled:opacity-50"
           >
             {isPending ? <Spinner /> : "Save Changes"}
           </button>
@@ -312,14 +338,18 @@ const PersonalInformation = ({
                   return (
                     <li key={index} className="flex gap-2 items-center">
                       {IconComponent && <IconComponent className="w-5 h-5 text-default-600" />}
-                      <Link
-                        href={media.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-secondary"
-                      >
-                        {media.platform}
-                      </Link>
+                      {media.url ? (
+                        <Link
+                          href={media.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-secondary-fg"
+                        >
+                          {media.platform}
+                        </Link>
+                      ) : (
+                        <span className="text-default-500">{media.platform}</span>
+                      )}
                     </li>
                   );
                 })
