@@ -8,12 +8,28 @@ import { FormEvent, useState } from "react";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [formError, setFormError] = useState("");
   const { mutate, isPending } = useForgetPassword();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutate({ email });
-    setMessage("If this email exists, you will receive a password reset link shortly.");
+    setMessage("");
+    setFormError("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setFormError("Please enter a valid email address.");
+      return;
+    }
+    mutate(
+      { email: email.trim() },
+      {
+        onSuccess: () =>
+          setMessage("If this email exists, you will receive a password reset link shortly."),
+        onError: (err) =>
+          setFormError(
+            err instanceof Error ? err.message : "Something went wrong. Please try again.",
+          ),
+      },
+    );
   };
 
   return (
@@ -22,7 +38,7 @@ export default function ForgotPassword() {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Mail className="w-8 h-8 text-primary" />
+            <Mail className="w-8 h-8 text-primary-fg" />
           </div>
           <h2 className="text-3xl font-bold text-foreground">Forgot your password?</h2>
           <p className="text-default-500 text-sm">
@@ -41,12 +57,11 @@ export default function ForgotPassword() {
             type="email"
             isRequired
             label="Email Address"
-            placeholder="you@example.com"
             variant="bordered"
             size="lg"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            startContent={<Mail className="w-5 h-5 text-default-400" />}
+            startContent={<Mail className="w-5 h-5 text-default-600" />}
             isDisabled={isPending}
             classNames={{
               input: "text-base",
@@ -54,10 +69,23 @@ export default function ForgotPassword() {
             }}
           />
 
-          {/* Success Message */}
+          {/* Success Message (only after the server confirms) */}
           {message && (
-            <div className="bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded-lg text-sm">
+            <div
+              role="status"
+              className="bg-success-50 dark:bg-success-500/10 border border-success-200 text-success-700 dark:text-success-300 px-4 py-3 rounded-lg text-sm"
+            >
               {message}
+            </div>
+          )}
+
+          {/* Error Message */}
+          {formError && (
+            <div
+              role="alert"
+              className="bg-danger-50 dark:bg-danger-500/10 border border-danger-200 text-danger-700 dark:text-danger-300 px-4 py-3 rounded-lg text-sm"
+            >
+              {formError}
             </div>
           )}
 
@@ -87,7 +115,7 @@ export default function ForgotPassword() {
         <div className="text-center">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-600 font-medium transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-primary-fg hover:text-primary-600 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Login

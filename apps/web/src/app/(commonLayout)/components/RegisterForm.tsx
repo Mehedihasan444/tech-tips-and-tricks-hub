@@ -22,7 +22,8 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
   const { setIsLoading: userLoading, user } = useUser();
   const {
@@ -39,7 +40,9 @@ const RegisterForm = () => {
     isError: isloginError,
     error: loginError,
   } = useUserLogin();
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+  const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
+  const busy = isPending || isloginPending;
 
   // 1) Registration effect
   useEffect(() => {
@@ -87,8 +90,18 @@ const RegisterForm = () => {
     e.preventDefault();
     setErrors(null);
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       setErrors("All fields are required.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrors("Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrors("Password must be at least 6 characters.");
       return;
     }
 
@@ -96,8 +109,14 @@ const RegisterForm = () => {
       setErrors("Passwords do not match.");
       return;
     }
-    const nickName = generateNickname(name);
-    handleUserRegistration({ name, email, password, profilePhoto, nickName });
+    const nickName = generateNickname(name.trim());
+    handleUserRegistration({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      profilePhoto,
+      nickName,
+    });
   };
 
   return (
@@ -114,9 +133,9 @@ const RegisterForm = () => {
           variant="bordered"
           isRequired
           size="lg"
-          placeholder="Enter your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          isDisabled={busy}
           classNames={{
             input: "text-base",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
@@ -130,11 +149,11 @@ const RegisterForm = () => {
           isRequired
           size="lg"
           type="email"
-          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          isDisabled={busy}
           classNames={{
-            input: "text-base",
+            input: "text-base outline-none focus:outline-none",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
         />
@@ -145,28 +164,28 @@ const RegisterForm = () => {
           variant="bordered"
           isRequired
           size="lg"
-          placeholder="Enter your password"
           classNames={{
-            input: "text-base",
+            input: "text-base outline-none focus:outline-none",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
           }}
           endContent={
             <button
               className="focus:outline-none"
               type="button"
-              onClick={toggleVisibility}
-              aria-label="toggle password visibility"
+              onClick={togglePasswordVisibility}
+              aria-label={isPasswordVisible ? "Hide password" : "Show password"}
             >
-              {isVisible ? (
-                <EyeOff className="w-5 h-5 text-default-400 pointer-events-none" />
+              {isPasswordVisible ? (
+                <EyeOff className="w-5 h-5 text-default-600 pointer-events-none" />
               ) : (
-                <EyeIcon className="w-5 h-5 text-default-400 pointer-events-none" />
+                <EyeIcon className="w-5 h-5 text-default-600 pointer-events-none" />
               )}
             </button>
           }
-          type={isVisible ? "text" : "password"}
+          type={isPasswordVisible ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          isDisabled={busy}
           className="max-w-lg"
         />
 
@@ -176,24 +195,24 @@ const RegisterForm = () => {
           variant="bordered"
           isRequired
           size="lg"
-          placeholder="Confirm your password"
           endContent={
             <button
               className="focus:outline-none"
               type="button"
-              onClick={toggleVisibility}
-              aria-label="toggle password visibility"
+              onClick={toggleConfirmVisibility}
+              aria-label={isConfirmVisible ? "Hide confirm password" : "Show confirm password"}
             >
-              {isVisible ? (
-                <EyeOff className="w-5 h-5 text-default-400 pointer-events-none" />
+              {isConfirmVisible ? (
+                <EyeOff className="w-5 h-5 text-default-600 pointer-events-none" />
               ) : (
-                <EyeIcon className="w-5 h-5 text-default-400 pointer-events-none" />
+                <EyeIcon className="w-5 h-5 text-default-600 pointer-events-none" />
               )}
             </button>
           }
-          type={isVisible ? "text" : "password"}
+          type={isConfirmVisible ? "text" : "password"}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          isDisabled={busy}
           classNames={{
             input: "text-base",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
@@ -201,7 +220,14 @@ const RegisterForm = () => {
         />
 
         {/* Error message */}
-        {errors && <p className="text-red-500 text-center text-sm">{errors}</p>}
+        {errors && (
+          <p
+            role="alert"
+            className="bg-danger-50 dark:bg-danger-500/10 border border-danger-200 text-danger-700 dark:text-danger-300 px-4 py-3 rounded-lg text-center text-sm"
+          >
+            {errors}
+          </p>
+        )}
 
         {/* Submit button */}
         <SubmitBtn
@@ -222,7 +248,7 @@ const RegisterForm = () => {
             Already registered?{" "}
             <Link
               href="/login"
-              className="text-primary hover:text-primary-600 font-semibold transition-colors"
+              className="text-primary-fg hover:text-primary-600 font-semibold transition-colors"
             >
               Login here
             </Link>

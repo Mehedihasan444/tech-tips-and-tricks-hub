@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button, Input } from "@heroui/react";
+import { Input } from "@heroui/react";
 import { EyeIcon, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,13 +9,15 @@ import { useUser } from "@/context/user.provider";
 import SubmitBtn from "./SubmitBtn";
 import GoogleLoginBtn from "./shared/GoogleLoginBtn";
 import FormDivider from "./shared/FormDivider";
+import DemoLoginPanel from "./shared/DemoLoginPanel";
+import { isDemoLoginEnabled, type TDemoAccount } from "@/contants/demoUsers";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const toggleVisibility = () => setIsVisible((v) => !v);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
@@ -35,6 +37,11 @@ const LoginForm = () => {
     }
   }, [isPending, isSuccess, isError, error, redirect, router, userLoading]);
 
+  const login = (nextEmail: string, nextPassword: string) => {
+    setErrors(null);
+    handleUserLogin({ email: nextEmail, password: nextPassword });
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors(null);
@@ -43,7 +50,17 @@ const LoginForm = () => {
       setErrors("Both email and password are required.");
       return;
     }
-    handleUserLogin({ email, password });
+    login(email, password);
+  };
+
+  // One-click role login: fill the fields visibly (so it is obvious what was
+  // submitted) and sign in immediately.
+  const handleDemoSelect = (account: TDemoAccount) => {
+    if (isPending) return;
+    setEmail(account.email);
+    setPassword(account.password);
+    setIsVisible(false);
+    login(account.email, account.password);
   };
 
   return (
@@ -54,34 +71,6 @@ const LoginForm = () => {
         <p className="text-default-500 text-sm">Sign in to your account to continue</p>
       </div>
 
-      {/* Demo Credentials - More subtle */}
-      <div className="flex gap-2 justify-center">
-        <Button
-          size="sm"
-          variant="flat"
-          color="default"
-          className="text-xs"
-          onClick={() => {
-            setEmail("admin@gmail.com");
-            setPassword("admin@gmail.com");
-          }}
-        >
-          Try Admin
-        </Button>
-        <Button
-          size="sm"
-          variant="flat"
-          color="default"
-          className="text-xs"
-          onClick={() => {
-            setEmail("user@gmail.com");
-            setPassword("user@gmail.com");
-          }}
-        >
-          Try User
-        </Button>
-      </div>
-
       {/* Main Form Card */}
       <form
         className="w-full space-y-5 bg-content1 p-8 rounded-2xl shadow-lg border border-divider"
@@ -89,14 +78,18 @@ const LoginForm = () => {
       >
         {/* Email Input */}
         <Input
+          id="email"
+          name="email"
           label="Email Address"
           variant="bordered"
           isRequired
           size="lg"
           type="email"
-          placeholder="you@example.com"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          isDisabled={isPending}
+          aria-describedby={errors ? "login-error" : undefined}
           classNames={{
             input: "text-base",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
@@ -105,28 +98,33 @@ const LoginForm = () => {
 
         {/* Password Input */}
         <Input
+          id="password"
+          name="password"
           label="Password"
           variant="bordered"
           isRequired
           size="lg"
-          placeholder="Enter your password"
+          autoComplete="current-password"
           endContent={
             <button
-              className="focus:outline-none"
               type="button"
               onClick={toggleVisibility}
-              aria-label="toggle password visibility"
+              aria-label={isVisible ? "Hide password" : "Show password"}
+              aria-pressed={isVisible}
+              className="rounded-md p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               {isVisible ? (
-                <EyeOff className="w-5 h-5 text-default-400 pointer-events-none" />
+                <EyeOff className="w-5 h-5 text-default-500 pointer-events-none" />
               ) : (
-                <EyeIcon className="w-5 h-5 text-default-400 pointer-events-none" />
+                <EyeIcon className="w-5 h-5 text-default-500 pointer-events-none" />
               )}
             </button>
           }
           type={isVisible ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          isDisabled={isPending}
+          aria-describedby={errors ? "login-error" : undefined}
           classNames={{
             input: "text-base",
             inputWrapper: "border-default-200 data-[hover=true]:border-default-400",
@@ -137,7 +135,7 @@ const LoginForm = () => {
         <div className="flex justify-end">
           <Link
             href="/forget-password"
-            className="text-sm text-primary hover:text-primary-600 transition-colors font-medium"
+            className="text-sm text-primary-fg hover:text-primary-600 transition-colors font-medium"
           >
             Forgot password?
           </Link>
@@ -145,7 +143,11 @@ const LoginForm = () => {
 
         {/* Error Message */}
         {errors && (
-          <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm">
+          <div
+            id="login-error"
+            role="alert"
+            className="bg-danger-50 dark:bg-danger-500/10 border border-danger-200 text-danger-700 dark:text-danger-300 px-4 py-3 rounded-lg text-sm"
+          >
             {errors}
           </div>
         )}
@@ -160,13 +162,20 @@ const LoginForm = () => {
         <GoogleLoginBtn />
       </form>
 
+      {isDemoLoginEnabled && (
+        <DemoLoginPanel
+          onSelect={handleDemoSelect}
+          pendingEmail={isPending ? email || null : null}
+        />
+      )}
+
       {/* Register Link */}
       <div className="text-center">
         <p className="text-sm text-default-600">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-primary hover:text-primary-600 font-semibold transition-colors"
+            className="text-primary-fg hover:text-primary-600 font-semibold transition-colors"
           >
             Create account
           </Link>
