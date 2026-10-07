@@ -46,22 +46,24 @@ type TUserWithoutObjects = Omit<IUser, OmittedKeys>;
 
 const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
   const [sortedBy, setSortedBy] = useState<SortedBy | null>(null);
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
 
   // Sort the data based on the selected column
   const sortedUsers = useMemo(() => {
     // CRITICAL: Always ensure we return an array, never undefined
-    if (!Array.isArray(users) || users.length === 0) {
+    const present = (Array.isArray(users) ? users : []).filter((u) => !removedIds.has(u._id));
+    if (present.length === 0) {
       return [];
     }
 
     if (!sortedBy) {
-      return users;
+      return present;
     }
 
     const { column, order } = sortedBy;
     const sortOrder = order === "asc" ? 1 : -1;
 
-    return [...users].sort((a, b) => {
+    return [...present].sort((a, b) => {
       const aValue = a[column];
       const bValue = b[column];
 
@@ -82,7 +84,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
 
       return 0;
     });
-  }, [users, sortedBy]);
+  }, [users, removedIds, sortedBy]);
 
   const renderCell = useCallback(
     (user: TUserWithoutObjects, columnKey: keyof TUserWithoutObjects | "actions") => {
@@ -112,7 +114,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
         case "role":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize text-default-700">{user.role}</p>
+              <p className="font-bold text-sm capitalize text-default-700">{user.role}</p>
             </div>
           );
         case "status":
@@ -131,7 +133,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
             <div className="relative flex items-center gap-2">
               <Tooltip content="Details">
                 <Link href={`/profile/${user?.nickName}`}>
-                  <span className="text-lg text-default-400 cursor-pointer active:opacity-50 hover:text-primary transition-colors">
+                  <span className="text-lg text-default-600 cursor-pointer active:opacity-50 hover:text-primary-fg transition-colors">
                     <Eye />
                   </span>
                 </Link>
@@ -139,7 +141,17 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
               {/* update modal */}
               <UserUpdateModal user={user} />
 
-              <DeleteConfirmationModal item={user} title="user" />
+              <DeleteConfirmationModal
+                item={user}
+                title="user"
+                onDeleted={(id) =>
+                  setRemovedIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(id);
+                    return next;
+                  })
+                }
+              />
             </div>
           );
         default:
@@ -149,19 +161,26 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
     [],
   );
 
-  const handleSort = useCallback((column: keyof IUser) => {
-    setSortedBy((prev) => {
-      let order: SortOrder = "asc";
-      if (prev && prev.column === column && prev.order === "asc") {
-        order = "desc";
-      }
-      return { column, order };
-    });
-  }, []);
+  const handleSortChange = (descriptor: { column: string | number; direction: string }) => {
+    const column = descriptor.column as keyof IUser;
+    setSortedBy((prev) => ({
+      column,
+      order: prev && prev.column === column && prev.order === "asc" ? "desc" : "asc",
+    }));
+  };
 
   return (
     <Table
       aria-label="User table with sorting"
+      sortDescriptor={
+        sortedBy
+          ? {
+              column: sortedBy.column as string,
+              direction: sortedBy.order === "desc" ? "descending" : "ascending",
+            }
+          : undefined
+      }
+      onSortChange={handleSortChange}
       classNames={{
         wrapper: "min-h-[400px]",
       }}
@@ -176,21 +195,8 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.uid !== "actions"}
-            onClick={() => {
-              if (column.uid !== "actions") {
-                handleSort(column.uid as keyof IUser);
-              }
-            }}
-            className="cursor-pointer hover:bg-default-100 transition-colors"
           >
-            <div className="flex items-center gap-1">
-              {column.name}
-              {sortedBy && sortedBy.column === column.uid && (
-                <span className="text-primary font-bold">
-                  {sortedBy.order === "asc" ? " ↑" : " ↓"}
-                </span>
-              )}
-            </div>
+            {column.name}
           </TableColumn>
         )}
       </TableHeader>
@@ -199,7 +205,7 @@ const UsersTable = ({ users = [] }: { users?: IUser[] }) => {
         emptyContent={
           <div className="text-center py-10">
             <p className="text-default-500 text-lg">No users found</p>
-            <p className="text-default-400 text-sm mt-2">
+            <p className="text-default-600 text-sm mt-2">
               There are no users to display at the moment.
             </p>
           </div>

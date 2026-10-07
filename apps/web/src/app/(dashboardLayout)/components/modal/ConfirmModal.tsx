@@ -15,24 +15,43 @@ import {
 } from "@heroui/react";
 import { Trash2, AlertTriangle } from "lucide-react";
 
-export default function DeleteConfirmationModal({ item, title }: { item: any; title: string }) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+export default function DeleteConfirmationModal({
+  item,
+  title,
+  onDeleted,
+}: {
+  item: any;
+  title: string;
+  onDeleted?: (id: string) => void;
+}) {
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { mutate: handleDeleteUser, isPending: isUserLoading } = useDeleteUser();
   const { mutate: handleDeletePost, isPending: isPostLoading } = useDeletePost();
 
   const isLoading = title === "user" ? isUserLoading : isPostLoading;
+  const itemName = item?.name || item?.title || "this item";
 
   const handleDelete = () => {
+    const done = () => {
+      onClose();
+      onDeleted?.(item._id);
+    };
     if (title === "user") {
-      handleDeleteUser({ userId: item._id });
+      handleDeleteUser({ userId: item._id }, { onSuccess: done });
     } else if (title === "post") {
-      handleDeletePost({ postId: item._id });
+      handleDeletePost({ postId: item._id }, { onSuccess: done });
     }
   };
 
   return (
     <>
-      <Button onPress={onOpen} className="bg-transparent min-w-0 p-0">
+      <Button
+        onPress={onOpen}
+        isIconOnly
+        variant="light"
+        aria-label={`Delete ${title} ${itemName}`}
+        className="text-danger hover:bg-danger/10 p-2"
+      >
         <Tooltip color="danger" content={`Delete ${title}`}>
           <Trash2 className="text-danger hover:scale-110 transition-transform" />
         </Tooltip>

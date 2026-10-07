@@ -13,38 +13,57 @@ interface CollapseItem {
 interface Props {
   icon: ReactNode;
   title: string;
-  // href?: string;
-  isActive?: string;
+  /** The current pathname, used to open this section when a child route is active. */
+  pathname?: string;
   items: CollapseItem[];
 }
 
-export const CollapseItems = ({ icon, items, title, isActive }: Props) => {
+export const CollapseItems = ({ icon, items, title, pathname }: Props) => {
+  // Without this, landing directly on a child route leaves the section closed
+  // and no item in the sidebar reads as active.
+  const hasActiveChild = items.some((item) => item.href === pathname);
+  // `selectedKeys` alone makes the accordion fully controlled with no way to
+  // toggle it, so the section could never be opened by clicking its header.
+  // Track openness locally, auto-opening whenever the route moves to a child.
+  const [isOpen, setIsOpen] = React.useState(hasActiveChild);
+
+  React.useEffect(() => {
+    if (hasActiveChild) setIsOpen(true);
+  }, [hasActiveChild, pathname]);
+
   return (
-    <div className="flex gap-4 h-full items-center cursor-pointer">
-      <Accordion className="px-0">
+    <div className="flex gap-4 h-full items-center">
+      <Accordion
+        className="px-0"
+        selectedKeys={isOpen ? new Set([title]) : new Set<string>([])}
+        onSelectionChange={(keys) =>
+          setIsOpen(keys === "all" ? true : (keys as Set<string>).has(title))
+        }
+      >
         <AccordionItem
+          key={title}
           indicator={<ChevronRight />}
           classNames={{
             indicator: "data-[open=true]:rotate-90",
             trigger:
-              "py-0 min-h-[44px] hover:bg-default-100  rounded-xl active:scale-[0.98] data-[open=true]:bg-default-100 transition-transform px-3.5",
+              "py-0 min-h-[44px] hover:bg-default-100 rounded-xl data-[open=true]:bg-default-100 transition-transform px-3.5",
 
-            title: `px-0 flex text-base gap-2  h-full items-center cursor-pointer`,
-            content: "bg-default-100 rounded-xl active:scale-[0.98] mt-1",
+            title: `px-0 flex text-base gap-2 h-full items-center cursor-pointer`,
+            content: "bg-default-100 rounded-xl mt-1",
           }}
-          aria-label="Accordion 1"
+          aria-label={title}
           title={
-            <div className="flex flex-row gap-2 ">
+            <div className="flex flex-row gap-2">
               <span>{icon}</span>
               <span>{title}</span>
             </div>
           }
         >
           <div className="pl-12 space-y-2">
-            {items.map((item, index) => (
+            {items.map((item) => (
               <SidebarItem
-                key={index}
-                isActive={isActive === item.href}
+                key={item.href ?? item.title}
+                isActive={pathname === item.href}
                 title={item.title}
                 icon={item.icon}
                 href={item.href}

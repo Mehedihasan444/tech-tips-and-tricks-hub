@@ -110,7 +110,7 @@ export default function UpdatePost({ post }: { post: any }) {
     <>
       <Button onPress={onOpen} className="bg-transparent">
         <Tooltip color="primary" content="Edit post">
-          <span className="text-lg text-primary cursor-pointer active:opacity-50">
+          <span className="text-lg text-primary-fg cursor-pointer active:opacity-50">
             <FilePenLine />
           </span>
         </Tooltip>
@@ -145,7 +145,7 @@ export default function UpdatePost({ post }: { post: any }) {
                       id="title"
                       isRequired
                       name="title"
-                      className="!text-primary"
+                      className="!text-primary-fg"
                       variant={"underlined"}
                       label="Post Title"
                       placeholder="Enter Post Title"

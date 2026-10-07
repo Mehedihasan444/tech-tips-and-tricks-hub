@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BarChart,
   Cog,
@@ -19,13 +21,15 @@ import { useSidebarContext } from "../../layout/layout-context";
 
 export const SidebarWrapper = () => {
   const pathname = usePathname();
-  const { collapsed } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebarContext();
   return (
-    <aside className="h-screen z-[20] sticky top-0">
-      {collapsed ? <div className={Sidebar.Overlay()} /> : null}
+    <aside id="dashboard-sidebar" className="h-screen z-[20] sticky top-0">
+      {isOpen ? (
+        <div className={Sidebar.Overlay()} onClick={() => setIsOpen(false)} aria-hidden="true" />
+      ) : null}
       <div
         className={Sidebar({
-          collapsed: collapsed,
+          isOpen,
         })}
       >
         <div className={Sidebar.Header()}>
@@ -67,7 +71,7 @@ export const SidebarWrapper = () => {
               <CollapseItems
                 icon={<Cog />}
                 title="Post Management"
-                isActive={pathname}
+                pathname={pathname}
                 // href="/dashboard/create-post"
                 items={[
                   {

@@ -1,75 +1,203 @@
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  CardBody,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+  Button,
+  Avatar,
+} from "@heroui/react";
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
+import EmptyState from "@/components/ui/EmptyState";
+import { TableRowSkeleton } from "@/components/ui/Skeleton";
 import { getPayments } from "@/services/PaymentService";
 import { IUser } from "@/types/IUser";
-import React from "react";
-
-// Fetches live payment data from the API at request time, so it must not be
-// prerendered at build time (a build has no API to talk to).
-export const dynamic = "force-dynamic";
 
 type TPayment = {
-  userId: IUser;
+  userId: IUser | string | null;
   transactionId: string;
   createdAt: string;
   updatedAt: string;
 };
-const page = async () => {
-  const { data: payments } = await getPayments("");
-  return (
-    <div className="min-h-screen p-8">
-      <div className="bg-gray-50 p-8">
-        {/* Page Title */}
-        <PageTitle title="Payment Information"></PageTitle>
 
-        {/* Table Section */}
-        <div className="overflow-x-auto shadow-md rounded-lg p-8">
-          <table className="min-w-full bg-default-50 border">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 border">Transaction ID</th>
-                <th className="px-4 py-2 border">Payment Method</th>
-                <th className="px-4 py-2 border">Cardholder Name</th>
-                <th className="px-4 py-2 border">Payment Date</th>
-                <th className="px-4 py-2 border">Author Get</th>
-                <th className="px-4 py-2 border">Cut Off</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments && payments.length > 0 ? (
-                payments.map((payment: TPayment, index: number) => (
-                  <tr key={index} className="text-default-700">
-                    <td className="border px-4 py-2">{payment.transactionId}</td>
-                    <td className="border px-4 py-2">N/A</td>
-                    <td className="border px-4 py-2">{payment?.userId?.name}</td>
-                    <td className="border px-4 py-2">
-                      {new Date(payment.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="border px-4 py-2">$15</td>
-                    <td className="border px-4 py-2">$5</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="text-center px-4 py-2 text-default-500">
-                    No payment data available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+interface AuthorSummary {
+  key: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  totalPayments: number;
+  lastPaymentAt: string;
+}
 
-        {/* Footer Information */}
-        <div className="text-center mt-6 text-sm text-default-500">
-          If you have any issues with payments, please contact support at{" "}
-          <a href="mailto:support@technest.com" className="text-teal-600 underline">
-            support@technest.com
-          </a>
-          .
-        </div>
-      </div>
-    </div>
+const formatPaymentDate = (value?: string): string => {
+  if (!value) return "—";
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? "—" : new Date(value).toLocaleDateString();
+};
+
+// Author view is derived ONLY from verified payment records, grouped by the
+// paying customer. No payout figures are invented — the gateway stores one
+// record per verified subscription, so the count and latest date are real.
+const summarizeByAuthor = (payments: TPayment[]): AuthorSummary[] => {
+  const map = new Map<string, AuthorSummary>();
+  for (const payment of payments) {
+    const user =
+      typeof payment.userId === "object" && payment.userId !== null ? payment.userId : null;
+    const key = user?._id ?? user?.email ?? payment.transactionId ?? `unknown-${map.size}`;
+    const prev = map.get(key);
+    const createdAt = payment.createdAt ?? "";
+    if (prev) {
+      prev.totalPayments += 1;
+      if (createdAt && (!prev.lastPaymentAt || createdAt > prev.lastPaymentAt)) {
+        prev.lastPaymentAt = createdAt;
+      }
+    } else {
+      map.set(key, {
+        key,
+        name: user?.name ?? "Unknown User",
+        email: user?.email ?? "",
+        avatar: user?.profilePhoto,
+        totalPayments: 1,
+        lastPaymentAt: createdAt,
+      });
+    }
+  }
+  return [...map.values()].sort((a, b) =>
+    (b.lastPaymentAt ?? "").localeCompare(a.lastPaymentAt ?? ""),
   );
 };
 
-export default page;
+export default function AuthorTransactionsPage() {
+  const [payments, setPayments] = useState<TPayment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const fetchPayments = async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+      const res = await getPayments();
+      setPayments(res?.data ?? []);
+    } catch (err) {
+      console.error("Error fetching payments:", err);
+      setLoadError("We couldn't load transactions. Check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchPayments();
+  }, []);
+
+  const summaries = useMemo(() => summarizeByAuthor(payments), [payments]);
+
+  if (loading) {
+    return (
+      <div className="p-6" role="status" aria-label="Loading author transactions...">
+        <PageTitle title="Author Transactions" />
+        <TableRowSkeleton columns={4} />
+        <TableRowSkeleton columns={4} />
+        <TableRowSkeleton columns={4} />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="p-6">
+        <PageTitle title="Author Transactions" />
+        <div className="bg-content1 rounded-2xl border border-divider">
+          <EmptyState
+            type="custom"
+            title="Couldn't load transactions"
+            description={loadError}
+            actionLabel="Try Again"
+            onAction={() => void fetchPayments()}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <PageTitle title="Author Transactions" />
+      <p className="text-sm text-default-500 mb-6 -mt-2">
+        Verified premium payments grouped by customer. Records appear here only after gateway
+        verification succeeds.
+      </p>
+
+      <Card>
+        <CardBody className="p-0">
+          <Table aria-label="Author transactions table" removeWrapper>
+            <TableHeader>
+              <TableColumn>CUSTOMER</TableColumn>
+              <TableColumn>TOTAL PAYMENTS</TableColumn>
+              <TableColumn>LAST PAYMENT</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent={
+                <EmptyState
+                  type="custom"
+                  title="No transactions yet"
+                  description="Verified payments will appear here once users subscribe to premium."
+                />
+              }
+            >
+              {summaries.map((summary) => (
+                <TableRow key={summary.key}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar src={summary.avatar} name={summary.name} size="sm" />
+                      <div>
+                        <p className="font-medium">{summary.name}</p>
+                        {summary.email ? (
+                          <p className="text-xs text-default-500">{summary.email}</p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-semibold">{summary.totalPayments}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-default-500">
+                      {formatPaymentDate(summary.lastPaymentAt)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Chip color="success" variant="flat" size="sm">
+                      Successful
+                    </Chip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
+
+      <div className="text-center mt-6 text-sm text-default-500">
+        If you have any issues with payments, please contact support at{" "}
+        <a href="mailto:support@technest.com" className="text-primary-fg underline">
+          support@technest.com
+        </a>
+        .
+      </div>
+      <div className="flex justify-center mt-4">
+        <Button color="primary" variant="flat" size="sm" onPress={() => void fetchPayments()}>
+          Refresh
+        </Button>
+      </div>
+    </div>
+  );
+}

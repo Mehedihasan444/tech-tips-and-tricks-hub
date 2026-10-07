@@ -1,8 +1,9 @@
+"use client";
+
 import { CollapseItems } from "./collapse-items";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
 import { Sidebar } from "./sidebar.styles";
-
 import {
   BackpackIcon,
   Banknote,
@@ -13,6 +14,11 @@ import {
   User,
   Activity,
   Flag,
+  MessageSquare,
+  Image,
+  Tags,
+  Settings,
+  BarChart2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,14 +26,16 @@ import { useSidebarContext } from "../../layout/layout-context";
 
 export const AdminSidebarWrapper = () => {
   const pathname = usePathname();
-  const { collapsed } = useSidebarContext();
+  const { isOpen, setIsOpen } = useSidebarContext();
 
   return (
-    <aside className="h-screen z-[20] sticky top-0">
-      {collapsed ? <div className={Sidebar.Overlay()} /> : null}
+    <aside id="dashboard-sidebar" className="h-screen z-[20] sticky top-0">
+      {isOpen ? (
+        <div className={Sidebar.Overlay()} onClick={() => setIsOpen(false)} aria-hidden="true" />
+      ) : null}
       <div
         className={Sidebar({
-          collapsed: collapsed,
+          isOpen,
         })}
       >
         <div className={Sidebar.Header()}>
@@ -49,7 +57,7 @@ export const AdminSidebarWrapper = () => {
               isActive={pathname === "/admin-dashboard"}
               href="/admin-dashboard"
             />
-            <SidebarMenu title="Management">
+            <SidebarMenu title="Content Management">
               <SidebarItem
                 isActive={pathname === "/admin-dashboard/posts-management"}
                 title="Manage Posts"
@@ -57,14 +65,39 @@ export const AdminSidebarWrapper = () => {
                 href="/admin-dashboard/posts-management"
               />
               <SidebarItem
+                isActive={pathname === "/admin-dashboard/comments-management"}
+                title="Manage Comments"
+                icon={<MessageSquare />}
+                href="/admin-dashboard/comments-management"
+              />
+              <SidebarItem
+                isActive={pathname === "/admin-dashboard/stories-management"}
+                title="Manage Stories"
+                icon={<Image />}
+                href="/admin-dashboard/stories-management"
+              />
+              <SidebarItem
+                isActive={pathname === "/admin-dashboard/categories-tags"}
+                title="Categories & Tags"
+                icon={<Tags />}
+                href="/admin-dashboard/categories-tags"
+              />
+            </SidebarMenu>
+
+            <SidebarMenu title="User Management">
+              <SidebarItem
                 isActive={pathname === "/admin-dashboard/users-management"}
                 title="Manage Users"
                 icon={<User />}
                 href="/admin-dashboard/users-management"
               />
+            </SidebarMenu>
+
+            <SidebarMenu title="Transactions">
               <CollapseItems
                 icon={<Banknote />}
                 title="Transactions"
+                pathname={pathname}
                 items={[
                   {
                     title: "Author Transactions",
@@ -80,10 +113,10 @@ export const AdminSidebarWrapper = () => {
               />
             </SidebarMenu>
 
-            <SidebarMenu title="Monitoring">
+            <SidebarMenu title="Moderation & Safety">
               <SidebarItem
                 isActive={pathname === "/admin-dashboard/reports"}
-                title="Reports"
+                title="Reports & Review Queue"
                 icon={<Flag />}
                 href="/admin-dashboard/reports"
               />
@@ -95,6 +128,15 @@ export const AdminSidebarWrapper = () => {
               />
             </SidebarMenu>
 
+            <SidebarMenu title="Analytics & Insights">
+              <SidebarItem
+                isActive={pathname === "/admin-dashboard/analytics"}
+                title="Analytics Dashboard"
+                icon={<BarChart2 />}
+                href="/admin-dashboard/analytics"
+              />
+            </SidebarMenu>
+
             <SidebarMenu title="System">
               <SidebarItem
                 isActive={pathname === "/admin-dashboard/changelog"}
@@ -102,22 +144,14 @@ export const AdminSidebarWrapper = () => {
                 icon={<FileClock />}
                 href="/admin-dashboard/changelog"
               />
+              <SidebarItem
+                isActive={pathname === "/admin-dashboard/settings"}
+                title="Platform Settings"
+                icon={<Settings />}
+                href="/admin-dashboard/settings"
+              />
             </SidebarMenu>
           </div>
-          {/* <div className={Sidebar.Footer()}>
-            <Tooltip content={"Settings"} color="primary">
-              <div className="max-w-fit">
-                <Home />
-              </div>
-            </Tooltip>
-            
-            <Tooltip content={"Profile"} color="primary">
-              <Avatar
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                size="sm"
-              />
-            </Tooltip>
-          </div> */}
         </div>
       </div>
     </aside>

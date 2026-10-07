@@ -1,20 +1,30 @@
-// SidebarContext.tsx (or whatever filename you're using)
 "use client";
 import { createContext, useContext } from "react";
 
-// Define the interface for the context value
 interface SidebarContextProps {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
+  /**
+   * Whether the off-canvas sidebar is currently open on small screens.
+   * Named `isOpen` rather than `collapsed` because the sidebar is only ever
+   * collapsible below the `md` breakpoint; above it is always visible.
+   */
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  toggleSidebar: () => void;
 }
 
-// Create the context with default values
-export const SidebarContext = createContext<SidebarContextProps>({
-  collapsed: false,
-  setCollapsed: () => {},
-});
+/**
+ * Default is `undefined` on purpose: a non-null default silently swallows a
+ * missing provider and turns every toggle into a no-op, which is exactly what
+ * happened when this provider was never mounted. Consumers must fail loudly.
+ */
+export const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
-// Hook to use the SidebarContext in components
 export const useSidebarContext = () => {
-  return useContext(SidebarContext);
+  const context = useContext(SidebarContext);
+
+  if (context === undefined) {
+    throw new Error("useSidebarContext must be used within a SidebarContext.Provider");
+  }
+
+  return context;
 };

@@ -6,18 +6,33 @@ import NotificationsDropdown from "@/components/ui/NotificationsDropdown";
 import { useChatManager } from "@/components/ui/ChatManager";
 import { useSocket } from "@/context/socket.provider";
 import { Badge, Button, Tooltip } from "@heroui/react";
-import { MessageSquareText, Home } from "lucide-react";
+import { MessageSquareText, Home, Menu } from "lucide-react";
 import Link from "next/link";
 import React, { ReactNode } from "react";
+import { useSidebarContext } from "../../layout/layout-context";
 
 const NavbarWrapper = ({ children }: { children: ReactNode }) => {
   const { toggleChatList } = useChatManager();
   const { isConnected } = useSocket();
+  const { isOpen, toggleSidebar } = useSidebarContext();
 
   return (
     <div className="w-full ">
       <div className="p-5 flex justify-between items-center shadow">
         <div className="flex-1 flex items-center gap-4">
+          {/* Mobile drawer toggle — the sidebar is off-canvas below md */}
+          <Button
+            isIconOnly
+            variant="light"
+            radius="full"
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
+            aria-controls="dashboard-sidebar"
+            onPress={toggleSidebar}
+            className="md:hidden"
+          >
+            <Menu size={20} className="text-default-600" />
+          </Button>
           <ThemeSwitcher />
           <Tooltip content="Back to Home" color="primary">
             <Link href="/">
@@ -32,28 +47,28 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
           <NotificationsDropdown />
 
           {/* Messages */}
-          <Badge
-            content=""
-            color="primary"
-            size="sm"
-            placement="top-right"
-            className="border-2 border-background"
-            isInvisible={!isConnected}
-            isDot
-          >
-            <Button
-              isIconOnly
-              variant="light"
-              radius="full"
-              className="hover:bg-default-100 transition-colors"
-              aria-label="Messages"
-              onPress={toggleChatList}
+          <Tooltip content={isConnected ? "Messages" : "Messages (offline)"} color="primary">
+            <Badge
+              content=""
+              color="primary"
+              size="sm"
+              placement="top-right"
+              className="border-2 border-background"
+              isInvisible={!isConnected}
+              isDot
             >
-              <Tooltip content="Messages" color="primary">
+              <Button
+                isIconOnly
+                variant="light"
+                radius="full"
+                className="hover:bg-default-100 transition-colors"
+                aria-label="Messages"
+                onPress={toggleChatList}
+              >
                 <MessageSquareText size={20} className="text-default-600" />
-              </Tooltip>
-            </Button>
-          </Badge>
+              </Button>
+            </Badge>
+          </Tooltip>
 
           <Tooltip content={"Profile"} color="primary">
             <div className="max-w-fit">

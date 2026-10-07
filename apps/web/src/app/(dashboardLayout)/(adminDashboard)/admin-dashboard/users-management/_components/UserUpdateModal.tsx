@@ -102,7 +102,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
       >
         <Tooltip color="primary" content="Edit user">
           <FilePenLine
-            className="text-primary cursor-pointer hover:scale-110 transition-transform"
+            className="text-primary-fg cursor-pointer hover:scale-110 transition-transform"
             size={20}
           />
         </Tooltip>
@@ -124,13 +124,13 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <FilePenLine className="text-primary" size={20} />
+                <FilePenLine className="text-primary-fg" size={20} />
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">Update User</span>
                   <span className="text-sm text-default-500 font-normal">{user.name}</span>
                 </div>
                 {(isSubmitting || isPending) && (
-                  <Loader2 className="ml-auto animate-spin text-primary" size={20} />
+                  <Loader2 className="ml-auto animate-spin text-primary-fg" size={20} />
                 )}
               </ModalHeader>
               <ModalBody className="gap-4 py-6">
@@ -144,7 +144,7 @@ export default function UserUpdateModal({ user }: { user: IUser }) {
                     isDisabled={isSubmitting || isPending}
                     variant="bordered"
                     size="lg"
-                    startContent={<Shield size={18} className="text-default-400" />}
+                    startContent={<Shield size={18} className="text-default-600" />}
                     classNames={{
                       trigger: "border-2 hover:border-primary",
                     }}
