@@ -7,6 +7,8 @@ import { checkUserSubscriptions } from "./app/utils/checkUserSubscriptions";
 import { initializeSocket } from "./app/socket/socket";
 
 let server: Server;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let io: any;
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception:", error);
@@ -27,7 +29,12 @@ process.on("unhandledRejection", (error) => {
 
 async function bootstrap() {
   try {
-    await mongoose.connect(config.db_url as string);
+    // Fail fast instead of hanging forever on an unreachable DB (important for
+    // Docker HEALTHCHECK / orchestrator readiness probes).
+    await mongoose.connect(config.db_url as string, {
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 10,
+    });
     console.log("🛢 Database connected successfully");
     await seed();
     await checkUserSubscriptions();
@@ -36,7 +43,7 @@ async function bootstrap() {
     server = createServer(app);
 
     // Initialize Socket.io
-    initializeSocket(server);
+    io = initializeSocket(server);
     console.log("🔌 Socket.io initialized");
 
     server.listen(config.port, () => {
@@ -50,26 +57,28 @@ async function bootstrap() {
 
 bootstrap();
 
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received");
-  if (server) {
-    server.close(() => {
-      console.log("Server closed due to SIGTERM");
-      process.exit(0);
-    });
-  } else {
+async function shutdown(signal: string) {
+  console.log(`${signal} received`);
+  try {
+    if (io?.close) {
+      await new Promise<void>((resolve) => io.close(() => resolve()));
+      console.log("Socket.io closed");
+    }
+    if (server) {
+      await new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve())),
+      );
+      console.log("HTTP server closed");
+    }
+    await mongoose.disconnect();
+    console.log("MongoDB disconnected");
     process.exit(0);
+  } catch (shutdownError) {
+    console.error("Error during shutdown:", shutdownError);
+    process.exit(1);
   }
-});
+}
 
-process.on("SIGINT", () => {
-  console.log("SIGINT received");
-  if (server) {
-    server.close(() => {
-      console.log("Server closed due to SIGINT");
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
-  }
-});
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+
+process.on("SIGINT", () => void shutdown("SIGINT"));

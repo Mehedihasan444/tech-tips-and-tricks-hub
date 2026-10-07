@@ -1,5 +1,6 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
+import config from "../config";
 
 // Types
 interface OnlineUser {
@@ -59,13 +60,17 @@ const typingUsers = new Map<string, TypingData>();
 let io: Server;
 
 export const initializeSocket = (httpServer: HttpServer): Server => {
+  // Single validated origin (no wildcard + credentials combo, no raw process.env
+  // bypass, no stale hardcoded prod URL). CLIENT_URL is the source of truth.
+  const clientOrigins = [config.client_url as string];
+  if (config.NODE_ENV !== "production") {
+    if (!clientOrigins.includes("http://localhost:3000")) {
+      clientOrigins.push("http://localhost:3000");
+    }
+  }
   io = new Server(httpServer, {
     cors: {
-      origin: [
-        "http://localhost:3000",
-        "https://tech-tips-hub.vercel.app",
-        process.env.CLIENT_URL || "*",
-      ],
+      origin: clientOrigins,
       methods: ["GET", "POST"],
       credentials: true,
     },

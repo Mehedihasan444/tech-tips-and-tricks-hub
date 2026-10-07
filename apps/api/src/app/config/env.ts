@@ -21,6 +21,18 @@ const envSchema = z.object({
   ADMIN_PROFILE_PHOTO: z.string().url().optional().or(z.literal("")),
   ADMIN_MOBILE_NUMBER: z.string().optional().default(""),
 
+  // Demo accounts backing the one-click role logins on the web login page.
+  // `DEMO_LOGIN_ENABLED` is coerced off in production below so these can never
+  // be switched on for a real deployment by a stray env value.
+  DEMO_LOGIN_ENABLED: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+  DEMO_ADMIN_EMAIL: z.string().email().default("admin@demo.test"),
+  DEMO_ADMIN_PASSWORD: z.string().min(8).default("DemoAdmin@123"),
+  DEMO_USER_EMAIL: z.string().email().default("user@demo.test"),
+  DEMO_USER_PASSWORD: z.string().min(8).default("DemoUser@123"),
+
   CLOUDINARY_CLOUD_NAME: z.string().optional().default(""),
   CLOUDINARY_API_KEY: z.string().optional().default(""),
   CLOUDINARY_API_SECRET: z.string().optional().default(""),
@@ -31,7 +43,7 @@ const envSchema = z.object({
   SENDER_EMAIL: z.string().email().optional().or(z.literal("")),
   SENDER_APP_PASS: z.string().optional().default(""),
 
-  RESET_PASS_UI_LINK: z.string().startsWith("/").default("/reset-password?token="),
+  RESET_PASS_UI_LINK: z.string().startsWith("/").default("/reset-password"),
 
   STORE_ID: z.string().optional().default(""),
   SIGNATURE_KEY: z.string().optional().default(""),
@@ -56,7 +68,15 @@ function loadEnv(): Env {
     console.error(parsed.error.flatten().fieldErrors);
     throw new Error("Invalid environment variables");
   }
-  return parsed.data;
+  const data = parsed.data;
+
+  // Hard guarantee: demo accounts can never exist in production, even if
+  // DEMO_LOGIN_ENABLED=true leaks into a production env file.
+  if (data.NODE_ENV === "production") {
+    data.DEMO_LOGIN_ENABLED = false;
+  }
+
+  return data;
 }
 
 export const env = loadEnv();

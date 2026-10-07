@@ -1,4 +1,3 @@
-import { TUser } from "../modules/User/user.interface";
 import { User } from "../modules/User/user.model";
 
 export const checkUserSubscriptions = async () => {
@@ -8,21 +7,26 @@ export const checkUserSubscriptions = async () => {
     // Find all users with premium access
     const users = await User.find({ isPremium: true });
 
-    users.forEach(async (user: TUser) => {
-      const subscriptionStartDate = new Date(user.subscriptionStartDate as string);
-      const diffInTime = currentDate.getTime() - subscriptionStartDate.getTime();
-      const diffInMonths = diffInTime / (1000 * 3600 * 24 * 30); // Convert time difference into months
+    // Sequential for..of (not forEach) so rejections are caught and awaited.
+    for (const user of users) {
+      try {
+        const subscriptionStartDate = new Date(user.subscriptionStartDate as string);
+        const diffInTime = currentDate.getTime() - subscriptionStartDate.getTime();
+        const diffInMonths = diffInTime / (1000 * 3600 * 24 * 30); // Convert time difference into months
 
-      if (diffInMonths >= 1) {
-        // Use MongoDB's $set operator to directly update the isPremium field
-        await User.updateOne(
-          { _id: user._id }, // Match the user by _id
-          { $set: { isPremium: false } }, // Set isPremium to false
-        );
+        if (diffInMonths >= 1) {
+          // Use MongoDB's $set operator to directly update the isPremium field
+          await User.updateOne(
+            { _id: user._id }, // Match the user by _id
+            { $set: { isPremium: false } }, // Set isPremium to false
+          );
 
-        console.log(`User ${user.email} has had their premium access revoked.`);
+          console.log(`User ${user.email} has had their premium access revoked.`);
+        }
+      } catch (perUserError) {
+        console.error(`Error checking subscription for ${user.email}:`, perUserError);
       }
-    });
+    }
   } catch (error) {
     console.error("Error checking subscriptions:", error);
   }

@@ -25,7 +25,13 @@ const globalErrorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   ];
 
   if ((req as any).files && Object.keys((req as any).files).length > 0) {
-    await deleteImageFromCloudinary((req as any).files as TImageFiles);
+    // Never let cleanup fail the error response: Cloudinary may be
+    // unconfigured (empty creds) or unreachable in some environments.
+    try {
+      await deleteImageFromCloudinary((req as any).files as TImageFiles);
+    } catch (cleanupError) {
+      console.error("Failed to clean up uploaded images:", cleanupError);
+    }
   }
 
   if (err instanceof ZodError) {
@@ -68,12 +74,14 @@ const globalErrorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   }
 
   //ultimate return
+  // Never leak driver internals: `err` is only echoed in development.
+  const isDevelopment = config.NODE_ENV === "development";
   return res.status(statusCode).json({
     success: false,
     message,
     errorSources,
-    err,
-    stack: config.NODE_ENV === "development" ? err?.stack : null,
+    ...(isDevelopment ? { err } : {}),
+    stack: isDevelopment ? err?.stack : null,
   });
 };
 

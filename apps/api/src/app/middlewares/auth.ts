@@ -48,7 +48,8 @@ const auth = (...requiredRoles: (keyof typeof USER_ROLE)[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized !");
     }
 
-    if (requiredRoles && !requiredRoles.includes(role)) {
+    // Only enforce when roles are actually required; an empty call means "any authenticated user".
+    if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
     }
 

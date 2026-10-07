@@ -1,18 +1,27 @@
-import { MeiliSearch } from "meilisearch";
+import { Meilisearch } from "meilisearch";
 import { Document, Types } from "mongoose";
 import config from "../config";
 import { noImage } from "../modules/Post/post.constant";
 import { TPost } from "../modules/Post/post.interface";
 
-const meiliClient = new MeiliSearch({
-  host: config.meilisearch_host as string,
-  apiKey: config.meilisearch_master_key,
-});
+// Meilisearch is optional: the API must boot (auth, posts, etc.) even when
+// MEILISEARCH_HOST is unset. The `meilisearch` v0.62 JS client exports
+// `Meilisearch` (lowercase "s"); the old `MeiliSearch` name is `undefined`
+// and `new undefined()` crashes the process at import time.
+const meilisearchHost = (config.meilisearch_host as string | undefined)?.trim() || "";
+
+const meiliClient = meilisearchHost
+  ? new Meilisearch({
+      host: meilisearchHost,
+      apiKey: config.meilisearch_master_key || undefined,
+    })
+  : null;
 
 export async function addDocumentToIndex(
   result: Document<unknown, object, TPost> & TPost & { _id: Types.ObjectId },
   indexKey: string,
 ) {
+  if (!meiliClient) return;
   const index = meiliClient.index(indexKey);
 
   const { _id, title, content, images, category, tags } = result;
@@ -36,6 +45,7 @@ export async function addDocumentToIndex(
 }
 
 export const deleteDocumentFromIndex = async (indexKey: string, id: string) => {
+  if (!meiliClient) return;
   const index = meiliClient.index(indexKey);
 
   try {
@@ -47,7 +57,8 @@ export const deleteDocumentFromIndex = async (indexKey: string, id: string) => {
 };
 
 export const deleteMeiliSearchIndex = async (indexKey: string) => {
-  meiliClient.deleteIndex(indexKey);
+  if (!meiliClient) return;
+  await meiliClient.deleteIndex(indexKey);
 };
 
 export default meiliClient;

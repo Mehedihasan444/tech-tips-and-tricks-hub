@@ -4,6 +4,7 @@ import express, { Application, Request, Response } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import httpStatus from "http-status";
+import mongoose from "mongoose";
 import routes from "./app/routes";
 import config from "./app/config";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
@@ -25,11 +26,16 @@ app.use(
   }),
 );
 
-// Strict CORS: single client origin, explicit methods/headers, credentials on
+// Strict CORS: comma-separated CLIENT_URL allow-list, explicit methods/headers,
+// credentials on. Supports one or many web origins (preview + prod).
+const allowedOrigins = String(config.client_url || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 app.use(
   cors({
     credentials: true,
-    origin: [config.client_url as string],
+    origin: allowedOrigins.length > 0 ? allowedOrigins : false,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     maxAge: 600,
@@ -70,6 +76,18 @@ app.get("/", (req: Request, res: Response) => {
     success: true,
     message: "Welcome to the Tech Tips And Tricks API",
   });
+});
+
+// Dedicated readiness probe for load balancers / Docker HEALTHCHECK.
+// Reports MongoDB connectivity without exposing internals.
+app.get("/api/health", (req: Request, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  const dbState = mongoose.connection?.readyState; // 1 = connected
+  if (dbState === 1) {
+    res.status(httpStatus.OK).json({ success: true, message: "OK" });
+  } else {
+    res.status(httpStatus.SERVICE_UNAVAILABLE).json({ success: false, message: "DB not ready" });
+  }
 });
 
 //global error handler
