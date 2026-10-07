@@ -1,5 +1,7 @@
 import React from "react";
-import { User, Tooltip, Button, Divider } from "@heroui/react"; // For UI components
+// Via the client shim: importing the @heroui/react barrel from a Server
+// Component evaluates createContext on the server. See @/components/ui/heroui.
+import { User, Tooltip, Button, Divider } from "@/components/ui/heroui";
 import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { getPost } from "@/services/PostService";
 import Image from "next/image";

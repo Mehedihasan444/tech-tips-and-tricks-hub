@@ -96,7 +96,7 @@ export default function DraftsPage() {
             placeholder="Search drafts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Search size={18} className="text-default-400" />}
+            startContent={<Search size={18} className="text-default-600" />}
             className="w-full md:w-64"
             size="sm"
           />
@@ -198,7 +198,7 @@ export default function DraftsPage() {
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-divider">
-                  <span className="text-xs text-default-400 flex items-center gap-1">
+                  <span className="text-xs text-default-600 flex items-center gap-1">
                     <Clock size={12} />
                     {formatDate(draft.lastSaved)}
                   </span>

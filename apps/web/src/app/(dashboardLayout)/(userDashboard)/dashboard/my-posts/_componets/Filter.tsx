@@ -1,67 +1,92 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState } from "react";
-import { Select, SelectItem, TimeInput, DateInput, Input } from "@heroui/react";
+import React, { useEffect, useState } from "react";
+import { Select, SelectItem, Input, Button } from "@heroui/react";
 import { TPost } from "@/types/TPost";
-const Filter = ({ allPosts }: { allPosts: TPost[] }) => {
-  const [filteredPosts, setFilteredPosts] = useState(allPosts);
-  const [categoryFilter, setCategoryFilter] = useState("All");
-  const [dateFilter, setDateFilter] = useState("");
+import { postCategories } from "@/app/(dashboardLayout)/(userDashboard)/dashboard/create-post/constant";
 
-  // Filter posts based on selected category and date
-  const filterPosts = () => {
-    let filtered = allPosts;
+const ALL_CATEGORIES = "All Categories";
 
-    // Filter by category
-    if (categoryFilter !== "All") {
-      filtered = filtered.filter((post) => post.category === categoryFilter);
-    }
+export interface PostFilters {
+  query: string;
+  category: string;
+  date: string;
+}
 
-    // Filter by date
-    if (dateFilter) {
-      filtered = filtered.filter((post) => post.createdAt.includes(dateFilter));
-    }
+const Filter = ({ posts, onFilter }: { posts: TPost[]; onFilter: (filtered: TPost[]) => void }) => {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState(ALL_CATEGORIES);
+  const [date, setDate] = useState("");
 
-    setFilteredPosts(filtered);
+  useEffect(() => {
+    const q = query.trim().toLowerCase();
+    const filtered = (posts ?? []).filter((post) => {
+      if (category !== ALL_CATEGORIES && post.category !== category) return false;
+      if (date && !(post.createdAt ?? "").startsWith(date)) return false;
+      if (q) {
+        const haystack =
+          `${post.title ?? ""} ${post.content?.replace(/<[^>]+>/g, "") ?? ""}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+    onFilter(filtered);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posts, query, category, date]);
+
+  const clearAll = () => {
+    setQuery("");
+    setCategory(ALL_CATEGORIES);
+    setDate("");
   };
 
-  // Handle changes in filters
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategoryFilter(e.target.value);
-    filterPosts();
-  };
+  const isActive = query.trim() !== "" || category !== ALL_CATEGORIES || date !== "";
 
   return (
-    <>
+    <div className="flex flex-wrap items-end gap-3">
       {/* Search Bar */}
       <Input
-        type="email"
-        variant={"underlined"}
+        type="search"
+        variant="underlined"
         label="Search"
+        aria-label="Search my posts"
         placeholder="Search here ..."
         className="max-w-xs"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
 
       {/* Category Filter */}
-
       <Select
-        variant={"underlined"}
-        label="Favorite Category"
-        placeholder="Select an Category"
+        variant="underlined"
+        label="Category"
+        aria-label="Filter by category"
+        placeholder="Select a category"
         className="max-w-xs"
-        value={categoryFilter}
-        onChange={handleCategoryChange}
+        selectedKeys={new Set([category])}
+        onSelectionChange={(keys) => setCategory((Array.from(keys)[0] as string) ?? ALL_CATEGORIES)}
       >
-        {["All Categories", "JavaScript", "React", "CSS"].map((item, idx) => (
-          <SelectItem key={idx}>{item}</SelectItem>
+        {([ALL_CATEGORIES, ...postCategories] as string[]).map((item) => (
+          <SelectItem key={item}>{item}</SelectItem>
         ))}
       </Select>
+
       {/* Date Filter */}
-      <div className="flex ">
-        <TimeInput variant="underlined" className="max-w-xs" label="Event Time" />
-        <DateInput variant="underlined" className="max-w-xs" label={"Event date"} />
-      </div>
-    </>
+      <Input
+        type="date"
+        variant="underlined"
+        label="Published on"
+        aria-label="Filter by publish date"
+        className="max-w-xs"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+      />
+
+      {isActive && (
+        <Button size="sm" variant="light" onPress={clearAll}>
+          Clear
+        </Button>
+      )}
+    </div>
   );
 };
 

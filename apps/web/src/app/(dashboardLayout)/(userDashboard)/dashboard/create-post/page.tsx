@@ -24,7 +24,7 @@ export default function CreatePost() {
   const { user } = useUser();
   const {
     mutate: handleCreatePost,
-    // isPending: createPostPending,
+    isPending: isCreatePending,
     isSuccess,
     reset: resetMutation,
   } = useCreatePost();
@@ -40,7 +40,10 @@ export default function CreatePost() {
         setSelectedTags(new Set(draft.tags || []) as any);
         setIsPremium(draft.isPremium || false);
         if (draft.content) {
-          quill.root.innerHTML = draft.content;
+          // Assigning root.innerHTML bypasses Quill's Delta, so quill.getText()
+          // still returned empty and the submit handler then rejected the post
+          // with "Please write some content" for a draft the user could see.
+          quill.clipboard.dangerouslyPasteHTML(draft.content);
         }
         setLoadedDraftId(draft.id);
         // Clear the loadDraft from localStorage after loading
@@ -52,9 +55,17 @@ export default function CreatePost() {
     }
   }, [quill]);
 
-  const handleSelectionChange = (e: any) => {
-    setSelectedTags(new Set(e.target.value.split(",")));
-  };
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  // Object URLs must be created once per file (not during render) and
+  // revoked when replaced to avoid leaks and flicker.
+  useEffect(() => {
+    const urls = pictures.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [pictures]);
   useEffect(() => {
     const selectLocalImage = () => {
       const input = document.createElement("input");
@@ -100,20 +111,27 @@ export default function CreatePost() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess]);
 
-  // Handle category change
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
+  // Handle category change (HeroUI Select reports selection keys, not events)
+  const handleCategoryChange = (keys: Set<string> | string) => {
+    const next = typeof keys === "string" ? keys : (Array.from(keys)[0] ?? "");
+    setSelectedCategory(next as string);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedCategory || selectedTags.size === 0 || !title || !quill) {
+    if (isCreatePending) return;
+    if (!selectedCategory || selectedTags.size === 0 || !title.trim() || !quill) {
       toast.warning("Please fill up all input fields!");
       return;
     }
 
     // Append the Quill editor content as HTML
     const quillContent = quill.root.innerHTML;
+    const plainText = quill.getText().trim();
+    if (!plainText) {
+      toast.warning("Please write some content for your post.");
+      return;
+    }
     const { cleanedContent } = extractAndProcessImages(quillContent);
     const postData = {
       content: cleanedContent,
@@ -159,26 +177,35 @@ export default function CreatePost() {
               isRequired
               id="category"
               name="category"
+              aria-label="Select a category"
               className=""
               variant={"underlined"}
               label="Select your relevant Category"
               placeholder="Select a Category"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
+              selectedKeys={selectedCategory ? new Set([selectedCategory]) : new Set([])}
+              onSelectionChange={(keys) =>
+                handleCategoryChange(keys === "all" ? "" : (keys as Set<string>))
+              }
             >
               {postCategories.map((item) => (
                 <SelectItem key={item}>{item}</SelectItem>
               ))}
             </Select>
-            <Checkbox isSelected={isPremium} onValueChange={setIsPremium}>
-              Premium
-            </Checkbox>
+            <div className="flex flex-col gap-1 shrink-0">
+              <Checkbox isSelected={isPremium} onValueChange={setIsPremium}>
+                Premium
+              </Checkbox>
+              <span className="text-xs text-default-600 max-w-[180px]">
+                Premium posts are visible to subscribers only.
+              </span>
+            </div>
           </div>
 
           {/* Select Tags */}
           <div className="mb-6">
             <Select
               label="Select your relevant Tags"
+              aria-label="Select tags"
               isRequired
               name="tags"
               variant={"underlined"}
@@ -186,7 +213,9 @@ export default function CreatePost() {
               placeholder="Select Tags"
               selectedKeys={selectedTags}
               className=""
-              onChange={handleSelectionChange}
+              onSelectionChange={(keys) => {
+                if (keys !== "all") setSelectedTags(new Set(keys as Set<string>) as any);
+              }}
             >
               {postTags.map((tag) => (
                 <SelectItem key={tag}>{tag}</SelectItem>
@@ -195,31 +224,26 @@ export default function CreatePost() {
           </div>
 
           {/* Quill Editor */}
-          <div className="border border-gray-500 rounded-md p-2 overflow-hidden flex flex-col">
-            {/* Sticky toolbar */}
-            <div
-              className="sticky top-0 bg-default-50 z-10"
-              style={{ borderBottom: "1px solid #ccc" }}
-            >
-              {/* Quill toolbar will automatically appear here */}
-            </div>
+          <div className="border border-default-300 rounded-md p-2 overflow-hidden flex flex-col">
+            {/* Quill injects its own toolbar as the first child of the editor
+                node, so no placeholder element is needed here. */}
 
             {/* Scrollable Text Area */}
             <div
               ref={quillRef}
+              className="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 rounded-xl"
               style={{
                 height: "400px", // Editor height
-                background: "white",
                 overflowY: "auto", // Scrollable text area
                 padding: "10px",
               }}
             />
-            <div className="pt-2 flex gap-2">
-              {pictures?.map((image, index) => (
+            <div className="pt-2 flex gap-2 flex-wrap">
+              {previewUrls.map((url, index) => (
                 <Image
-                  key={index}
-                  src={URL.createObjectURL(image)}
-                  alt={"picture"}
+                  key={`${url}-${index}`}
+                  src={url}
+                  alt={`Attached image ${index + 1}`}
                   width={100}
                   height={100}
                 />
@@ -239,8 +263,10 @@ export default function CreatePost() {
             <Button
               className="bg-secondary text-default-50 shadow-lg shadow-indigo-500/20"
               type="submit"
+              isLoading={isCreatePending}
+              isDisabled={isCreatePending}
             >
-              Submit Post
+              {isCreatePending ? "Publishing..." : "Submit Post"}
             </Button>
           </div>
         </form>

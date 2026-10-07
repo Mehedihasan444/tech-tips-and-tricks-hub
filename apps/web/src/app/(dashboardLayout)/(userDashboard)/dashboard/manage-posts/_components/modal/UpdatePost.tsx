@@ -254,7 +254,7 @@ export default function UpdatePost({ post }: { post: any }) {
     <>
       <Button onPress={onOpen} className="bg-transparent" isDisabled={isSubmitting || isPending}>
         <Tooltip color="primary" content="Edit post">
-          <span className="text-lg text-primary cursor-pointer active:opacity-50">
+          <span className="text-lg text-primary-fg cursor-pointer active:opacity-50">
             <FilePenLine />
           </span>
         </Tooltip>
@@ -281,10 +281,10 @@ export default function UpdatePost({ post }: { post: any }) {
             <>
               <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[90vh]">
                 <ModalHeader className="flex items-center gap-2 flex-shrink-0">
-                  <FilePenLine className="text-primary" size={24} />
+                  <FilePenLine className="text-primary-fg" size={24} />
                   <span className="text-2xl font-bold">Update Your Post</span>
                   {(isSubmitting || isPending) && (
-                    <Loader2 className="ml-auto animate-spin text-primary" size={20} />
+                    <Loader2 className="ml-auto animate-spin text-primary-fg" size={20} />
                   )}
                 </ModalHeader>
 
@@ -335,7 +335,7 @@ export default function UpdatePost({ post }: { post: any }) {
                     <div className="flex items-center gap-2 h-14 px-4 border-2 border-default-200 rounded-xl hover:border-warning transition-colors">
                       <Crown
                         size={18}
-                        className={isPremium ? "text-warning" : "text-default-400"}
+                        className={isPremium ? "text-warning" : "text-default-600"}
                       />
                       <Checkbox
                         isSelected={isPremium}

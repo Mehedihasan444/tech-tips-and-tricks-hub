@@ -15,7 +15,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Card, CardBody, CardHeader, Spinner } from "@heroui/react";
+import { Card, CardBody, CardHeader } from "@heroui/react";
+import EmptyState from "@/components/ui/EmptyState";
+import { DashboardCardSkeleton } from "@/components/ui/Skeleton";
 import { useUser } from "@/context/user.provider";
 import { getMyPosts } from "@/services/PostService";
 import { TPost } from "@/types/TPost";
@@ -42,6 +44,12 @@ ChartJS.register(
   Legend,
 );
 
+interface MonthlyBucket {
+  month: string;
+  posts: number;
+  engagement: number;
+}
+
 interface AnalyticsData {
   totalPosts: number;
   totalComments: number;
@@ -52,32 +60,38 @@ interface AnalyticsData {
   following: number;
   topPosts: { title: string; upvotes: number }[];
   categoryDistribution: { category: string; count: number }[];
-  monthlyActivity: { month: string; posts: number; engagement: number }[];
+  monthlyActivity: MonthlyBucket[];
 }
 
 const AnalyticsPage = () => {
   const { user } = useUser();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchAnalytics = async () => {
       try {
         setLoading(true);
+        setLoadError(false);
         const { data: posts } = await getMyPosts("");
 
-        // Calculate analytics from posts
+        // Calculate analytics from real post data (arrays where present,
+        // numeric counters otherwise).
         let totalComments = 0;
         let totalUpvotes = 0;
         let totalDownvotes = 0;
         let totalViews = 0;
         const categoryCount: Record<string, number> = {};
 
-        posts?.forEach((post: TPost) => {
+        (posts ?? []).forEach((post: TPost) => {
           totalComments += post.comments?.length || 0;
-          totalUpvotes += post.upvotes?.length || 0;
-          totalDownvotes += post.downvotes?.length || 0;
-          totalViews += post.views || Math.floor(Math.random() * 500) + 50;
+          const up = Array.isArray(post.upvotes) ? post.upvotes.length : (post.likes ?? 0);
+          const down = Array.isArray(post.downvotes) ? post.downvotes.length : (post.dislikes ?? 0);
+          totalUpvotes += up;
+          totalDownvotes += down;
+          totalViews += post.views ?? 0;
 
           if (post.category) {
             categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
@@ -85,12 +99,12 @@ const AnalyticsPage = () => {
         });
 
         // Get top posts by upvotes
-        const sortedPosts = [...(posts || [])].sort(
-          (a, b) => (b.upvotes?.length || 0) - (a.upvotes?.length || 0),
-        );
+        const voteCount = (p: TPost) =>
+          Array.isArray(p.upvotes) ? p.upvotes.length : (p.likes ?? 0);
+        const sortedPosts = [...(posts || [])].sort((a, b) => voteCount(b) - voteCount(a));
         const topPosts = sortedPosts.slice(0, 5).map((p) => ({
           title: p.title?.substring(0, 30) + (p.title?.length > 30 ? "..." : "") || "Untitled",
-          upvotes: p.upvotes?.length || 0,
+          upvotes: voteCount(p),
         }));
 
         // Category distribution
@@ -99,40 +113,89 @@ const AnalyticsPage = () => {
           count,
         }));
 
-        // Generate monthly activity (simulated based on posts)
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-        const monthlyActivity = months.map((month) => ({
-          month,
-          posts: Math.floor(Math.random() * 10) + 1,
-          engagement: Math.floor(Math.random() * 100) + 20,
-        }));
+        // Real monthly activity for the last 6 months, bucketed from createdAt.
+        const now = new Date();
+        const monthlyActivity: MonthlyBucket[] = [];
+        for (let i = 5; i >= 0; i--) {
+          const bucket = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const next = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+          let bucketPosts = 0;
+          let bucketEngagement = 0;
+          (posts ?? []).forEach((post: TPost) => {
+            if (!post.createdAt) return;
+            const time = new Date(post.createdAt).getTime();
+            if (Number.isNaN(time) || time < bucket.getTime() || time >= next.getTime()) return;
+            bucketPosts += 1;
+            bucketEngagement +=
+              voteCount(post) +
+              (Array.isArray(post.downvotes) ? post.downvotes.length : (post.dislikes ?? 0)) +
+              (post.comments?.length || 0);
+          });
+          monthlyActivity.push({
+            month: bucket.toLocaleDateString("en-US", { month: "short" }),
+            posts: bucketPosts,
+            engagement: bucketEngagement,
+          });
+        }
 
-        setAnalytics({
-          totalPosts: posts?.length || 0,
-          totalComments,
-          totalUpvotes,
-          totalDownvotes,
-          totalViews,
-          followers: user?.followers?.length || 0,
-          following: user?.following?.length || 0,
-          topPosts,
-          categoryDistribution,
-          monthlyActivity,
-        });
+        if (!cancelled) {
+          setAnalytics({
+            totalPosts: posts?.length || 0,
+            totalComments,
+            totalUpvotes,
+            totalDownvotes,
+            totalViews,
+            followers: user?.followers?.length || 0,
+            following: user?.following?.length || 0,
+            topPosts,
+            categoryDistribution,
+            monthlyActivity,
+          });
+        }
       } catch (error) {
         console.error("Error fetching analytics:", error);
+        if (!cancelled) setLoadError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchAnalytics();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Spinner size="lg" color="primary" />
+      <div className="container mx-auto p-6">
+        <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          role="status"
+          aria-label="Loading analytics..."
+        >
+          {[1, 2, 3, 4].map((i) => (
+            <DashboardCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
+        <div className="bg-content1 rounded-2xl border border-divider">
+          <EmptyState
+            type="custom"
+            title="Couldn't load analytics"
+            description="We couldn't fetch your stats. Check your connection and try again."
+            actionLabel="Try Again"
+            onAction={() => window.location.reload()}
+          />
+        </div>
       </div>
     );
   }
@@ -242,7 +305,7 @@ const AnalyticsPage = () => {
         <Card className="lg:col-span-2">
           <CardHeader className="pb-0">
             <h3 className="font-semibold flex items-center gap-2">
-              <TrendingUp size={18} className="text-primary" />
+              <TrendingUp size={18} className="text-primary-fg" />
               Activity Over Time
             </h3>
           </CardHeader>
@@ -276,7 +339,7 @@ const AnalyticsPage = () => {
                 />
               </div>
             ) : (
-              <p className="text-default-400 text-center">No posts yet</p>
+              <p className="text-default-600 text-center">No posts yet</p>
             )}
           </CardBody>
         </Card>
@@ -302,7 +365,7 @@ const AnalyticsPage = () => {
                 }}
               />
             ) : (
-              <p className="text-default-400 text-center py-8">Create posts to see analytics</p>
+              <p className="text-default-600 text-center py-8">Create posts to see analytics</p>
             )}
           </CardBody>
         </Card>
@@ -315,7 +378,7 @@ const AnalyticsPage = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-default-100 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Eye className="text-primary" size={20} />
+                  <Eye className="text-primary-fg" size={20} />
                   <span>Total Views</span>
                 </div>
                 <span className="font-bold">{analytics?.totalViews?.toLocaleString() || 0}</span>
@@ -336,7 +399,7 @@ const AnalyticsPage = () => {
               </div>
               <div className="flex items-center justify-between p-3 bg-default-100 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Users className="text-secondary" size={20} />
+                  <Users className="text-secondary-fg" size={20} />
                   <span>Following</span>
                 </div>
                 <span className="font-bold">{analytics?.following || 0}</span>

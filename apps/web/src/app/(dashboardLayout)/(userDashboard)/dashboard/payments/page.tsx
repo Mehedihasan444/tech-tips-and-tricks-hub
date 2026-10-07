@@ -9,39 +9,48 @@ type TPayment = {
   createdAt: string;
   updatedAt: string;
 };
+
+const formatPaymentDate = (value?: string): string => {
+  if (!value) return "—";
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? "—" : new Date(value).toLocaleDateString();
+};
 const PaymentInfoPage = async () => {
   const user = await getCurrentUser();
   const userId = user?._id;
-  const { data: payments } = await getPayments(userId);
+  // Without a signed-in user there is nothing to scope the query to — return
+  // an empty list rather than falling back to every payment in the system.
+  const { data: payments } = userId ? await getPayments(userId) : { data: [] };
   return (
-    <div className="min-h-screen bg-gray-50 flex  justify-center p-8">
-      <div className="w-full h-full  bg-default-50 shadow-md rounded-lg p-4">
+    <div className="min-h-screen flex justify-center p-8">
+      <div className="w-full h-full bg-content1 border border-divider shadow-md rounded-lg p-4">
         {/* Page Title */}
         <PageTitle title="Payment Information"></PageTitle>
 
         {/* Table Section */}
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-default-50 border">
+          <table className="min-w-full bg-content1 border border-divider">
             <thead>
-              <tr>
-                <th className="px-4 py-2 border">Transaction ID</th>
-                <th className="px-4 py-2 border">Payment Method</th>
-                <th className="px-4 py-2 border">Cardholder Name</th>
-                <th className="px-4 py-2 border">Payment Date</th>
-                <th className="px-4 py-2 border">Amount</th>
+              <tr className="text-foreground">
+                <th className="px-4 py-2 border border-divider">Transaction ID</th>
+                <th className="px-4 py-2 border border-divider">Customer</th>
+                <th className="px-4 py-2 border border-divider">Payment Date</th>
+                <th className="px-4 py-2 border border-divider">Status</th>
               </tr>
             </thead>
             <tbody>
               {payments && payments.length > 0 ? (
                 payments.map((payment: TPayment, index: number) => (
-                  <tr key={index} className="text-default-700">
-                    <td className="border px-4 py-2">{payment.transactionId}</td>
-                    <td className="border px-4 py-2">N/A</td>
-                    <td className="border px-4 py-2">{payment?.userId?.name}</td>
-                    <td className="border px-4 py-2">
-                      {new Date(payment.createdAt).toLocaleDateString()}
+                  <tr key={index} className="text-foreground">
+                    <td className="border border-divider px-4 py-2">{payment.transactionId}</td>
+                    <td className="border border-divider px-4 py-2">
+                      {payment?.userId?.name ?? "—"}
                     </td>
-                    <td className="border px-4 py-2">$20</td>
+                    <td className="border border-divider px-4 py-2">
+                      {formatPaymentDate(payment.createdAt)}
+                    </td>
+                    {/* Records are only stored after gateway verification succeeds. */}
+                    <td className="border border-divider px-4 py-2">Successful</td>
                   </tr>
                 ))
               ) : (
@@ -58,7 +67,7 @@ const PaymentInfoPage = async () => {
         {/* Footer Information */}
         <div className="text-center mt-6 text-sm text-default-500">
           If you have any issues with payments, please contact support at{" "}
-          <a href="mailto:support@technest.com" className="text-teal-600 underline">
+          <a href="mailto:support@technest.com" className="text-primary-fg underline">
             support@technest.com
           </a>
           .

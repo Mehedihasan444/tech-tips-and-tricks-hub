@@ -33,15 +33,21 @@ interface SortedBy {
 const PostTable = ({ posts }: { posts: TPost[] }) => {
   const [sortedBy, setSortedBy] = useState<SortedBy | null>(null);
   const [page, setPage] = useState<number>(1);
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
   const rowsPerPage = 4;
+
+  const visiblePosts = useMemo(
+    () => (posts ?? []).filter((post) => !removedIds.has(post._id)),
+    [posts, removedIds],
+  );
 
   // const { mutate: handleDeletePost } = useDeletePost(); // Use update post hook
 
   const sortedPosts = useMemo(() => {
-    if (!sortedBy) return posts;
+    if (!sortedBy) return visiblePosts;
     const { column, order } = sortedBy;
     const sortOrder = order === "asc" ? 1 : -1;
-    return [...posts].sort((a, b) => {
+    return [...visiblePosts].sort((a, b) => {
       const aValue = a[column];
       const bValue = b[column];
       if (aValue === undefined || bValue === undefined) return 0;
@@ -49,15 +55,16 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
       if (aValue < bValue) return -sortOrder;
       return 0;
     });
-  }, [posts, sortedBy]);
+  }, [visiblePosts, sortedBy]);
 
-  const pages = Math.ceil(posts?.length / rowsPerPage);
+  const pages = Math.max(1, Math.ceil(visiblePosts?.length / rowsPerPage));
+  const safePage = Math.min(Math.max(1, page), pages);
 
   const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
+    const start = (safePage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     return sortedPosts.slice(start, end);
-  }, [page, sortedPosts]);
+  }, [safePage, sortedPosts]);
 
   type OmittedKeys = "content" | "images" | "tags" | "author"; // Specify the keys you want to omit
 
@@ -73,9 +80,9 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
       switch (columnKey) {
         case "title":
           return (
-            <div className="text-secondary">
+            <div className="text-secondary-fg">
               {cellValue}
-              <h3 className="text-default-400">
+              <h3 className="text-default-600">
                 Posted on: {new Date(post.createdAt).toLocaleDateString()}
               </h3>
             </div>
@@ -83,12 +90,16 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
 
         case "likes":
           return (
-            <div className="text-primary">{typeof cellValue === "number" ? cellValue : null}</div>
+            <div className="text-primary-fg">
+              {typeof cellValue === "number" ? cellValue : null}
+            </div>
           );
 
         case "dislikes":
           return (
-            <div className="text-secondary">{typeof cellValue === "number" ? cellValue : null}</div>
+            <div className="text-secondary-fg">
+              {typeof cellValue === "number" ? cellValue : null}
+            </div>
           );
 
         case "actions":
@@ -96,7 +107,7 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
             <div className="relative flex justify-center items-center gap-2">
               <Tooltip color="primary" content="View post">
                 <Link href={`/dashboard/my-posts/${post._id}`}>
-                  <span className="text-xl text-primary cursor-pointer active:opacity-50">
+                  <span className="text-xl text-primary-fg cursor-pointer active:opacity-50">
                     <Eye />
                   </span>
                 </Link>
@@ -104,7 +115,17 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
               {/* update modal */}
               <UpdatePost post={post} />
               {/* post delete modal */}
-              <DeleteConfirmationModal item={post} title="post" />
+              <DeleteConfirmationModal
+                item={post}
+                title="post"
+                onDeleted={(id) =>
+                  setRemovedIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(id);
+                    return next;
+                  })
+                }
+              />
               {/* <Tooltip color="danger" content="Delete post">
                 <span onClick={()=>handleDeletePost({postId:post._id})} className="text-lg text-danger cursor-pointer active:opacity-50">
                   <Trash2 />
@@ -125,30 +146,41 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
     [],
   );
 
-  const handleSort = (column: keyof TPost) => {
-    let order: SortOrder = "asc";
-    if (sortedBy && sortedBy.column === column && sortedBy.order === "asc") {
-      order = "desc";
-    }
-    setSortedBy({ column, order });
+  const handleSortChange = (descriptor: { column: string | number; direction: string }) => {
+    const column = descriptor.column as keyof TPost;
+    setSortedBy((prev) => ({
+      column,
+      order: prev && prev.column === column && prev.order === "asc" ? "desc" : "asc",
+    }));
   };
 
   return (
     <div>
       <Table
-        aria-label="Post management table with sorting"
+        aria-label="My posts table with sorting"
+        sortDescriptor={
+          sortedBy
+            ? {
+                column: sortedBy.column as string,
+                direction: sortedBy.order === "desc" ? "descending" : "ascending",
+              }
+            : undefined
+        }
+        onSortChange={handleSortChange}
         bottomContent={
-          <div className="flex w-full justify-center">
-            <Pagination
-              isCompact
-              showControls
-              showShadow
-              color="secondary"
-              page={page}
-              total={pages}
-              onChange={(page) => setPage(page)}
-            />
-          </div>
+          pages > 1 ? (
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="secondary"
+                page={safePage}
+                total={pages}
+                onChange={(next) => setPage(next)}
+              />
+            </div>
+          ) : undefined
         }
         style={{
           height: "auto",
@@ -160,17 +192,13 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
             <TableColumn
               key={column.uid}
               align={column.uid === "actions" ? "center" : "start"}
-              allowsSorting
-              onClick={() => handleSort(column.uid as keyof TPost)}
+              allowsSorting={column.uid !== "actions"}
             >
               {column.name}
-              {sortedBy && sortedBy.column === column.uid && (
-                <span>{sortedBy.order === "asc" ? "↑" : "↓"}</span>
-              )}
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={items}>
+        <TableBody items={items} emptyContent="No posts found.">
           {(item) => (
             <TableRow key={item._id}>
               {(columnKey) => (

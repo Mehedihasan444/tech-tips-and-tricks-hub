@@ -1,49 +1,56 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Pagination, Button } from "@heroui/react";
-import { TPost } from "@/types/TPost";
-const Paginate = ({ allPosts }: { allPosts: TPost[] }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 2;
-  const totalPosts = allPosts.length;
-  const totalPages = Math.ceil(totalPosts / postsPerPage);
-  // Get current posts for the current page
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = allPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+const Paginate = ({
+  total,
+  page,
+  perPage,
+  onChange,
+}: {
+  total: number;
+  page: number;
+  perPage: number;
+  onChange: (page: number) => void;
+}) => {
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+  // A pager for a single page is noise — hide it.
+  if (totalPages <= 1) return null;
+
+  const safePage = Math.min(Math.max(1, page), totalPages);
 
   return (
-    <>
-      <div className="flex flex-col items-center gap-5 mt-12">
-        <p className="text-small text-default-500">Selected Page: {currentPage}</p>
-
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="flat"
-            color="secondary"
-            onPress={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-          >
-            Previous
-          </Button>
-          <Pagination
-            total={totalPages}
-            color="secondary"
-            page={currentPage}
-            onChange={setCurrentPage}
-          />
-          <Button
-            size="sm"
-            variant="flat"
-            color="secondary"
-            onPress={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          >
-            Next
-          </Button>
-        </div>
+    <div className="flex flex-col items-center gap-5 mt-12">
+      <div className="flex gap-2 items-center">
+        <Button
+          size="sm"
+          variant="flat"
+          color="secondary"
+          isDisabled={safePage <= 1}
+          onPress={() => onChange(safePage - 1)}
+        >
+          Previous
+        </Button>
+        <Pagination
+          total={totalPages}
+          color="secondary"
+          page={safePage}
+          onChange={onChange}
+          showControls={false}
+          aria-label="Posts pages"
+        />
+        <Button
+          size="sm"
+          variant="flat"
+          color="secondary"
+          isDisabled={safePage >= totalPages}
+          onPress={() => onChange(safePage + 1)}
+        >
+          Next
+        </Button>
       </div>
-    </>
+    </div>
   );
 };
 
