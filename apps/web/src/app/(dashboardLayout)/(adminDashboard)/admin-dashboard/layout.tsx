@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { AdminLayout } from "./layout/adminLayout";
 export const metadata: Metadata = {
-  title: "Dashboard - Tech Tips and Tricks",
-  description: "Next Level Riding Sharing Service",
+  title: "Admin Dashboard",
+  description: "Moderate users, posts, reports and platform activity.",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminDashboardLayout({
