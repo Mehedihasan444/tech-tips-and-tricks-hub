@@ -20,28 +20,67 @@ services:
         condition: service_healthy
     ports:
       - "5000:5000"
+    # Local dev secrets live in apps/api/.env (gitignored). Compose requires it
+    # so a fresh clone fails with a clear message instead of crash-looping on
+    # zod validation. Copy from apps/api/.env.example first.
     env_file:
       - path: apps/api/.env
-        required: false
+        required: true
     environment:
       DB_URL: mongodb://mongo:27017/tech-tips-and-tricks-hub
       CLIENT_URL: http://localhost:3000
       SERVER_URL: http://localhost:5000
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:' + (process.env.PORT || 5000) + '/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        NEXT_PUBLIC_SERVER_URL: http://localhost:5000
+        # NEXT_PUBLIC_* is baked at build time: override per environment, e.g.
+        # docker compose build --build-arg NEXT_PUBLIC_SERVER_URL=https://api.example.com
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:5000}
     restart: unless-stopped
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "3000:3000"
+    # Runtime secrets for the web container. Provide via shell env or a
+    # apps/web/.env.local file (see apps/web/.env.example). Dummy AUTH_SECRET
+    # is fine for local compose; use a strong secret in production.
+    env_file:
+      - path: apps/web/.env.local
+        required: false
     environment:
-      NEXT_PUBLIC_SERVER_URL: http://localhost:5000
-      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:5000}
+      SERVER_URL: ${SERVER_URL:-http://localhost:5000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      AUTH_SECRET: ${AUTH_SECRET:-local-dev-secret-change-in-production-0123456789abcdef}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   mongo-data:
