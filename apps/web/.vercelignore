@@ -1,6 +1,8 @@
-# In the monorepo the API lives at the sibling path ../server.
-# Vercel projects should use a Root Directory instead, so nothing needs ignoring here.
-../server
-turbo.json
-../../package.json
-../../package-lock.json
+# Vercel (with Root Directory = apps/web) ignores .next / node_modules automatically.
+# Keep this file minimal: do NOT ignore the monorepo root package.json,
+# pnpm-lock.yaml, pnpm-workspace.yaml, or turbo.json — they are required for
+# install and build detection.
+.next
+out
+*.log
+.env*.local

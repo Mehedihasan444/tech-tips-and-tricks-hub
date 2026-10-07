@@ -1,51 +1,104 @@
 @import "tailwindcss";
 
-@config "../../tailwind.config.ts";
+@config "../../tailwind.config.mjs";
+
+/* HeroUI v2 ships no CSS: its component classes (`border-medium`, `rounded-large`,
+   `min-h-12`, `border-small`, …) are utility *candidates* that Tailwind only emits
+   when it finds them in a scanned source.
+
+   Tailwind v4 hard-excludes `node_modules/` from source detection and `@source`
+   cannot re-include it, so a `@source` aimed at the pnpm store path under
+   `node_modules/.pnpm` silently matches nothing. `.heroui-theme/` is a mirror of
+   `@heroui/theme/dist` produced by `scripts/sync-heroui-theme.mjs` (wired to
+   `predev`/`prebuild`), which Tailwind does scan. Without it every HeroUI Input
+   renders with no border, no radius and no hover/focus state. */
+@source "../../.heroui-theme/**/*.js";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Brand — teal primary scale */
+  /* Brand — teal primary scale.
+     500 carries white button labels, so it must be dark enough for WCAG AA:
+     #00B3A6 only reached 2.63:1 against white. #008577 measures 4.54:1 while
+     keeping the same hue, so every `bg-primary` + white-text site is fixed at
+     once without a per-component override. */
   --color-primary-50: #effcfb;
   --color-primary-100: #c9f5f1;
   --color-primary-200: #93ebe3;
   --color-primary-300: #55d9d0;
   --color-primary-400: #26bfb8;
-  --color-primary-500: #00b3a6;
-  --color-primary-600: #03867f;
+  --color-primary-500: #008577;
+  --color-primary-600: #037a6e;
   --color-primary-700: #076b67;
   --color-primary-800: #0b5552;
   --color-primary-900: #0e4745;
 
-  /* Brand — coral secondary scale */
+  /* Brand — coral secondary scale.
+     Same reason: #FF6F61 gave 2.73:1 with white; #C93A2D gives 5.09:1. */
   --color-secondary-50: #fff3f1;
   --color-secondary-100: #ffe4e0;
   --color-secondary-200: #ffcdc6;
   --color-secondary-300: #ffa89d;
   --color-secondary-400: #ff7a6b;
-  --color-secondary-500: #ff6f61;
-  --color-secondary-600: #e04a3c;
+  --color-secondary-500: #c93a2d;
+  --color-secondary-600: #b23327;
   --color-secondary-700: #bc372c;
 
-  /* Back-compat aliases used across the app (bg-primary, text-secondary, …) */
+  /* Aliases used across the app (bg-primary, text-secondary, …) */
   --color-primary: var(--color-primary-500);
   --color-secondary: var(--color-secondary-500);
+
+  /* Foreground variants.
+     The brand fills are tuned to sit *under* white text, which makes them
+     unreadable as text on a light surface (2.63:1). Links, counts and icons
+     must use these instead: 6.35:1 in light mode, 11.52:1 in dark mode. */
+  --color-primary-fg: var(--color-primary-700);
+  --color-secondary-fg: var(--color-secondary-700);
 
   /* Typography */
   --font-sans: var(--font-geist-sans), "Roboto", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Shape */
+  /* Shape. Note these two are not referenced by any component today — surfaces
+     use HeroUI's own `rounded-*` scale. Kept as-is rather than invented into
+     use; delete them if they stay unused. */
   --radius-card: 1rem;
   --radius-pill: 999px;
 
-  /* Elevation */
+  /* Elevation
+     Light sits on near-white and dark on near-black, so a single opaque shadow
+     reads as muddy in one mode and invisible in the other. These are paired
+     with a hairline border and overridden per-mode in `.dark` below. */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px -4px rgb(0 0 0 / 0.08);
+  --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.04), 0 18px 40px -12px rgb(0 0 0 / 0.16);
   --shadow-pop: 0 8px 32px -8px rgb(0 0 0 / 0.2);
 
-  /* Motion */
+  /* Premium elevation: a coloured ambient bloom (not just grey blur) is what
+     separates a flat card from something that feels lit. Keyed to the brand so
+     it never reads as a random coloured smudge. */
+  --shadow-glow-primary: 0 0 0 1px rgb(0 133 119 / 0.1), 0 12px 40px -12px rgb(0 133 119 / 0.35);
+
+  /* A 1px inner top highlight. Sells the "lit glass panel" look on dark mode
+     where the outer shadow alone cannot separate a surface from the page. */
+  --shadow-inset-hairline: inset 0 1px 0 0 rgb(255 255 255 / 0.6);
+
+  /* Motion
+     Duration + easing live in tokens so every interaction in the app shares one
+     personality. `ease-out-expo` is used for anything entering the viewport. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
   --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-float-slow: float-slow 9s ease-in-out infinite;
+
+  /* Skeletons: a travelling highlight instead of a flat opacity pulse. The
+     pulse reads as "flickering"; the sweep reads as "loading". */
+  --animate-shimmer: shimmer 1.8s ease-in-out infinite;
+
+  /* Ambient pulse for the online badge. Opacity only, deliberately: HeroUI
+     positions the badge dot with `translate-x-1/2 translate-y-1/2`, so a
+     `transform` keyframe here would override that and snap the dot out of its
+     corner. Opacity reads as "live" without touching layout or position. */
+  --animate-pulse-soft: pulse-soft 2.4s var(--ease-out-expo) infinite;
 
   @keyframes fade-up {
     from {
@@ -67,6 +120,25 @@
       transform: translateY(-12px);
     }
   }
+
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
 }
 
 :root {
@@ -83,15 +155,141 @@
   --foreground: #ededed;
 }
 
+/* Lighten the foreground variants on dark surfaces: primary-700 on #0a0a0a is
+   only 2.9:1, while primary-300 reaches 11.5:1. */
+.dark {
+  --color-primary-fg: var(--color-primary-300);
+  --color-secondary-fg: var(--color-secondary-300);
+}
+
+/* Dark-mode elevation is retuned rather than reused: the light values are built
+   from `rgb(0 0 0 / …)`, which is invisible against a near-black page. Swap in
+   a black bloom for depth and a white hairline for edge definition instead. */
+.dark {
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px -4px rgb(0 0 0 / 0.4);
+  --shadow-card-hover: 0 2px 4px rgb(0 0 0 / 0.3), 0 18px 40px -12px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 8px 32px -8px rgb(0 0 0 / 0.7);
+  --shadow-inset-hairline: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-sans);
+  /* Premium feel starts with rhythm: default to the slightly looser, more
+     deliberate leading rather than the browser's cramped 1.5. */
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cross-fade the page on theme change instead of snapping between palettes.
+   Scoped to the class swap itself because the transition also has to be
+   suppressed while the user is mid-interaction (a click on a card would
+   otherwise animate every colour on the way to the next page). */
+html.theme-transition,
+html.theme-transition body {
+  transition:
+    background-color 0.35s var(--ease-out-expo),
+    color 0.35s var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition body,
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* ── Frosted glass ──────────────────────────────────────────────
+     Two variants, split by how much content sits behind the panel:
+     `glass` for large planes (nav, sidebar) and `glass-strong` for small
+     floating ones (menus, popovers) where content behind must not bleed
+     through and start competing with the label text.
+     `backdrop-saturate` matters as much as the blur: blur alone over a
+     colourful hero produces a washed-out grey, saturating restores it.
+
+     Declare ONLY the unprefixed property here. Lightning CSS (Tailwind v4's
+     transformer) adds `-webkit-` itself from the project browser targets; when
+     a hand-written `-webkit-backdrop-filter` is also present it deduplicates
+     the pair down to just the prefixed form, which browsers that dropped the
+     alias silently ignore — the blur then never renders at all. */
+  .glass {
+    background: color-mix(in oklab, var(--background) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+  .glass-strong {
+    background: color-mix(in oklab, var(--background) 88%, transparent);
+    backdrop-filter: blur(28px) saturate(180%);
+  }
+
+  /* Hairline top highlight shared by every raised surface. */
+  .surface {
+    background: var(--background);
+    border: 1px solid var(--heroui-default-200, rgb(229 231 235));
+    box-shadow: var(--shadow-card), var(--shadow-inset-hairline);
+  }
+  .dark .surface {
+    border-color: var(--heroui-default-200, rgb(44 44 46));
+  }
+
+  /* Lift-on-hover. Uses `translate` (compositor-only) rather than `top`/`margin`
+     so the transition never triggers layout on cards in a long feed. */
+  .hover-lift {
+    transition:
+      transform 0.35s var(--ease-out-expo),
+      box-shadow 0.35s var(--ease-out-expo);
+    will-change: transform;
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Brand gradient text for headings and wordmarks. `-webkit-text-fill-color`
+     is required because the utility sets `transparent` as the text colour,
+     which would otherwise make the element inherit nothing. */
+  .text-gradient {
+    background-image: linear-gradient(
+      115deg,
+      var(--color-primary-400),
+      var(--color-primary-600) 45%,
+      var(--color-secondary-500)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Shimmer overlay for skeleton blocks. Sits above the block's own fill and
+     is clipped by it via the parent's overflow-hidden. */
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.45),
+      transparent
+    );
+    animation: var(--animate-shimmer);
+  }
+  .dark .shimmer::after {
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.08), transparent);
   }
 
   /* Premium gradient hero surface (light + dark aware) */
@@ -127,4 +325,33 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/* Slim scrollbar for long dropdown lists (search results, sidebars).
+   HeroUI v2 exposes --heroui-* variables; the v1 --nextui-* prefix resolved to
+   nothing and rendered the thumb with no background at all. */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--heroui-default-300, rgb(212 212 216));
+  border-radius: 3px;
+  /* Transparent border keeps the thumb visually thin when zoomed, because the
+     padding is carved out of the thumb itself rather than added to it. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.25s var(--ease-out-expo);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--heroui-default-400, rgb(161 161 170));
+  background-clip: padding-box;
+}
+/* Firefox draws its own scrollbar and ignores -webkit-* entirely, so the same
+   three declarations are needed for the non-suffixed selector. */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--heroui-default-300, rgb(212 212 216)) transparent;
 }

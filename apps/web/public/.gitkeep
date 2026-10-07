@@ -1,0 +1,2 @@
+# Static assets for the Next.js web app (served from `/`).
+# Kept so the Docker standalone image always has a `./public` source to copy.
