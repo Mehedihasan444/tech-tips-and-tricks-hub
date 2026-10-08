@@ -21,6 +21,7 @@ import PostCard from "../components/PostCard";
 import EmptyState from "@/components/ui/EmptyState";
 import { PostCardSkeleton, UserCardSkeleton } from "@/components/ui/Skeleton";
 import { useUser } from "@/context/user.provider";
+import { formatHandle } from "@/utils/formatHandle";
 import { useUpdateUser } from "@/hooks/user.hook";
 import { TPost } from "@/types/TPost";
 import { IUser } from "@/types/IUser";
@@ -212,7 +213,7 @@ function ExploreContent() {
                 title="Couldn't load trending"
                 description="Check your connection and try again."
                 actionLabel="Retry"
-                onAction={() => window.location.reload()}
+                onAction={() => router.refresh()}
               />
             </div>
           ) : trending.length === 0 ? (
@@ -333,7 +334,7 @@ function ExploreContent() {
                           )}
                         </p>
                         <p className="truncate text-xs text-default-500">
-                          @{u.nickName} {u.profession ? `· ${u.profession}` : ""}
+                          {formatHandle(u.nickName)} {u.profession ? `· ${u.profession}` : ""}
                         </p>
                       </div>
                     </CardHeader>

@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { useCallback, useMemo, useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import UpdatePost from "./modal/UpdatePost";
 import DeleteConfirmationModal from "@/app/(dashboardLayout)/components/modal/ConfirmModal";
@@ -40,8 +40,6 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
     () => (posts ?? []).filter((post) => !removedIds.has(post._id)),
     [posts, removedIds],
   );
-
-  // const { mutate: handleDeletePost } = useDeletePost(); // Use update post hook
 
   const sortedPosts = useMemo(() => {
     if (!sortedBy) return visiblePosts;
@@ -80,26 +78,36 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
       switch (columnKey) {
         case "title":
           return (
-            <div className="text-secondary-fg">
-              {cellValue}
-              <h3 className="text-default-600">
-                Posted on: {new Date(post.createdAt).toLocaleDateString()}
-              </h3>
+            <div className="min-w-0">
+              <p className="truncate font-medium text-foreground">
+                {String(cellValue ?? "Untitled")}
+              </p>
+              <p className="text-xs text-default-500">
+                {post.createdAt
+                  ? new Date(post.createdAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "Unknown date"}
+              </p>
             </div>
           );
 
         case "likes":
           return (
-            <div className="text-primary-fg">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <span className="inline-flex items-center gap-1.5 text-sm text-default-600">
+              <ThumbsUp size={15} className="text-success" aria-hidden="true" />
+              {typeof cellValue === "number" ? cellValue : 0}
+            </span>
           );
 
         case "dislikes":
           return (
-            <div className="text-secondary-fg">
-              {typeof cellValue === "number" ? cellValue : null}
-            </div>
+            <span className="inline-flex items-center gap-1.5 text-sm text-default-600">
+              <ThumbsDown size={15} className="text-danger" aria-hidden="true" />
+              {typeof cellValue === "number" ? cellValue : 0}
+            </span>
           );
 
         case "actions":
@@ -114,7 +122,6 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
               </Tooltip>
               {/* update modal */}
               <UpdatePost post={post} />
-              {/* post delete modal */}
               <DeleteConfirmationModal
                 item={post}
                 title="post"
@@ -126,11 +133,6 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
                   })
                 }
               />
-              {/* <Tooltip color="danger" content="Delete post">
-                <span onClick={()=>handleDeletePost({postId:post._id})} className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <Trash2 />
-                </span>
-              </Tooltip> */}
             </div>
           );
 
@@ -158,6 +160,8 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
     <div>
       <Table
         aria-label="My posts table with sorting"
+        removeWrapper
+        classNames={{ th: "bg-transparent", td: "bg-transparent" }}
         sortDescriptor={
           sortedBy
             ? {
@@ -174,7 +178,7 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
                 isCompact
                 showControls
                 showShadow
-                color="secondary"
+                color="primary"
                 page={safePage}
                 total={pages}
                 onChange={(next) => setPage(next)}
@@ -198,7 +202,10 @@ const PostTable = ({ posts }: { posts: TPost[] }) => {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={items} emptyContent="No posts found.">
+        <TableBody
+          items={items}
+          emptyContent="No posts found. Create your first post to get started."
+        >
           {(item) => (
             <TableRow key={item._id}>
               {(columnKey) => (

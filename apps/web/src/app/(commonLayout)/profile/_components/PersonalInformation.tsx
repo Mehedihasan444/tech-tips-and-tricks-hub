@@ -230,7 +230,7 @@ const PersonalInformation = ({
             )}
             <button
               onClick={handleAddEducation}
-              className="text-sm text-blue-500 underline flex items-center mt-2"
+              className="text-sm text-primary-fg underline flex items-center mt-2"
             >
               <Plus className="mr-1" /> Add Education
             </button>
@@ -264,7 +264,7 @@ const PersonalInformation = ({
             </ul>
             <button
               onClick={handleAddSocialMedia}
-              className="text-sm text-blue-500 underline flex items-center mt-2"
+              className="text-sm text-primary-fg underline flex items-center mt-2"
             >
               <Plus className="mr-1" /> Add Social Media
             </button>

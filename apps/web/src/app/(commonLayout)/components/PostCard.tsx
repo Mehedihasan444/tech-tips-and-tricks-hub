@@ -34,6 +34,7 @@ import { IUser } from "@/types/IUser";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/context/socket.provider";
 import { sanitizeParse } from "@/utils/sanitizeHtml";
+import { formatHandle } from "@/utils/formatHandle";
 import { isPostSaved, toggleSavedPost } from "@/utils/bookmarks";
 
 const CHARACTER_LIMIT = 300;
@@ -207,7 +208,7 @@ const PostCard = ({ post }: { post: any }) => {
                       href={`/profile/${user.nickName}`}
                       className="hover:text-primary-fg transition-colors duration-200"
                     >
-                      @{user.nickName}
+                      {formatHandle(user.nickName)}
                     </Link>
                   ) : (
                     <span>@unknown</span>

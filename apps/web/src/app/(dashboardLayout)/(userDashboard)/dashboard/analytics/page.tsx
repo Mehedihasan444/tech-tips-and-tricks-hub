@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
@@ -16,6 +18,8 @@ import {
   Legend,
 } from "chart.js";
 import { Card, CardBody, CardHeader } from "@heroui/react";
+import PageHeader from "@/components/ui/PageHeader";
+import { BarChart3 } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { DashboardCardSkeleton } from "@/components/ui/Skeleton";
 import { useUser } from "@/context/user.provider";
@@ -66,6 +70,7 @@ interface AnalyticsData {
 const AnalyticsPage = () => {
   const { user } = useUser();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
@@ -168,8 +173,12 @@ const AnalyticsPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
+        <PageHeader
+          title="My Analytics"
+          subtitle="Your publishing performance at a glance."
+          icon={BarChart3}
+        />
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
           role="status"
@@ -185,20 +194,31 @@ const AnalyticsPage = () => {
 
   if (loadError) {
     return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
-        <div className="bg-content1 rounded-2xl border border-divider">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
+        <PageHeader
+          title="My Analytics"
+          subtitle="Your publishing performance at a glance."
+          icon={BarChart3}
+        />
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load analytics"
             description="We couldn't fetch your stats. Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
     );
   }
+
+  // Muted axis styling that stays legible on light and dark surfaces.
+  const axisTheme = {
+    grid: { color: "rgba(128, 128, 128, 0.15)" },
+    ticks: { color: "#8a8a8a", font: { size: 11 } },
+  };
+  const legendTheme = { labels: { color: "#8a8a8a", boxWidth: 12, font: { size: 11 } } };
 
   // Chart data
   const engagementData = {
@@ -246,63 +266,75 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl mb-6 border-l-5 border-primary font-bold pl-5">My Analytics</h1>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageHeader
+        title="My Analytics"
+        subtitle="Your publishing performance at a glance."
+        icon={BarChart3}
+      />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-gradient-to-br from-violet-500 to-purple-600">
-          <CardBody className="flex flex-row items-center gap-3 text-white p-4">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <FileText size={24} />
-            </div>
-            <div>
-              <p className="text-xs opacity-80">Total Posts</p>
-              <p className="text-2xl font-bold">{analytics?.totalPosts || 0}</p>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-cyan-500 to-blue-600">
-          <CardBody className="flex flex-row items-center gap-3 text-white p-4">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <MessageSquare size={24} />
-            </div>
-            <div>
-              <p className="text-xs opacity-80">Comments</p>
-              <p className="text-2xl font-bold">{analytics?.totalComments || 0}</p>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-500 to-emerald-600">
-          <CardBody className="flex flex-row items-center gap-3 text-white p-4">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <ThumbsUp size={24} />
-            </div>
-            <div>
-              <p className="text-xs opacity-80">Upvotes</p>
-              <p className="text-2xl font-bold">{analytics?.totalUpvotes || 0}</p>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-amber-500 to-orange-600">
-          <CardBody className="flex flex-row items-center gap-3 text-white p-4">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Users size={24} />
-            </div>
-            <div>
-              <p className="text-xs opacity-80">Followers</p>
-              <p className="text-2xl font-bold">{analytics?.followers || 0}</p>
-            </div>
-          </CardBody>
-        </Card>
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+        {[
+          {
+            label: "Total Posts",
+            value: analytics?.totalPosts || 0,
+            icon: FileText,
+            tone: "bg-primary/10 text-primary-fg",
+          },
+          {
+            label: "Comments",
+            value: analytics?.totalComments || 0,
+            icon: MessageSquare,
+            tone: "bg-secondary/10 text-secondary-fg",
+          },
+          {
+            label: "Upvotes",
+            value: analytics?.totalUpvotes || 0,
+            icon: ThumbsUp,
+            tone: "bg-success/10 text-success",
+          },
+          {
+            label: "Followers",
+            value: analytics?.followers || 0,
+            icon: Users,
+            tone: "bg-warning/10 text-warning",
+          },
+        ].map((stat) => (
+          <Card key={stat.label} className="surface overflow-hidden">
+            <CardBody className="flex flex-row items-center gap-3 p-4">
+              <span
+                aria-hidden="true"
+                className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${stat.tone}`}
+              >
+                <stat.icon size={22} />
+              </span>
+              <span>
+                <span className="block text-xs text-default-500">{stat.label}</span>
+                <span className="block text-2xl font-bold tracking-tight text-foreground">
+                  {stat.value}
+                </span>
+              </span>
+            </CardBody>
+          </Card>
+        ))}
       </div>
+
+      {analytics?.totalPosts === 0 && (
+        <div className="mb-8 overflow-hidden rounded-2xl border border-divider bg-content1">
+          <EmptyState
+            type="posts"
+            title="No data yet"
+            description="Publish your first post and your performance charts will appear here."
+            actionLabel="Create a Post"
+            onAction={() => router.push("/dashboard/create-post")}
+          />
+        </div>
+      )}
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="lg:col-span-2">
+        <Card className="surface overflow-hidden lg:col-span-2">
           <CardHeader className="pb-0">
             <h3 className="font-semibold flex items-center gap-2">
               <TrendingUp size={18} className="text-primary-fg" />
@@ -310,17 +342,21 @@ const AnalyticsPage = () => {
             </h3>
           </CardHeader>
           <CardBody>
-            <Line
-              data={engagementData}
-              options={{
-                responsive: true,
-                plugins: { legend: { position: "bottom" } },
-              }}
-            />
+            <div className="h-64">
+              <Line
+                data={engagementData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: "bottom", ...legendTheme } },
+                  scales: { x: axisTheme, y: { ...axisTheme, beginAtZero: true } },
+                }}
+              />
+            </div>
           </CardBody>
         </Card>
 
-        <Card>
+        <Card className="surface overflow-hidden">
           <CardHeader className="pb-0">
             <h3 className="font-semibold flex items-center gap-2">
               <Award size={18} className="text-warning" />
@@ -329,12 +365,13 @@ const AnalyticsPage = () => {
           </CardHeader>
           <CardBody className="flex justify-center items-center">
             {analytics?.categoryDistribution.length ? (
-              <div className="w-48 h-48">
+              <div className="h-48 w-48">
                 <Doughnut
                   data={categoryData}
                   options={{
                     responsive: true,
-                    plugins: { legend: { position: "bottom" } },
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "bottom", ...legendTheme } },
                   }}
                 />
               </div>
@@ -346,8 +383,8 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Top Posts and Additional Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="surface overflow-hidden">
           <CardHeader className="pb-0">
             <h3 className="font-semibold flex items-center gap-2">
               <Award size={18} className="text-success" />
@@ -356,21 +393,25 @@ const AnalyticsPage = () => {
           </CardHeader>
           <CardBody>
             {analytics?.topPosts.length ? (
-              <Bar
-                data={topPostsData}
-                options={{
-                  responsive: true,
-                  indexAxis: "y",
-                  plugins: { legend: { display: false } },
-                }}
-              />
+              <div className="h-64">
+                <Bar
+                  data={topPostsData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: "y",
+                    plugins: { legend: { display: false } },
+                    scales: { x: axisTheme, y: axisTheme },
+                  }}
+                />
+              </div>
             ) : (
               <p className="text-default-600 text-center py-8">Create posts to see analytics</p>
             )}
           </CardBody>
         </Card>
 
-        <Card>
+        <Card className="surface overflow-hidden">
           <CardHeader className="pb-0">
             <h3 className="font-semibold">Engagement Summary</h3>
           </CardHeader>

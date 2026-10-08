@@ -263,7 +263,11 @@ export default function AnalyticsDashboardPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading analytics...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading analytics..."
+      >
         <PageTitle title="Analytics Dashboard" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {[1, 2, 3, 4].map((i) => (
@@ -280,7 +284,7 @@ export default function AnalyticsDashboardPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Analytics Dashboard" />
         <Card>
           <CardBody className="text-center py-12">
@@ -301,7 +305,7 @@ export default function AnalyticsDashboardPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <PageTitle title="Analytics Dashboard" />
         <div className="flex items-center gap-3">

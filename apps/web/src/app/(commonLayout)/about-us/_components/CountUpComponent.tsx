@@ -9,7 +9,7 @@ const CountUpComponent = ({ value }: { value: number }) => {
       //   separator=" "
       // decimals={4}
       decimal=","
-      className="text-teal-600 text-4xl font-bold"
+      className="text-primary-fg text-4xl font-bold"
     ></CountUp>
   );
 };

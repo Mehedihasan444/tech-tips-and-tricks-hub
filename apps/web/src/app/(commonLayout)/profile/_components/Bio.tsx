@@ -67,7 +67,7 @@ const Bio = ({ user, showEditOption }: { user: IUser; showEditOption: boolean })
           <p className="mb-4">{bio || "No bio available."}</p>
           {/* <button
             onClick={() => setBioEditMode(true)}
-            className="text-sm text-blue-500 underline"
+            className="text-sm text-primary-fg underline"
           >
             Edit Bio
           </button> */}

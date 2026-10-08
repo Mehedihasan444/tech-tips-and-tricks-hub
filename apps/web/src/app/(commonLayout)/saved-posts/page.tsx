@@ -2,6 +2,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Bookmark, Search } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import PageHeader from "@/components/ui/PageHeader";
 import PostCard from "../components/PostCard";
 import { TPost } from "@/types/TPost";
 import { clearSavedPosts, getSavedPosts, SAVED_POSTS_EVENT } from "@/utils/bookmarks";
@@ -31,9 +33,12 @@ const SavedPosts = () => {
     };
   }, [refresh]);
 
+  const [confirmClear, setConfirmClear] = useState(false);
+
   const handleClearAll = () => {
     clearSavedPosts();
     setSavedPosts([]);
+    setConfirmClear(false);
   };
 
   const q = query.trim().toLowerCase();
@@ -47,18 +52,28 @@ const SavedPosts = () => {
     : savedPosts;
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between gap-3 mb-8">
-        <div className="flex items-center gap-3">
-          <Bookmark className="w-8 h-8 text-primary-fg" />
-          <h1 className="text-3xl font-bold">Saved Posts</h1>
-        </div>
-        {savedPosts.length > 0 && (
-          <Button size="sm" variant="light" color="danger" onPress={handleClearAll}>
-            Clear all
-          </Button>
-        )}
-      </div>
+    <div className="mx-auto max-w-5xl p-4">
+      <PageHeader
+        title="Saved Posts"
+        subtitle="Posts you bookmarked on this device."
+        icon={Bookmark}
+        actions={
+          savedPosts.length > 0 ? (
+            <Button size="sm" variant="light" color="danger" onPress={() => setConfirmClear(true)}>
+              Clear all
+            </Button>
+          ) : undefined
+        }
+      />
+      <ConfirmationModal
+        isOpen={confirmClear}
+        onClose={() => setConfirmClear(false)}
+        onConfirm={handleClearAll}
+        title="Clear saved posts?"
+        message="This removes all bookmarked posts from this device. This cannot be undone."
+        confirmText="Clear all"
+        type="danger"
+      />
 
       {savedPosts.length === 0 ? (
         <div className="bg-content1 rounded-2xl border border-divider">

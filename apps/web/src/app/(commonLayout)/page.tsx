@@ -270,7 +270,7 @@ const NewsFeed = () => {
                     <Button
                       as="a"
                       href="/register"
-                      className="bg-white text-teal-900 font-semibold"
+                      className="bg-white font-semibold text-primary-800"
                       endContent={<ArrowRight size={16} />}
                     >
                       Join the community
@@ -411,7 +411,7 @@ const NewsFeed = () => {
                       size="sm"
                       variant="light"
                       color="primary"
-                      onPress={() => window.location.reload()}
+                      onPress={() => router.refresh()}
                     >
                       Retry
                     </Button>

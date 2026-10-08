@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -75,6 +77,7 @@ const writeStoryStatuses = (statuses: Record<string, Story["status"]>) => {
 
 export default function StoriesManagementPage() {
   const [stories, setStories] = useState<Story[]>([]);
+  const router = useRouter();
   const [statuses, setStatuses] = useState<Record<string, Story["status"]>>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -91,13 +94,23 @@ export default function StoriesManagementPage() {
         setLoading(true);
         setLoadError(false);
         const res = await getStories();
-        const fetched = (res?.data ?? []).map((s: any) => ({
-          id: s.id,
-          imageUrl: s.imageUrl,
-          userId: s.userId,
-          userImage: s.userImage,
-          username: s.username,
-          createdAt: s.timestamp || s.createdAt,
+        type StoryDTO = {
+          id?: string;
+          imageUrl?: string;
+          userId?: string;
+          userImage?: string;
+          username?: string;
+          timestamp?: string;
+          createdAt?: string;
+          views?: number;
+        };
+        const fetched: Story[] = ((res?.data ?? []) as StoryDTO[]).map((s, i) => ({
+          id: s.id ?? `story-${i}`,
+          imageUrl: s.imageUrl ?? "",
+          userId: s.userId ?? "",
+          userImage: s.userImage ?? "",
+          username: s.username ?? "Unknown",
+          createdAt: s.timestamp || s.createdAt || new Date().toISOString(),
           status: "visible" as const,
           views: s.views ?? 0,
         }));
@@ -153,7 +166,11 @@ export default function StoriesManagementPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading stories...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading stories..."
+      >
         <PageTitle title="Stories Management" />
         <TableRowSkeleton columns={5} />
         <TableRowSkeleton columns={5} />
@@ -164,15 +181,15 @@ export default function StoriesManagementPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Stories Management" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load stories"
             description="Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
@@ -187,8 +204,11 @@ export default function StoriesManagementPage() {
   };
 
   return (
-    <div className="p-6">
-      <PageTitle title="Stories Management" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageTitle
+        title="Stories Management"
+        subtitle="Review expiring stories. Decisions are stored locally on this device (demo)."
+      />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Moderate all user stories. Hidden stories are removed from the feed.
       </p>

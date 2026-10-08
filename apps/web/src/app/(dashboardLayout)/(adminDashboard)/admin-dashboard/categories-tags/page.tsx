@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -224,6 +226,7 @@ const buildTagsFromPosts = (posts: TPost[], existing: Tag[]): Tag[] => {
 
 export default function CategoriesTagsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -375,7 +378,7 @@ export default function CategoriesTagsPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading...">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6" role="status" aria-label="Loading...">
         <PageTitle title="Categories & Tags" />
         <Skeleton className="h-12 w-full" />
         <Skeleton className="h-12 w-full" />
@@ -386,14 +389,14 @@ export default function CategoriesTagsPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Categories & Tags" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load data"
             actionLabel="Retry"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
@@ -401,8 +404,11 @@ export default function CategoriesTagsPage() {
   }
 
   return (
-    <div className="p-6">
-      <PageTitle title="Categories & Tags" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageTitle
+        title="Categories & Tags"
+        subtitle="Organize topics. Changes are stored locally on this device (demo)."
+      />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Manage post categories and tags. Categories are broad topics; tags are specific keywords.
       </p>

@@ -1,86 +1,94 @@
 "use client";
 
-import React from "react";
-import { Card } from "@heroui/react";
+import React, { Suspense } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { FacebookIcon, XIcon, InstagramIcon } from "@/components/ui/BrandIcons";
-// import MapSection from "./_components/MapSection";
 import ContactForm from "./_components/ContactForm";
+import PageHeader from "@/components/ui/PageHeader";
+import ContentCard from "@/components/ui/ContentCard";
+import { siteConfig } from "@/config/site";
+import { MessageSquare } from "lucide-react";
+import { Skeleton } from "@heroui/react";
 import dynamic from "next/dynamic";
-// Dynamically import MapSection without SSR
+
 const MapSection = dynamic(() => import("./_components/MapSection"), {
-  ssr: false, // Disable server-side rendering
+  ssr: false,
+  loading: () => <Skeleton className="h-64 w-full rounded-2xl" />,
 });
+
 const ContactUs = () => {
   return (
-    <div className="min-h-screen bg-default-50 py-12">
-      {/* Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center  mb-8">Contact Us</h2>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <PageHeader
+        title="Contact Us"
+        subtitle="Questions, feedback or partnership ideas — we reply within 2 business days."
+        icon={MessageSquare}
+      />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Left Side: Contact Form */}
-          <ContactForm />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <ContactForm />
 
-          {/* Right Side: Company Information */}
-          <div className="space-y-6">
-            {/* Company Info */}
-            <Card className="bg-default-50 p-6 rounded-lg shadow-lg">
-              <h3 className="text-2xl font-semibold  mb-4">Contact Information</h3>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Phone className="text-teal-600 text-2xl mr-3" />
-                  <p className="">+1 123 456 7890</p>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="text-teal-600 text-2xl mr-3" />
-                  <p className="">info@techtips.com</p>
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="text-teal-600 text-2xl mr-3" />
-                  <p className="">123 Tech Street, San Francisco, CA</p>
-                </div>
+        <div className="space-y-6">
+          <ContentCard title="Contact Information" subtitle="Our support team is here to help">
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <Phone size={20} className="mr-3 shrink-0 text-primary-fg" aria-hidden="true" />
+                <p>{siteConfig.contact.phone}</p>
               </div>
-            </Card>
-
-            {/* Social Media Links */}
-            <Card className="bg-default-50 p-6 rounded-lg shadow-lg">
-              <h3 className="text-2xl font-semibold  mb-4">Follow Us</h3>
-              <div className="flex space-x-6 text-2xl">
+              <div className="flex items-center">
+                <Mail size={20} className="mr-3 shrink-0 text-primary-fg" aria-hidden="true" />
                 <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Follow us on Facebook (opens in a new tab)"
-                  className="text-teal-600 hover:text-teal-800"
+                  href={`mailto:${siteConfig.contact.email}`}
+                  className="transition-colors hover:text-primary-fg"
                 >
-                  <FacebookIcon />
-                </a>
-                <a
-                  href="https://x.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Follow us on X (opens in a new tab)"
-                  className="text-teal-600 hover:text-teal-800"
-                >
-                  <XIcon />
-                </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Follow us on Instagram (opens in a new tab)"
-                  className="text-teal-600 hover:text-teal-800"
-                >
-                  <InstagramIcon />
+                  {siteConfig.contact.email}
                 </a>
               </div>
-            </Card>
-          </div>
+              <div className="flex items-center">
+                <MapPin size={20} className="mr-3 shrink-0 text-primary-fg" aria-hidden="true" />
+                <p>{siteConfig.contact.address}</p>
+              </div>
+            </div>
+          </ContentCard>
+
+          <ContentCard title="Follow Us" subtitle="Product updates and community highlights">
+            <div className="flex space-x-3">
+              <a
+                href={siteConfig.socials.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Facebook (opens in a new tab)"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-divider text-default-500 transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary-fg"
+              >
+                <FacebookIcon />
+              </a>
+              <a
+                href={siteConfig.socials.x}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on X (opens in a new tab)"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-divider text-default-500 transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary-fg"
+              >
+                <XIcon />
+              </a>
+              <a
+                href={siteConfig.socials.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Instagram (opens in a new tab)"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-divider text-default-500 transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary-fg"
+              >
+                <InstagramIcon />
+              </a>
+            </div>
+          </ContentCard>
         </div>
+      </div>
 
-        {/* Map Section */}
-        <MapSection />
+      <div className="mt-6">
+        <Suspense fallback={<Skeleton className="h-64 w-full rounded-2xl" />}>
+          <MapSection />
+        </Suspense>
       </div>
     </div>
   );

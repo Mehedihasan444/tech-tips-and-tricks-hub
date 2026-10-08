@@ -71,7 +71,11 @@ export default function UserTransactionsPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading transactions...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading transactions..."
+      >
         <PageTitle title="User Transactions" />
         <TableRowSkeleton columns={4} />
         <TableRowSkeleton columns={4} />
@@ -82,9 +86,9 @@ export default function UserTransactionsPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="User Transactions" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load transactions"
@@ -98,7 +102,7 @@ export default function UserTransactionsPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <PageTitle title="User Transactions" />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Verified premium payments from the payment gateway. Records appear here only after gateway
@@ -160,8 +164,8 @@ export default function UserTransactionsPage() {
 
       <div className="text-center mt-6 text-sm text-default-500">
         If you have any issues with payments, please contact support at{" "}
-        <a href="mailto:support@technest.com" className="text-primary-fg underline">
-          support@technest.com
+        <a href="mailto:support@techtips-hub.com" className="text-primary-fg underline">
+          support@techtips-hub.com
         </a>
         .
       </div>

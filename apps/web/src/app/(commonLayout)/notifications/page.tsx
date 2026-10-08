@@ -80,7 +80,12 @@ export default function NotificationsPage() {
   const handleOpen = (n: Notification) => {
     markNotificationAsRead(n.id);
     if (n.postId) router.push(`/posts/${n.postId}`);
-    else if (n.type === "follow" && n.fromUser?._id) router.push(`/profile/${n.fromUser._id}`);
+    else if (n.type === "follow") {
+      // Profile route is keyed by nickName, not _id — fall back safely.
+      const nickName =
+        (n.fromUser as { nickName?: string } | undefined)?.nickName ?? n.fromUser?._id;
+      if (nickName) router.push(`/profile/${nickName}`);
+    }
   };
 
   const formatTime = (date: Date) => {

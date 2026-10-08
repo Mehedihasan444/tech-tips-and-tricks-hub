@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -94,6 +96,7 @@ const getStatusChip = (status: ReviewStatus) => {
 
 export default function ReportsPage() {
   const [queue, setQueue] = useState<ReviewItem[]>([]);
+  const router = useRouter();
   const [statuses, setStatuses] = useState<Record<string, ReviewStatus>>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -156,7 +159,11 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading review queue...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading review queue..."
+      >
         <PageTitle title="Reports & Moderation" />
         <TableRowSkeleton columns={5} />
         <TableRowSkeleton columns={5} />
@@ -167,15 +174,15 @@ export default function ReportsPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Reports & Moderation" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load the review queue"
             description="We couldn't fetch posts for review. Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
@@ -183,8 +190,11 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="p-6">
-      <PageTitle title="Reports & Moderation" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageTitle
+        title="Reports & Moderation"
+        subtitle="Review queue built from community signals. Decisions are stored locally on this device (demo)."
+      />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Posts the community disliked surface here for human review. Decisions are saved on this
         device.

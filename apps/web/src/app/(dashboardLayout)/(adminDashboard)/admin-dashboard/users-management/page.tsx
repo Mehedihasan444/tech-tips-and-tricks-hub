@@ -42,7 +42,7 @@ export default function ManageUsersTable() {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-default-50 rounded-lg mt-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <PageTitle title="Manage Users" />
 
       {loading ? (
@@ -51,23 +51,12 @@ export default function ManageUsersTable() {
         </div>
       ) : error ? (
         <div className="text-center py-10">
-          <p role="alert" className="text-danger mb-4">
+          <p role="alert" className="mb-4 text-danger">
             {error}. Check your connection and try again.
           </p>
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="primary"
-            page={page}
-            total={totalPages}
-            onChange={handlePageChange}
-          />
-          <div className="mt-4">
-            <Button color="primary" variant="flat" onPress={() => void fetchUsers(page)}>
-              Try Again
-            </Button>
-          </div>
+          <Button color="primary" variant="flat" onPress={() => void fetchUsers(page)}>
+            Try Again
+          </Button>
         </div>
       ) : (
         <>

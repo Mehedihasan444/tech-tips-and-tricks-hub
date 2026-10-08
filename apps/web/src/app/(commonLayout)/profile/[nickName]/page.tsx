@@ -58,9 +58,9 @@ const ProfilePage = async ({ params }: IProps) => {
   const showEditOption = Boolean(loggedInUser?._id && loggedInUser._id === user._id);
 
   return (
-    <div className=" mx-auto p-4 ">
+    <div className="mx-auto max-w-6xl p-4">
       {/* Header Section */}
-      <div className="sm:flex items-center justify-between mb-6 bg-default-50 p-3 shadow-md rounded-lg">
+      <div className="surface mb-6 items-center justify-between rounded-2xl p-4 sm:flex">
         <div className="flex items-center space-x-4">
           <div className="relative ">
             {user?.isPremium ? (
@@ -103,9 +103,9 @@ const ProfilePage = async ({ params }: IProps) => {
         {/* Bio Section */}
         <Bio user={user} showEditOption={showEditOption} />
       </div>
-      <div className="sm:flex justify-between gap-5 h-full">
+      <div className="h-full justify-between gap-5 sm:flex">
         <div className="flex-1 sm:max-w-80 ">
-          <div className="sticky top-0">
+          <div className="sticky top-20 space-y-5">
             {/* Personal Information Section */}
             <PersonalInformation user={user} showEditOption={showEditOption} />
             {/* Media Section */}
@@ -119,7 +119,7 @@ const ProfilePage = async ({ params }: IProps) => {
         <div className="flex-1">
           {/* Post Creation Option */}
           {showEditOption && (
-            <div className="bg-default-50 shadow-md rounded-lg p-6 mb-6">
+            <div className="surface mb-6 rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-4">Create a New Post</h2>
               <Divider />
               <div className="flex justify-between gap-5 mt-2">

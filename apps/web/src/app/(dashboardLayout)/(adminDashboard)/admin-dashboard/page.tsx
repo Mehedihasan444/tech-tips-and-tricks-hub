@@ -182,7 +182,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Admin Dashboard" />
         <div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8"
@@ -199,9 +199,9 @@ const AdminDashboard = () => {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Admin Dashboard" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load dashboard"
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <PageTitle title="Admin Dashboard" />
 
       {/* Stats Cards */}

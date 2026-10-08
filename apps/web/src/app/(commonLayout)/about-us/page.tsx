@@ -8,7 +8,7 @@ import aboutUs from "@/assets/aboutUs.jpg";
 
 const AboutPage = () => {
   return (
-    <div className="min-h-screen p-4">
+    <div className="mx-auto min-h-screen max-w-7xl px-4 pb-12">
       {/* Header */}
       <header
         className="text-white py-20 text-center bg-center bg-cover bg-no-repeat relative"
@@ -40,7 +40,7 @@ const AboutPage = () => {
 
       {/* Call to Action */}
       <section className="text-center space-y-4 my-12">
-        <h2 className="text-3xl font-semibold text-teal-600">Join Us on This Tech Journey!</h2>
+        <h2 className="text-3xl font-semibold text-primary-fg">Join Us on This Tech Journey!</h2>
         <p className="text-default-700">
           Whether you’re a beginner or a pro, our community has something for everyone. Let’s grow
           and innovate together!

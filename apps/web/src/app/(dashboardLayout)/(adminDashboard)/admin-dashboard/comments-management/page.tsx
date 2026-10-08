@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -62,18 +64,28 @@ const writeCommentStatuses = (statuses: Record<string, Comment["status"]>) => {
   }
 };
 
+type LegacyComment = {
+  _id?: string;
+  id?: string;
+  author?: { name?: string; profilePhoto?: string };
+  content?: string;
+  text?: string;
+  createdAt?: string;
+};
+
 const buildCommentList = (posts: TPost[]): Comment[] => {
   const comments: Comment[] = [];
   posts.forEach((post) => {
-    (post.comments ?? []).forEach((comment: any) => {
+    const raw = (post.comments ?? []) as unknown as LegacyComment[];
+    raw.forEach((comment) => {
       comments.push({
-        id: comment._id || comment.id,
+        id: comment._id || comment.id || `${post._id}-comment`,
         postId: post._id,
         postTitle: post.title || "Untitled",
         authorName: comment.author?.name || "Unknown",
         authorAvatar: comment.author?.profilePhoto,
         content: comment.content || comment.text || "",
-        createdAt: comment.createdAt,
+        createdAt: comment.createdAt || post.createdAt,
         status: "visible",
       });
     });
@@ -106,6 +118,7 @@ const getStatusChip = (status: Comment["status"]) => {
 
 export default function CommentsManagementPage() {
   const [comments, setComments] = useState<Comment[]>([]);
+  const router = useRouter();
   const [statuses, setStatuses] = useState<Record<string, Comment["status"]>>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -174,7 +187,11 @@ export default function CommentsManagementPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading comments...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading comments..."
+      >
         <PageTitle title="Comments Management" />
         <TableRowSkeleton columns={5} />
         <TableRowSkeleton columns={5} />
@@ -185,15 +202,15 @@ export default function CommentsManagementPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Comments Management" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load comments"
             description="Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
@@ -208,8 +225,11 @@ export default function CommentsManagementPage() {
   };
 
   return (
-    <div className="p-6">
-      <PageTitle title="Comments Management" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageTitle
+        title="Comments Management"
+        subtitle="Review community comments. Decisions are stored locally on this device (demo)."
+      />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Moderate all community comments. Hidden comments are removed from public view.
       </p>

@@ -60,7 +60,7 @@ export default function Sidebar() {
                 className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/25 to-transparent"
               />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-gradient">TechNest</h1>
+            <h1 className="text-xl font-bold tracking-tight text-gradient">Tech Tips & Tricks</h1>
           </Link>
         )}
         <Button

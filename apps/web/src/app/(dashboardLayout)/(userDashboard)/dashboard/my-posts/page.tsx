@@ -4,10 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getMyPosts } from "@/services/PostService";
-import Filter from "./_componets/Filter";
-import Paginate from "./_componets/Paginate";
+import Filter from "./_components/Filter";
+import Paginate from "./_components/Paginate";
 import { TPost } from "@/types/TPost";
 import EmptyState from "@/components/ui/EmptyState";
+import PageHeader from "@/components/ui/PageHeader";
+import {
+  ArrowRight,
+  CalendarDays,
+  FileText,
+  MessageSquare,
+  PenSquare,
+  ThumbsUp,
+} from "lucide-react";
+import { Button, Chip } from "@heroui/react";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 
 const POSTS_PER_PAGE = 6;
@@ -16,7 +26,11 @@ const formatPostDate = (value?: string): string => {
   if (!value) return "Unknown date";
   const time = new Date(value).getTime();
   if (Number.isNaN(time)) return "Unknown date";
-  return value.split("T")[0];
+  return new Date(value).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const excerpt = (html: string, limit = 200): string => {
@@ -32,29 +46,24 @@ const MyPosts = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setLoadError(false);
-        const { data: posts } = await getMyPosts("");
-        if (!cancelled) {
-          setAllPosts(posts ?? []);
-          setFilteredPosts(posts ?? []);
-        }
-      } catch (error) {
-        console.error("Error fetching my posts:", error);
-        if (!cancelled) setLoadError(true);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void fetchPosts();
-    return () => {
-      cancelled = true;
-    };
+  const fetchPosts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setLoadError(false);
+      const { data: posts } = await getMyPosts("");
+      setAllPosts(posts ?? []);
+      setFilteredPosts(posts ?? []);
+    } catch (error) {
+      console.error("Error fetching my posts:", error);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void fetchPosts();
+  }, [fetchPosts]);
 
   const handleFilter = useCallback((filtered: TPost[]) => {
     setFilteredPosts(filtered);
@@ -74,14 +83,23 @@ const MyPosts = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-background py-5 px-5 md:px-20">
-      {/* Search and Filter Section */}
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-5 mb-8">
-        <div className="flex items-center">
-          <h1 className="text-2xl border-l-5 border-primary font-bold pl-5 text-default-800 dark:text-foreground">
-            My Posts
-          </h1>
-        </div>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageHeader
+        title="My Posts"
+        subtitle="All posts published from your account."
+        icon={FileText}
+        actions={
+          <Button
+            size="sm"
+            color="primary"
+            startContent={<PenSquare size={15} />}
+            onPress={() => router.push("/dashboard/create-post")}
+          >
+            New Post
+          </Button>
+        }
+      />
+      <div className="mb-6">
         <Filter posts={allPosts} onFilter={handleFilter} />
       </div>
 
@@ -96,17 +114,17 @@ const MyPosts = () => {
           ))}
         </div>
       ) : loadError ? (
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="posts"
             title="Couldn't load your posts"
             description="Something went wrong. Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => void fetchPosts()}
           />
         </div>
       ) : filteredPosts.length === 0 ? (
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="posts"
             title={allPosts.length === 0 ? "You haven't posted yet" : "No posts match your filters"}
@@ -129,72 +147,97 @@ const MyPosts = () => {
             {filteredPosts.length === 1 ? "post" : "posts"}
           </p>
           {/* Posts Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {currentPosts?.map((post: TPost) => (
-              <div
-                key={post._id}
-                className="bg-content1 rounded-lg shadow-lg overflow-hidden flex flex-col"
-              >
-                {post.images?.[0] ? (
-                  <Image
-                    width={300}
-                    height={300}
-                    src={post.images[0]}
-                    alt={post.title ?? "Post image"}
-                    className="w-full h-48 object-cover"
-                  />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="flex w-full h-48 items-center justify-center bg-default-100 text-4xl font-bold text-default-600"
-                  >
-                    {(post.title ?? "?").charAt(0)}
-                  </span>
-                )}
-                <div className="p-6 space-y-2 flex-1 flex flex-col">
-                  <h2 className="text-2xl font-semibold text-default-800 dark:text-foreground">
-                    {post.title}
-                  </h2>
-                  <div className="text-default-600 ">{excerpt(post.content, 200)}</div>
-
-                  <p className="text-sm text-default-500">
-                    <span className="font-semibold text-sm text-default-500">Posted at: </span>
-                    {formatPostDate(post.createdAt)}
-                  </p>
-
-                  {/* Displaying category and tags */}
-                  {post.category && (
-                    <div className="">
-                      <span className="font-semibold text-sm text-default-500">Category: </span>
-                      <span className="text-sm text-default-600">{post.category}</span>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {currentPosts?.map((post: TPost) => {
+              const likes = Array.isArray(post.upvotes) ? post.upvotes.length : (post.likes ?? 0);
+              const comments = post.comments?.length ?? 0;
+              return (
+                <article
+                  key={post._id}
+                  className="surface hover-lift flex flex-col overflow-hidden rounded-2xl"
+                >
+                  <div className="relative h-44 w-full overflow-hidden bg-default-100">
+                    {post.images?.[0] ? (
+                      <Image
+                        width={600}
+                        height={340}
+                        src={post.images[0]}
+                        alt={post.title ?? "Post image"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-500/15 via-default-100 to-secondary-500/15 text-4xl font-bold text-default-400"
+                      >
+                        {(post.title ?? "?").charAt(0)}
+                      </span>
+                    )}
+                    <div className="absolute left-3 top-3 flex gap-1.5">
+                      {post.category && (
+                        <Chip size="sm" color="primary" variant="flat" className="backdrop-blur">
+                          {post.category}
+                        </Chip>
+                      )}
+                      {post.isPremium && (
+                        <Chip size="sm" color="warning" variant="flat" className="backdrop-blur">
+                          Premium
+                        </Chip>
+                      )}
                     </div>
-                  )}
-                  {post.tags?.length > 0 && (
-                    <div className="">
-                      <span className="font-semibold text-sm text-default-500">Tags: </span>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {post.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="bg-default-200 text-default-700 text-xs font-medium py-1 px-2 rounded-full"
-                          >
-                            {tag}
-                          </span>
+                  </div>
+                  <div className="flex flex-1 flex-col gap-2.5 p-5">
+                    <h2 className="line-clamp-2 text-lg font-semibold leading-snug text-foreground">
+                      <Link
+                        href={`/posts/${post._id}`}
+                        className="transition-colors hover:text-primary-fg"
+                      >
+                        {post.title}
+                      </Link>
+                    </h2>
+                    <p className="line-clamp-3 text-sm leading-relaxed text-default-500">
+                      {excerpt(post.content, 160)}
+                    </p>
+                    {post.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {post.tags.slice(0, 3).map((tag) => (
+                          <Chip key={tag} size="sm" variant="bordered" className="text-xs">
+                            #{tag}
+                          </Chip>
                         ))}
                       </div>
+                    )}
+                    <div className="mt-auto flex items-center justify-between gap-2 border-t border-divider pt-3">
+                      <span className="flex items-center gap-1.5 text-xs text-default-500">
+                        <CalendarDays size={13} aria-hidden="true" />
+                        {formatPostDate(post.createdAt)}
+                      </span>
+                      <span className="flex items-center gap-3 text-xs text-default-500">
+                        <span className="flex items-center gap-1">
+                          <ThumbsUp size={13} aria-hidden="true" />
+                          {likes}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageSquare size={13} aria-hidden="true" />
+                          {comments}
+                        </span>
+                      </span>
                     </div>
-                  )}
-                  <div className="pt-2 mt-auto">
                     <Link
-                      href={`/dashboard/my-posts/${post._id}`}
-                      className="inline-block bg-secondary/80 hover:bg-secondary text-white py-2 px-4 rounded-lg transition-colors"
+                      href={`/posts/${post._id}`}
+                      className="group/link mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-fg"
                     >
                       Read More
+                      <ArrowRight
+                        size={15}
+                        aria-hidden="true"
+                        className="transition-transform group-hover/link:translate-x-0.5"
+                      />
                     </Link>
                   </div>
-                </div>
-              </div>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* Pagination Section */}

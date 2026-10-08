@@ -59,7 +59,7 @@ export function StoryCard({
       {!isAddStory ? (
         <>
           <div className="absolute top-4 left-4">
-            <div className="rounded-full p-[2px] bg-gradient-to-br from-teal-500 via-purple-500 to-pink-500">
+            <div className="rounded-full bg-gradient-to-br from-primary via-purple-500 to-secondary p-[2px]">
               <Avatar
                 src={userImage}
                 className="w-10 h-10 border-2 border-white"
@@ -74,7 +74,7 @@ export function StoryCard({
         </>
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-          <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center mb-2">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
             <AddStoryModal />
           </div>
           <p className="text-sm font-medium">Create Story</p>
@@ -209,7 +209,7 @@ const AddStoryModal = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="relative w-full h-[160px] rounded-lg mb-2 border-2 border-dashed border-teal-400 hover:border-teal-500 transition-colors group">
+                  <div className="group relative mb-2 h-[160px] w-full rounded-lg border-2 border-dashed border-primary/40 transition-colors hover:border-primary">
                     <input
                       type="file"
                       accept="image/*"
@@ -218,16 +218,16 @@ const AddStoryModal = () => {
                       className="absolute inset-0 opacity-0 cursor-pointer z-10"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-                      <span className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-500 mb-2 group-hover:bg-teal-200 transition-colors">
+                      <span className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary-fg transition-colors group-hover:bg-primary/20">
                         <CloudUpload />
                       </span>
-                      <span className="text-sm text-gray-500">Click to upload</span>
-                      <span className="text-xs text-gray-400 mt-1">or drag and drop</span>
+                      <span className="text-sm text-default-500">Click to upload</span>
+                      <span className="mt-1 text-xs text-default-400">or drag and drop</span>
                     </div>
                   </div>
                 )}
 
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-default-500">
                   Your story will be visible for 24 hours
                 </p>
               </ModalBody>

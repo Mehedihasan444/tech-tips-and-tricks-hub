@@ -99,7 +99,11 @@ export default function AIAssistantPanel({
 
   const handleRemoveApiKey = () => {
     removeApiKey();
-    window.location.reload();
+    setTitleSuggestions([]);
+    setTagSuggestions([]);
+    setOutline("");
+    setQualityResult(null);
+    toast.success("API key removed");
   };
 
   const handleGenerateTitles = async () => {

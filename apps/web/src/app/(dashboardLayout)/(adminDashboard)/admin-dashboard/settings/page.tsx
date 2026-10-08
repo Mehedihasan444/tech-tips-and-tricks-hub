@@ -28,7 +28,7 @@ const defaultSettings = {
     siteName: "Tech Tips & Tricks Hub",
     siteDescription:
       "Bite-size tech tips, tutorials, and premium deep-dives from engineers shipping in production.",
-    siteUrl: "https://technest.example.com",
+    siteUrl: "https://techtips-hub.com",
     maintenanceMode: false,
     allowRegistration: true,
     defaultUserRole: "USER",
@@ -53,8 +53,8 @@ const defaultSettings = {
     smtpPort: 587,
     smtpUser: "",
     smtpPass: "",
-    fromEmail: "noreply@technest.example.com",
-    fromName: "TechNest",
+    fromEmail: "noreply@techtips-hub.com",
+    fromName: "Tech Tips & Tricks Hub",
     enableEmailVerification: true,
     enableWelcomeEmail: true,
     enablePasswordResetEmail: true,
@@ -93,7 +93,7 @@ const defaultSettings = {
     ogImage: "",
     twitterHandle: "@technest",
     robotsTxt:
-      "User-agent: *\nAllow: /\nDisallow: /dashboard/\nDisallow: /admin-dashboard/\nSitemap: https://technest.example.com/sitemap.xml",
+      "User-agent: *\nAllow: /\nDisallow: /dashboard/\nDisallow: /admin-dashboard/\nSitemap: https://techtips-hub.com/sitemap.xml",
   },
   advanced: {
     apiRateLimit: 100,
@@ -126,22 +126,26 @@ const writeSettings = (settings: SettingsSchema) => {
   } catch {}
 };
 
-const deepMerge = (target: any, source: any): any => {
-  const output = { ...target };
+const isObject = (item: unknown): item is Record<string, unknown> =>
+  !!item && typeof item === "object" && !Array.isArray(item);
+
+const deepMerge = <T extends Record<string, unknown>>(target: T, source: unknown): T => {
+  const output: Record<string, unknown> = { ...target };
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
-        if (!(key in target)) Object.assign(output, { [key]: source[key] });
-        else output[key] = deepMerge(target[key], source[key]);
+      const srcVal = source[key];
+      const tgtVal = (target as Record<string, unknown>)[key];
+      if (isObject(srcVal)) {
+        if (!(key in target)) Object.assign(output, { [key]: srcVal });
+        else if (isObject(tgtVal)) output[key] = deepMerge(tgtVal, srcVal);
+        else Object.assign(output, { [key]: srcVal });
       } else {
-        Object.assign(output, { [key]: source[key] });
+        Object.assign(output, { [key]: srcVal });
       }
     });
   }
-  return output;
+  return output as T;
 };
-
-const isObject = (item: any): boolean => item && typeof item === "object" && !Array.isArray(item);
 
 export default function PlatformSettingsPage() {
   const [settings, setSettings] = useState<SettingsSchema>(defaultSettings);
@@ -155,7 +159,7 @@ export default function PlatformSettingsPage() {
     setLoading(false);
   }, []);
 
-  const handleChange = (section: keyof SettingsSchema, key: string, value: any) => {
+  const handleChange = (section: keyof SettingsSchema, key: string, value: unknown) => {
     setSettings((prev) => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
   };
 
@@ -201,7 +205,11 @@ export default function PlatformSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading settings...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading settings..."
+      >
         <PageTitle title="Platform Settings" />
         <div className="flex justify-center">
           <Spinner size="lg" />
@@ -296,8 +304,11 @@ export default function PlatformSettingsPage() {
   );
 
   return (
-    <div className="p-6">
-      <PageTitle title="Platform Settings" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <PageTitle
+        title="Platform Settings"
+        subtitle="Local demo preferences — changes here do not affect the server."
+      />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Configure platform behavior, features, and appearance. Changes take effect immediately.
       </p>

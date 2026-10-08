@@ -22,8 +22,8 @@ const OurFleet = () => {
           <div className="flex-1">
             <h2 className="text-4xl font-bold  ">
               Our goal is to be the go-to platform for{" "}
-              <span className="text-teal-700">tech tutorials</span> and{" "}
-              <span className="text-teal-700">industry insights</span>.
+              <span className="text-primary-fg">tech tutorials</span> and{" "}
+              <span className="text-primary-fg">industry insights</span>.
             </h2>
           </div>
           <div className="flex-1">

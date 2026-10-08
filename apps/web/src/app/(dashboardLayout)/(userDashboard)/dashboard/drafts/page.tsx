@@ -5,6 +5,7 @@ import { Card, CardBody, Button, Chip, Divider } from "@heroui/react";
 import { FileText, Trash2, Clock, Edit3, Plus, Search, RefreshCw } from "lucide-react";
 import { PostDraft, getAllDrafts, deleteDraft } from "@/hooks/useDraftAutoSave";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -43,11 +44,8 @@ export default function DraftsPage() {
 
   const loadDrafts = () => {
     setIsLoading(true);
-    // Small delay to show loading state
-    setTimeout(() => {
-      setDrafts(getAllDrafts());
-      setIsLoading(false);
-    }, 300);
+    setDrafts(getAllDrafts());
+    setIsLoading(false);
   };
 
   const handleDeleteDraft = (id: string) => {
@@ -78,19 +76,22 @@ export default function DraftsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-5 px-5 md:px-20">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 mb-8">
-        <div className="flex items-center">
-          <h1 className="text-2xl border-l-5 border-primary font-bold pl-5 text-default-800">
-            My Drafts
-          </h1>
-          {drafts.length > 0 && (
-            <Chip size="sm" color="primary" variant="flat" className="ml-3">
-              {drafts.length} {drafts.length === 1 ? "draft" : "drafts"}
-            </Chip>
-          )}
-        </div>
+        <PageHeader
+          title="My Drafts"
+          subtitle="Unpublished posts saved on this device."
+          icon={FileText}
+          className="mb-0"
+          badge={
+            drafts.length > 0 ? (
+              <Chip size="sm" color="primary" variant="flat">
+                {drafts.length} {drafts.length === 1 ? "draft" : "drafts"}
+              </Chip>
+            ) : undefined
+          }
+        />
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Input
             placeholder="Search drafts..."
@@ -125,7 +126,7 @@ export default function DraftsPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="surface animate-pulse">
               <CardBody className="p-5">
                 <div className="h-6 bg-default-200 rounded w-3/4 mb-3"></div>
                 <div className="h-4 bg-default-100 rounded w-full mb-2"></div>
@@ -139,33 +140,32 @@ export default function DraftsPage() {
           ))}
         </div>
       ) : filteredDrafts.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title={searchQuery ? "No drafts found" : "No drafts yet"}
-          description={
-            searchQuery
-              ? "Try adjusting your search terms"
-              : "Your saved drafts will appear here. Start writing a post and it will be automatically saved."
-          }
-          actionLabel={searchQuery ? "Clear Search" : "Create New Post"}
-          onAction={() => {
-            if (searchQuery) {
-              setSearchQuery("");
-            } else {
-              router.push("/dashboard/create-post");
+        <div className="surface overflow-hidden rounded-2xl">
+          <EmptyState
+            icon={FileText}
+            title={searchQuery ? "No drafts found" : "No drafts yet"}
+            description={
+              searchQuery
+                ? "Try adjusting your search terms"
+                : "Your saved drafts will appear here. Start writing a post and it will be automatically saved."
             }
-          }}
-        />
+            actionLabel={searchQuery ? "Clear Search" : "Create New Post"}
+            onAction={() => {
+              if (searchQuery) {
+                setSearchQuery("");
+              } else {
+                router.push("/dashboard/create-post");
+              }
+            }}
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDrafts.map((draft) => (
-            <Card
-              key={draft.id}
-              className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 bg-default-50"
-            >
+            <Card key={draft.id} className="surface hover-lift">
               <CardBody className="p-5">
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <h3 className="font-semibold text-lg text-default-800 line-clamp-1">
+                  <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
                     {draft.title || "Untitled Draft"}
                   </h3>
                   {draft.isPremium && (

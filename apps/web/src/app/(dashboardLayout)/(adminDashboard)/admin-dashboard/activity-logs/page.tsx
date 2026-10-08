@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -130,6 +132,7 @@ const buildActivity = (users: IUser[], posts: TPost[], payments: any[]): Activit
 
 export default function ActivityLogsPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -195,7 +198,11 @@ export default function ActivityLogsPage() {
 
   if (loading) {
     return (
-      <div className="p-6" role="status" aria-label="Loading activity logs...">
+      <div
+        className="mx-auto w-full max-w-6xl px-4 py-6"
+        role="status"
+        aria-label="Loading activity logs..."
+      >
         <PageTitle title="Activity Logs" />
         <TableRowSkeleton columns={4} />
         <TableRowSkeleton columns={4} />
@@ -206,15 +213,15 @@ export default function ActivityLogsPage() {
 
   if (loadError) {
     return (
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <PageTitle title="Activity Logs" />
-        <div className="bg-content1 rounded-2xl border border-divider">
+        <div className="surface overflow-hidden rounded-2xl">
           <EmptyState
             type="custom"
             title="Couldn't load activity"
             description="We couldn't fetch activity records. Check your connection and try again."
             actionLabel="Try Again"
-            onAction={() => window.location.reload()}
+            onAction={() => router.refresh()}
           />
         </div>
       </div>
@@ -222,7 +229,7 @@ export default function ActivityLogsPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <PageTitle title="Activity Logs" />
       <p className="text-sm text-default-500 mb-6 -mt-2">
         Built from account, post, and payment records only — no inferred events.

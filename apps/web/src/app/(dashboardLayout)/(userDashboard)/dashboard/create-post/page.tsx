@@ -5,10 +5,12 @@ import { Button, Checkbox, Input, Select, SelectItem } from "@heroui/react";
 import { useQuill } from "react-quilljs";
 import "quill/dist/quill.snow.css"; // Add css for snow theme
 import PageTitle from "@/app/(dashboardLayout)/components/_page-title/PageTitle";
+import ContentCard from "@/components/ui/ContentCard";
 import { postCategories, postTags } from "./constant";
 import { toast } from "sonner";
 import { extractAndProcessImages } from "./_utils/extractAndProcessImages";
 import Image from "next/image";
+import { FileText, ImagePlus, PenSquare } from "lucide-react";
 import { useCreatePost } from "@/hooks/post.hook";
 import { useUser } from "@/context/user.provider";
 import { PostDraft, deleteDraft } from "@/hooks/useDraftAutoSave";
@@ -117,6 +119,21 @@ export default function CreatePost() {
     setSelectedCategory(next as string);
   };
 
+  const removePicture = (index: number) => {
+    setPictures((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClear = () => {
+    setTitle("");
+    setSelectedCategory("");
+    setSelectedTags(new Set([]));
+    setPictures([]);
+    setIsPremium(false);
+    setLoadedDraftId(null);
+    if (quill) quill.setText("");
+    toast.info("Form cleared");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (isCreatePending) return;
@@ -153,120 +170,138 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="container mx-auto rounded-lg p-6">
-        <PageTitle title="Create a New Post"></PageTitle>
-        <form onSubmit={handleSubmit}>
-          {/* Post title */}
-          <div className="mb-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
+      <div>
+        <PageTitle
+          title="Create a New Post"
+          subtitle="Write once, reach every engineer on the platform."
+        />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <ContentCard
+            title="Post details"
+            subtitle="Title, category and tags help readers find you"
+            icon={FileText}
+          >
             <Input
               isRequired
               name="title"
-              className=""
-              variant={"underlined"}
+              variant="bordered"
               label="Post Title"
-              placeholder="Enter Post Title"
+              placeholder="e.g. 5 React patterns I use in production"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-          </div>
-
-          {/* Select Category */}
-          <div className="mb-6 flex justify-between items-center gap-5">
-            <Select
-              isRequired
-              id="category"
-              name="category"
-              aria-label="Select a category"
-              className=""
-              variant={"underlined"}
-              label="Select your relevant Category"
-              placeholder="Select a Category"
-              selectedKeys={selectedCategory ? new Set([selectedCategory]) : new Set([])}
-              onSelectionChange={(keys) =>
-                handleCategoryChange(keys === "all" ? "" : (keys as Set<string>))
-              }
-            >
-              {postCategories.map((item) => (
-                <SelectItem key={item}>{item}</SelectItem>
-              ))}
-            </Select>
-            <div className="flex flex-col gap-1 shrink-0">
-              <Checkbox isSelected={isPremium} onValueChange={setIsPremium}>
-                Premium
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <Select
+                isRequired
+                id="category"
+                name="category"
+                aria-label="Select a category"
+                variant="bordered"
+                label="Category"
+                placeholder="Select a Category"
+                className="flex-1"
+                selectedKeys={selectedCategory ? new Set([selectedCategory]) : new Set([])}
+                onSelectionChange={(keys) =>
+                  handleCategoryChange(keys === "all" ? "" : (keys as Set<string>))
+                }
+              >
+                {postCategories.map((item) => (
+                  <SelectItem key={item}>{item}</SelectItem>
+                ))}
+              </Select>
+              <Select
+                label="Tags"
+                aria-label="Select tags"
+                isRequired
+                name="tags"
+                variant="bordered"
+                selectionMode="multiple"
+                placeholder="Select Tags"
+                selectedKeys={selectedTags}
+                className="flex-1"
+                onSelectionChange={(keys) => {
+                  if (keys !== "all") setSelectedTags(new Set(keys as Set<string>) as any);
+                }}
+              >
+                {postTags.map((tag) => (
+                  <SelectItem key={tag}>{tag}</SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div className="flex items-start gap-3 rounded-xl bg-warning/10 p-3">
+              <Checkbox isSelected={isPremium} onValueChange={setIsPremium} color="warning">
+                <span className="text-sm font-medium">Premium post</span>
               </Checkbox>
-              <span className="text-xs text-default-600 max-w-[180px]">
-                Premium posts are visible to subscribers only.
+              <span className="text-xs leading-relaxed text-default-500">
+                Premium posts are visible to subscribers only and earn you revenue share.
               </span>
             </div>
-          </div>
+          </ContentCard>
 
-          {/* Select Tags */}
-          <div className="mb-6">
-            <Select
-              label="Select your relevant Tags"
-              aria-label="Select tags"
-              isRequired
-              name="tags"
-              variant={"underlined"}
-              selectionMode="multiple"
-              placeholder="Select Tags"
-              selectedKeys={selectedTags}
-              className=""
-              onSelectionChange={(keys) => {
-                if (keys !== "all") setSelectedTags(new Set(keys as Set<string>) as any);
-              }}
-            >
-              {postTags.map((tag) => (
-                <SelectItem key={tag}>{tag}</SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          {/* Quill Editor */}
-          <div className="border border-default-300 rounded-md p-2 overflow-hidden flex flex-col">
+          <ContentCard
+            title="Content"
+            subtitle="Use the toolbar to format text or embed images"
+            icon={PenSquare}
+          >
             {/* Quill injects its own toolbar as the first child of the editor
                 node, so no placeholder element is needed here. */}
-
-            {/* Scrollable Text Area */}
             <div
               ref={quillRef}
-              className="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 rounded-xl"
+              className="rounded-xl bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100"
               style={{
-                height: "400px", // Editor height
-                overflowY: "auto", // Scrollable text area
+                height: "400px",
+                overflowY: "auto",
                 padding: "10px",
               }}
             />
-            <div className="pt-2 flex gap-2 flex-wrap">
-              {previewUrls.map((url, index) => (
-                <Image
-                  key={`${url}-${index}`}
-                  src={url}
-                  alt={`Attached image ${index + 1}`}
-                  width={100}
-                  height={100}
-                />
-              ))}
-            </div>
-          </div>
+            {previewUrls.length > 0 && (
+              <div>
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-medium text-default-600">
+                  <ImagePlus size={15} aria-hidden="true" />
+                  Attached images ({previewUrls.length})
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {previewUrls.map((url, index) => (
+                    <span
+                      key={`${url}-${index}`}
+                      className="relative block size-20 overflow-hidden rounded-xl border border-divider"
+                    >
+                      <Image
+                        src={url}
+                        alt={`Attached image ${index + 1}`}
+                        width={80}
+                        height={80}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePicture(index)}
+                        aria-label={`Remove attached image ${index + 1}`}
+                        className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-xs text-white transition-colors hover:bg-danger"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </ContentCard>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex justify-end gap-4">
-            {/* <Button
-              color="secondary"
-              variant="light"
-              onPress={() => console.log("Post closed")}
-            >
-              Cancel
-            </Button> */}
+          <div className="flex justify-end gap-3">
+            <Button variant="flat" onPress={handleClear} isDisabled={isCreatePending}>
+              Clear
+            </Button>
             <Button
-              className="bg-secondary text-default-50 shadow-lg shadow-indigo-500/20"
+              color="primary"
               type="submit"
+              className="font-semibold"
               isLoading={isCreatePending}
               isDisabled={isCreatePending}
             >
-              {isCreatePending ? "Publishing..." : "Submit Post"}
+              {isCreatePending ? "Publishing..." : "Publish Post"}
             </Button>
           </div>
         </form>

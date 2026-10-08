@@ -41,7 +41,7 @@ const ValuesCommitment = () => {
             <div key={index} className="bg-default-50  p-6 rounded-lg shadow-lg">
               <div className="mb-4 flex justify-center">
                 {/* Replace with actual icons */}
-                <span className="text-teal-600">{value.icon}</span>
+                <span className="text-primary-fg">{value.icon}</span>
               </div>
               <h3 className="text-2xl font-bold text-default-900">{value.title}</h3>
               <p className="text-default-600 mt-3">{value.description}</p>

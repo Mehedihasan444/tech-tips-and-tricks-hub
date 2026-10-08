@@ -1,8 +1,8 @@
 import React from "react";
-// Via the client shim: importing the @heroui/react barrel from a Server
-// Component evaluates createContext on the server. See @/components/ui/heroui.
-import { User, Tooltip, Button, Divider } from "@/components/ui/heroui";
-import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { User, Divider } from "@/components/ui/heroui";
+import { ArrowLeft } from "lucide-react";
 import { getPost } from "@/services/PostService";
 import Image from "next/image";
 import DownloadPdf from "@/app/(commonLayout)/posts/_components/DownloadPdf";
@@ -14,109 +14,110 @@ interface IProps {
   }>;
 }
 
-const PostDetailPage = async ({ params }: IProps) => {
+/**
+ * Owner preview of a single post inside the dashboard.
+ * The canonical public page lives at /posts/[PostId] — this view reuses the
+ * same data but adds dashboard context (back link, manage actions).
+ */
+const DashboardPostDetailPage = async ({ params }: IProps) => {
   const { PostId } = await params;
-  const { data: post } = await getPost(PostId);
+  let post = null;
+  try {
+    const res = await getPost(PostId);
+    post = res?.data;
+  } catch {
+    notFound();
+  }
+  if (!post?._id) notFound();
+
   return (
-    <div className="m-6 space-y-5">
-      {/* Header Section */}
-      <header className="post-header">
-        <div className="post-author">
-          <User
-            avatarProps={{ src: post.author.profilePhoto, radius: "lg" }}
-            name={post.author.name}
-            description={`Posted on: ${new Date(post.createdAt).toLocaleDateString()}`}
-          />
-          <h1 className="text-2xl font-semibold">Title : {post.title}</h1>
-        </div>
+    <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-6">
+      <Link
+        href="/dashboard/my-posts"
+        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-primary-fg"
+      >
+        <ArrowLeft size={15} /> Back to My Posts
+      </Link>
+
+      <header className="space-y-3">
+        <User
+          avatarProps={{ src: post.author?.profilePhoto, radius: "lg" }}
+          name={post.author?.name ?? "Unknown author"}
+          description={`Posted on: ${post.createdAt ? new Date(post.createdAt).toLocaleDateString() : "Unknown date"}`}
+        />
+        <h1 className="text-balance text-2xl font-bold tracking-tight sm:text-3xl">{post.title}</h1>
+        <p className="text-sm text-default-500">
+          Previewing as the author — the public page is{" "}
+          <Link href={`/posts/${post._id}`} className="text-primary-fg hover:underline">
+            /posts/{post._id}
+          </Link>
+        </p>
       </header>
 
-      {/* Images Section */}
-      {post.images.length > 0 && (
-        <div className="flex">
+      {post.images?.length > 0 && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {post.images.slice(0, 2).map((image: string, index: number) => (
-            <Image
-              key={index}
-              src={image}
-              height={500}
-              width={600}
-              alt={`Image ${index + 1}`}
-              className="post-image"
-            />
+            <span key={index} className="relative block h-64 overflow-hidden rounded-2xl">
+              <Image
+                src={image}
+                fill
+                alt={`${post.title} — image ${index + 1}`}
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 50vw"
+              />
+            </span>
           ))}
         </div>
       )}
 
-      {/* Post Content */}
-      <section className="post-content">
+      <section className="prose prose-sm max-w-none dark:prose-invert">
         <div>{sanitizeParse(post.content)}</div>
-
-        {/* Tags */}
-        <div className="post-tags flex gap-3">
-          {post.tags.map((tag: string, index: number) => (
-            <span key={index} className=" text-blue-600 cursor-pointer">
-              #{tag}
-            </span>
-          ))}
-        </div>
       </section>
 
-      {/* Post Metadata */}
-      <section className="flex justify-between items-center">
-        <div className="">
-          <div className="post-category">
-            <strong className="text-default-500">Category:</strong> {post.category}
-          </div>{" "}
-          <div className="post-updated">
-            <strong className="text-default-500">Last updated on:</strong>{" "}
-            {new Date(post.updatedAt).toLocaleDateString()}
-          </div>
+      {post.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {post.tags.map((tag: string) => (
+            <Link
+              key={tag}
+              href={`/posts?query=${encodeURIComponent(tag)}`}
+              className="rounded-full bg-default-100 px-3 py-1 text-xs font-medium text-default-600 transition-colors hover:bg-primary/10 hover:text-primary-fg"
+            >
+              #{tag}
+            </Link>
+          ))}
         </div>
-        <div className="flex gap-5">
-          <Tooltip content="Likes">
-            <Button variant="ghost" startContent={<ThumbsUp />}>
-              {post.likes}
-            </Button>
-          </Tooltip>
-          <Tooltip content="Dislikes">
-            <Button variant="ghost" startContent={<ThumbsDown />}>
-              {post.dislikes}
-            </Button>
-          </Tooltip>
+      )}
+
+      <section className="flex flex-wrap items-center justify-between gap-3">
+        <div className="text-sm text-default-500">
+          <p>
+            <strong className="font-medium">Category:</strong> {post.category || "—"}
+          </p>
+          <p>
+            <strong className="font-medium">Last updated:</strong>{" "}
+            {post.updatedAt ? new Date(post.updatedAt).toLocaleDateString() : "—"}
+          </p>
         </div>
+        <DownloadPdf post={post} />
       </section>
       <Divider />
 
-      {/* Share Options */}
-      <section className="flex justify-between  items-center gap-5">
-        <div className="flex items-center gap-5">
-          <div className="">
-            <h2 className="font-semibold text-default-500">Share this post : </h2>
-          </div>
-          <div className="flex gap-5 items-center">
-            <Tooltip content="Share on Facebook">
-              <Button startContent={<Share2 />} color="primary">
-                Facebook
-              </Button>
-            </Tooltip>
-            <Tooltip content="Share on Twitter">
-              <Button startContent={<Share2 />} color="secondary">
-                Twitter
-              </Button>
-            </Tooltip>
-            <Tooltip content="Copy Link">
-              <Button startContent={<Share2 />}>Copy Link</Button>
-            </Tooltip>
-          </div>
-        </div>
-        <div className="">
-          {/* PDF Download Button */}
-          <DownloadPdf post={post} />
-        </div>
-      </section>
-      {/* Comments Section */}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href={`/posts/${post._id}`}
+          className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        >
+          View public page
+        </Link>
+        <Link
+          href="/dashboard/manage-posts"
+          className="rounded-full border border-divider px-4 py-2 text-sm font-medium transition-colors hover:bg-default-100"
+        >
+          Manage posts
+        </Link>
+      </div>
     </div>
   );
 };
 
-export default PostDetailPage;
+export default DashboardPostDetailPage;

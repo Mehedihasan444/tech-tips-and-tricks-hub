@@ -112,11 +112,11 @@ const typeConfig = {
 
 export default function ChangelogPage() {
   return (
-    <div className="p-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6">
       <PageTitle title="Changelog" />
 
       <p className="text-default-500 mb-8">
-        Track all updates, improvements, and bug fixes to the TechNest platform.
+        Track all updates, improvements, and bug fixes to the Tech Tips & Tricks Hub platform.
       </p>
 
       <div className="space-y-6">
@@ -173,8 +173,8 @@ export default function ChangelogPage() {
           <Layout className="mx-auto text-default-300 mb-3" size={32} />
           <p className="text-default-500">
             Want to see a specific feature? Contact us at{" "}
-            <a href="mailto:support@technest.com" className="text-primary-fg hover:underline">
-              support@technest.com
+            <a href="mailto:support@techtips-hub.com" className="text-primary-fg hover:underline">
+              support@techtips-hub.com
             </a>
           </p>
         </CardBody>
