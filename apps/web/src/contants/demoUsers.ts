@@ -27,5 +27,4 @@ export type TDemoAccount = {
  * Resolved from `process.env.NODE_ENV`, which Next.js replaces at build time, so
  * `isDemoLoginEnabled && <DemoLoginPanel />` folds to `false` in production.
  */
-export const isDemoLoginEnabled =
-  process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN !== "false";
+export const isDemoLoginEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN !== "false";

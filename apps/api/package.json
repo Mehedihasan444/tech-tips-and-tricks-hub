@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Express + TypeScript REST API for Tech Tips & Tricks Hub, backed by MongoDB (Mongoose) and Socket.io.",
+  "engines": {
+    "node": "24.x"
+  },
   "main": "./dist/server.js",
   "scripts": {
     "start": "node ./dist/server.js",
