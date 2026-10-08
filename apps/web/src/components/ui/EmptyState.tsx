@@ -14,6 +14,7 @@ import {
   LucideIcon,
   Plus,
   RefreshCw,
+  DollarSign,
 } from "lucide-react";
 
 type EmptyStateType =
@@ -26,6 +27,7 @@ type EmptyStateType =
   | "followers"
   | "following"
   | "images"
+  | "payments"
   | "custom";
 
 interface EmptyStateProps {
@@ -108,6 +110,12 @@ const typeConfig: Record<
     description: "Upload images to make your content more engaging.",
     actionLabel: "Upload Image",
     color: "secondary",
+  },
+  payments: {
+    icon: DollarSign,
+    title: "No payments yet",
+    description: "Your subscription and billing history will appear here.",
+    color: "success",
   },
   custom: {
     icon: Settings,

@@ -19,4 +19,17 @@
  * Client Components may keep importing `@heroui/react` directly — they already
  * evaluate the barrel on the client, where `createContext` is fine.
  */
-export { Badge, Button, Divider, Tooltip, User } from "@heroui/react";
+export {
+  Badge,
+  Button,
+  Chip,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  User,
+} from "@heroui/react";
