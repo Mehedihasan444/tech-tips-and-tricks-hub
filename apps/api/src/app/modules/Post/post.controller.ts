@@ -3,6 +3,7 @@ import { TImageFiles } from "../../interfaces/image.interface";
 import { catchAsync } from "../../utils/catchAsync";
 import { getRouteParam } from "../../utils/getRouteParam";
 import sendResponse from "../../utils/sendResponse";
+import AppError from "../../errors/AppError";
 import { PostServices } from "./post.service";
 
 const createPost = catchAsync(async (req, res) => {
@@ -23,7 +24,12 @@ const createPost = catchAsync(async (req, res) => {
 const updatePost = catchAsync(async (req, res) => {
   const id = getRouteParam(req.params.id, "id");
 
-  const updatedPost = await PostServices.updatePostInDB(id, req.body, req.files as TImageFiles);
+  const updatedPost = await PostServices.updatePostInDB(
+    id,
+    req.body,
+    (req.files as TImageFiles | undefined) ?? null,
+  );
+  if (!updatedPost) throw new AppError(httpStatus.NOT_FOUND, "Post not found");
 
   sendResponse(res, {
     success: true,
@@ -46,6 +52,7 @@ const getAllPosts = catchAsync(async (req, res) => {
 const getPost = catchAsync(async (req, res) => {
   const postId = getRouteParam(req.params.id, "id");
   const post = await PostServices.getPostFromDB(postId);
+  if (!post) throw new AppError(httpStatus.NOT_FOUND, "Post not found");
 
   sendResponse(res, {
     success: true,

@@ -26,8 +26,8 @@ const createPostIntoDB = async (payload: TPost, images: any) => {
     return result;
   }
 };
-const updatePostInDB = async (postId: string, payload: TPost, images: TImageFiles) => {
-  if (images.postImages) {
+const updatePostInDB = async (postId: string, payload: TPost, images?: TImageFiles | null) => {
+  if (images?.postImages) {
     const { postImages } = images;
     const previousImages = payload.images || [];
     const newImages = postImages?.map((image) => image.path) || [];
@@ -59,8 +59,10 @@ const getAllPostsFromDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await postQuery.modelQuery;
-  // Get the total count of posts for the query (ignoring pagination)
-  const totalPosts = await Post.countDocuments(); //+
+  // Count with the same filter/search conditions (ignoring skip/limit)
+  // so pageCount stays correct when filtering. getFilter() excludes
+  // pagination/sort/select stages.
+  const totalPosts = await Post.countDocuments(postQuery.modelQuery.getFilter());
   // Calculate the page count
   const limit = Number(query?.limit) || 10;
   const pageCount = Math.ceil(totalPosts / limit);

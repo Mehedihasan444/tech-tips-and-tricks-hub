@@ -1,3 +1,5 @@
+import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import { TImageFiles } from "../../interfaces/image.interface";
 import { UserSearchableFields } from "./user.constant";
@@ -27,7 +29,7 @@ const updateUserFollowListAndFollowersListInDB = async (userId: string, payload:
       .populate("following");
 
     if (!user || !loggedInUser) {
-      throw new Error("User not found");
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
 
     // Check if the loggedInUser is already in the followers list of user
@@ -99,8 +101,8 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     .search(UserSearchableFields);
 
   const result = await users.modelQuery;
-  // Get the total count of posts for the query (ignoring pagination)
-  const totalUsers = await User.countDocuments(); //+
+  // Count with the same filter/search so pageCount is correct when filtering.
+  const totalUsers = await User.countDocuments(users.modelQuery.getFilter());
   // Calculate the page count
   const limit = Number(query?.limit) || 10;
   const pageCount = Math.ceil(totalUsers / limit);
@@ -125,21 +127,23 @@ const getSingleUserFromDB = async (nickName: string) => {
 const deleteUserFromDB = async (userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
-    throw new Error("User not found");
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
   if (user.role === "ADMIN") {
-    throw new Error("You can not delete an admin user");
+    throw new AppError(httpStatus.FORBIDDEN, "You can not delete an admin user");
   }
   const result = await User.findByIdAndDelete(userId);
   return result;
 };
 const updateProfilePhoto = async (payload: Record<string, unknown>, image: TImageFiles) => {
-  console.log(image.image[0].path, "image");
+  const file = (image as unknown as { image?: { path?: string }[] })?.image?.[0];
+  if (!file?.path) throw new AppError(httpStatus.BAD_REQUEST, "No profile picture found");
   const result = await User.findByIdAndUpdate(
     payload?.userId,
-    { profilePhoto: image.image[0].path },
+    { profilePhoto: file.path },
     { returnDocument: "after" },
   );
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, "User not found");
   return result;
 };
 

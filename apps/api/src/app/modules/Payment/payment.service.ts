@@ -40,6 +40,10 @@ const paymentConfirmation = async ({
   if (!verifyResponse || verifyResponse.pay_status !== "Successful") {
     throw new AppError(httpStatus.BAD_REQUEST, "Payment verification failed");
   }
+  // Idempotency: gateway retries must not create duplicate payment rows
+  // (transactionId is unique and would otherwise 500).
+  const existing = await Payment.findOne({ transactionId });
+  if (existing) return existing;
   const payment = await Payment.create({
     userId: new Types.ObjectId(userId),
     transactionId,

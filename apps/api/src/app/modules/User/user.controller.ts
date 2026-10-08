@@ -21,7 +21,26 @@ const updateUserFollowListAndFollowersList = catchAsync(async (req, res) => {
   if (!id && !req.body) {
     throw new AppError(400, "Something went wrong");
   }
-  const updatedUser = await UserServices.updateUserFollowListAndFollowersListInDB(id, req.body);
+  const caller = (req as unknown as { user?: { _id?: string; role?: string } }).user;
+  const body = { ...(req.body ?? {}) } as Record<string, unknown>;
+  if (caller?.role !== "ADMIN") {
+    // Follow/unfollow flow: callers may only act as themselves.
+    if (body.loggedInUserId && body.loggedInUserId !== caller?._id) {
+      throw new AppError(httpStatus.FORBIDDEN, "You can only follow as yourself");
+    }
+    // Profile updates: users may only update their own document,
+    // and never escalate privilege via role/status/premium/password.
+    if (!body.loggedInUserId && id !== caller?._id) {
+      throw new AppError(httpStatus.FORBIDDEN, "You can only update your own profile");
+    }
+    if (!body.loggedInUserId) {
+      delete body.role;
+      delete body.status;
+      delete body.isPremium;
+      delete body.password;
+    }
+  }
+  const updatedUser = await UserServices.updateUserFollowListAndFollowersListInDB(id, body);
 
   sendResponse(res, {
     success: true,
@@ -44,6 +63,7 @@ const getAllUsers = catchAsync(async (req, res) => {
 const getSingleUser = catchAsync(async (req, res) => {
   const nickName = getRouteParam(req.params.nickName, "nickName");
   const user = await UserServices.getSingleUserFromDB(nickName);
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
   sendResponse(res, {
     success: true,
@@ -67,7 +87,11 @@ const updateProfilePhoto = catchAsync(async (req, res) => {
   if (!req.files) {
     throw new AppError(400, "No profile picture found");
   }
-  await UserServices.updateProfilePhoto(req.body, req.files as TImageFiles);
+  const caller = (req as unknown as { user?: { _id?: string; role?: string } }).user;
+  // Users may only change their own avatar; admins may specify any userId.
+  const body = caller?.role !== "ADMIN" ? { ...req.body, userId: caller?._id } : req.body;
+  if (!body?.userId) throw new AppError(400, "userId is required");
+  await UserServices.updateProfilePhoto(body, req.files as TImageFiles);
 
   sendResponse(res, {
     success: true,

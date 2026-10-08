@@ -1,4 +1,5 @@
 import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { PaymentServices } from "./payment.service";
@@ -6,7 +7,11 @@ import config from "../../config";
 import { Request, Response } from "express"; // Ensure you have the necessary imports
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
-  const payment = await PaymentServices.createPayment(req.body);
+  // Prevent paying/triggering for another user: non-admin callers always pay as themselves.
+  const caller = (req as unknown as { user?: { _id?: string; role?: string } }).user;
+  const body =
+    caller?.role !== "ADMIN" && caller?._id ? { ...req.body, userId: caller._id } : req.body;
+  const payment = await PaymentServices.createPayment(body);
 
   sendResponse(res, {
     success: true,
@@ -139,7 +144,16 @@ const paymentFailed = catchAsync(async (req: Request, res: Response) => {
   `);
 });
 const getAllPayments = catchAsync(async (req, res) => {
-  const payment = await PaymentServices.getAllPaymentsFromDB(req.query);
+  // USERs may only list their own payments; ADMINs may list all or filter.
+  const caller = (req as unknown as { user?: { _id?: string; role?: string } }).user;
+  const query = { ...req.query } as Record<string, unknown>;
+  if (caller?.role !== "ADMIN") {
+    if (query.userId && query.userId !== caller?._id) {
+      throw new AppError(httpStatus.FORBIDDEN, "You can only view your own payments");
+    }
+    query.userId = caller?._id;
+  }
+  const payment = await PaymentServices.getAllPaymentsFromDB(query);
 
   sendResponse(res, {
     success: true,

@@ -20,10 +20,15 @@ router.post(
 router.get("/", UserControllers.getAllUsers);
 router.put(
   "/update-profile-photo",
+  auth(USER_ROLE.USER, USER_ROLE.ADMIN),
   multerUpload.fields([{ name: "image" }]),
   parseBody,
   UserControllers.updateProfilePhoto,
 );
 router.get("/:nickName", UserControllers.getSingleUser);
-router.put("/:id", UserControllers.updateUserFollowListAndFollowersList);
+router.put(
+  "/:id",
+  auth(USER_ROLE.USER, USER_ROLE.ADMIN),
+  UserControllers.updateUserFollowListAndFollowersList,
+);
 router.delete("/:id", auth(USER_ROLE.ADMIN), UserControllers.deleteUser);

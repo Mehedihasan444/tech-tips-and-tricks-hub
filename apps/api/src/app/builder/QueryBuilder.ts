@@ -15,13 +15,18 @@ export class QueryBuilder<T> {
     if (this.query?.searchTerm) {
       searchTerm = this.query.searchTerm as string;
     }
+    if (!searchTerm) return this;
+    // Escape RegExp meta-characters: user input must never become a live
+    // pattern (ReDoS / `new RegExp("(")` crash). Matches Postman/Meili
+    // behavior for literal search.
+    const escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     // {title: {$regex: searchTerm}}
     // {genre: {$regex: searchTerm}}
     this.modelQuery = this.modelQuery.find({
       $or: searchableFields.map(
         (field) =>
           ({
-            [field]: new RegExp(searchTerm, "i"),
+            [field]: new RegExp(escaped, "i"),
           }) as QueryFilter<T>,
       ),
     });
