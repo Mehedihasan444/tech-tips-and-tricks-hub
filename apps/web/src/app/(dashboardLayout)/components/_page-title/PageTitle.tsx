@@ -1,7 +1,12 @@
 import React from "react";
+import PageHeader from "@/components/ui/PageHeader";
 
-const PageTitle = ({ title }: { title: string }) => {
-  return <h1 className="text-2xl mb-6  border-l-5 border-primary font-bold pl-5">{title}</h1>;
+/**
+ * Legacy wrapper — kept so existing `import PageTitle` calls keep working.
+ * Renders the canonical PageHeader for visual consistency.
+ */
+const PageTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => {
+  return <PageHeader title={title} subtitle={subtitle} />;
 };
 
 export default PageTitle;

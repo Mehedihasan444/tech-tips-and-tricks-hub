@@ -1,7 +1,6 @@
 "use client";
 
-// import { NavbarWrapper } from "../../components/dashboardNabbar/dashboardNavbar";
-import NavbarWrapper from "../../../components/dashboardNavbar/dashboardNabbar";
+import NavbarWrapper from "../../../components/dashboardNavbar/dashboardNavbar";
 import { AdminSidebarWrapper } from "../../../components/sidebar/adminSidebar";
 
 interface Props {

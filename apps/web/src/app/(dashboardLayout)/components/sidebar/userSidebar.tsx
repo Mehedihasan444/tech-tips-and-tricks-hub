@@ -1,130 +1,52 @@
 "use client";
 
 import {
-  BarChart,
-  Cog,
+  BarChart3,
   DollarSign,
   FileText,
-  Home,
-  Users,
-  Edit,
-  BadgePlus,
   FolderOpen,
+  Home,
+  ListChecks,
+  PenSquare,
+  Settings2,
+  Users,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Sidebar } from "./sidebar.styles";
-import { SidebarItem } from "./sidebar-item";
-import { SidebarMenu } from "./sidebar-menu";
-import { CollapseItems } from "./collapse-items";
-import { useSidebarContext } from "../../layout/layout-context";
+import { DashboardSidebar, SidebarSection } from "./DashboardSidebar";
 
-export const SidebarWrapper = () => {
-  const pathname = usePathname();
-  const { isOpen, setIsOpen } = useSidebarContext();
-  return (
-    <aside id="dashboard-sidebar" className="h-screen z-[20] sticky top-0">
-      {isOpen ? (
-        <div className={Sidebar.Overlay()} onClick={() => setIsOpen(false)} aria-hidden="true" />
-      ) : null}
-      <div
-        className={Sidebar({
-          isOpen,
-        })}
-      >
-        <div className={Sidebar.Header()}>
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              TechNest
-            </h1>
-          </Link>
-        </div>
+const sections: SidebarSection[] = [
+  {
+    label: "Overview",
+    entries: [{ title: "Dashboard Home", href: "/dashboard", icon: <Home />, exact: true }],
+  },
+  {
+    label: "Posts",
+    entries: [
+      { title: "My Posts", href: "/dashboard/my-posts", icon: <FileText /> },
+      { title: "Drafts", href: "/dashboard/drafts", icon: <FolderOpen /> },
+      {
+        title: "Post Management",
+        icon: <Settings2 />,
+        children: [
+          { title: "Create Post", href: "/dashboard/create-post", icon: <PenSquare /> },
+          { title: "Manage Posts", href: "/dashboard/manage-posts", icon: <ListChecks /> },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Insights",
+    entries: [
+      { title: "Analytics", href: "/dashboard/analytics", icon: <BarChart3 /> },
+      { title: "Following Activity", href: "/dashboard/following-activity", icon: <Users /> },
+    ],
+  },
+  {
+    label: "Billing",
+    entries: [{ title: "Payments", href: "/dashboard/payments", icon: <DollarSign /> }],
+  },
+];
 
-        <div className="flex flex-col justify-between h-full">
-          <div className={Sidebar.Body()}>
-            {/* Dashboard Home */}
-            <SidebarItem
-              title="Dashboard Home"
-              icon={<Home />}
-              isActive={pathname === "/dashboard"}
-              href="/dashboard"
-            />
-
-            {/* My Posts Section */}
-            <SidebarMenu title="Posts">
-              <SidebarItem
-                isActive={pathname === "/dashboard/my-posts"}
-                title="My Posts"
-                icon={<FileText />}
-                href="/dashboard/my-posts"
-              />
-              <SidebarItem
-                isActive={pathname === "/dashboard/drafts"}
-                title="My Drafts"
-                icon={<FolderOpen />}
-                href="/dashboard/drafts"
-              />
-
-              <CollapseItems
-                icon={<Cog />}
-                title="Post Management"
-                pathname={pathname}
-                // href="/dashboard/create-post"
-                items={[
-                  {
-                    title: "Create Post",
-                    icon: <BadgePlus />,
-                    href: "/dashboard/create-post",
-                  },
-                  {
-                    title: "Manage Posts",
-                    icon: <Edit />,
-                    href: "/dashboard/manage-posts",
-                  },
-                  // {
-                  //   title: "Delete Posts",
-                  //   icon: <Trash2 />,
-                  //   href: "/dashboard/delete-post",
-                  // },
-                ]}
-              />
-            </SidebarMenu>
-
-            {/* Analytics Section */}
-            <SidebarMenu title="Analytics">
-              <SidebarItem
-                isActive={pathname === "/dashboard/analytics"}
-                title="View Analytics"
-                icon={<BarChart />}
-                href="/dashboard/analytics"
-              />
-            </SidebarMenu>
-
-            {/* Following Activity Section */}
-            <SidebarMenu title="Following Activity">
-              <SidebarItem
-                isActive={pathname === "/dashboard/following-activity"}
-                title="Following Activity"
-                icon={<Users />}
-                href="/dashboard/following-activity"
-              />
-            </SidebarMenu>
-
-            {/* Payments Section */}
-            <SidebarMenu title="Payments">
-              <SidebarItem
-                isActive={pathname === "/dashboard/payments"}
-                title="Payments"
-                icon={<DollarSign />}
-                href="/dashboard/payments"
-              />
-            </SidebarMenu>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
-};
+/** Creator sidebar — a thin config over the shared dashboard shell. */
+export const SidebarWrapper = () => (
+  <DashboardSidebar caption="Creator Studio" sections={sections} />
+);

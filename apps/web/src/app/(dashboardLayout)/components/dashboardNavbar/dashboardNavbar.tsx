@@ -17,9 +17,9 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
   const { isOpen, toggleSidebar } = useSidebarContext();
 
   return (
-    <div className="w-full ">
-      <div className="p-5 flex justify-between items-center shadow">
-        <div className="flex-1 flex items-center gap-4">
+    <div className="w-full min-w-0">
+      <header className="glass sticky top-0 z-30 flex items-center justify-between border-b border-divider/70 px-4 py-2.5 sm:px-5">
+        <div className="flex flex-1 items-center gap-1.5">
           {/* Mobile drawer toggle — the sidebar is off-canvas below md */}
           <Button
             isIconOnly
@@ -35,14 +35,14 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
           </Button>
           <ThemeSwitcher />
           <Tooltip content="Back to Home" color="primary">
-            <Link href="/">
+            <Link href="/" aria-label="Go to home">
               <Button isIconOnly variant="light" radius="full" aria-label="Go to home">
                 <Home size={20} className="text-default-600" />
               </Button>
             </Link>
           </Tooltip>
         </div>
-        <div className="flex-1 flex gap-4 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end gap-1.5">
           {/* Real-time Notifications */}
           <NotificationsDropdown />
 
@@ -61,7 +61,7 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
                 isIconOnly
                 variant="light"
                 radius="full"
-                className="hover:bg-default-100 transition-colors"
+                className="transition-colors hover:bg-default-100"
                 aria-label="Messages"
                 onPress={toggleChatList}
               >
@@ -70,13 +70,15 @@ const NavbarWrapper = ({ children }: { children: ReactNode }) => {
             </Badge>
           </Tooltip>
 
+          <span aria-hidden="true" className="mx-1 h-6 w-px bg-divider" />
+
           <Tooltip content={"Profile"} color="primary">
             <div className="max-w-fit">
               <ProfileDropdown />
             </div>
           </Tooltip>
         </div>
-      </div>
+      </header>
 
       <div className="">{children}</div>
     </div>

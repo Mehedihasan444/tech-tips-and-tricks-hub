@@ -7,9 +7,11 @@ interface Props {
 
 export const SidebarMenu = ({ title, children }: Props) => {
   return (
-    <div className="flex gap-2 flex-col">
-      <span className="text-xs font-medium uppercase tracking-wider text-default-500">{title}</span>
+    <nav aria-label={title} className="flex flex-col gap-1">
+      <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-default-400">
+        {title}
+      </p>
       {children}
-    </div>
+    </nav>
   );
 };

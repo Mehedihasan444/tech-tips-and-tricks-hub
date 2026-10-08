@@ -1,20 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useDeletePost } from "@/hooks/post.hook";
 import { useDeleteUser } from "@/hooks/user.hook";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-  Tooltip,
-  Spinner,
-} from "@heroui/react";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Button, useDisclosure, Tooltip } from "@heroui/react";
+import { Trash2 } from "lucide-react";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
+/**
+ * Delete trigger + confirmation — now built on the canonical
+ * `ConfirmationModal` so danger styling stays in one place.
+ */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function DeleteConfirmationModal({
   item,
   title,
@@ -50,74 +45,22 @@ export default function DeleteConfirmationModal({
         isIconOnly
         variant="light"
         aria-label={`Delete ${title} ${itemName}`}
-        className="text-danger hover:bg-danger/10 p-2"
+        className="p-2 text-danger hover:bg-danger/10"
       >
         <Tooltip color="danger" content={`Delete ${title}`}>
-          <Trash2 className="text-danger hover:scale-110 transition-transform" />
+          <Trash2 className="text-danger transition-transform hover:scale-110" />
         </Tooltip>
       </Button>
-      <Modal
+      <ConfirmationModal
         isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        placement="center"
-        backdrop="blur"
-        isDismissable={!isLoading}
-        hideCloseButton={isLoading}
-        classNames={{
-          backdrop: "bg-black/50 backdrop-blur-sm",
-          base: "border border-divider",
-        }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col items-center gap-2 pt-6">
-                <div className="p-3 rounded-full bg-danger-100">
-                  <AlertTriangle className="w-8 h-8 text-danger" />
-                </div>
-                <h3 className="text-xl font-bold text-center">
-                  Delete {title.charAt(0).toUpperCase() + title.slice(1)}
-                </h3>
-              </ModalHeader>
-              <ModalBody className="text-center pb-2">
-                <p className="text-default-500">
-                  Are you sure you want to delete{" "}
-                  <strong className="text-foreground">{item?.name || item?.title}</strong>?
-                </p>
-                <p className="text-sm text-danger-500 mt-2">This action cannot be undone.</p>
-              </ModalBody>
-              <ModalFooter className="flex gap-2 justify-center pb-6">
-                <Button
-                  variant="flat"
-                  onPress={onClose}
-                  isDisabled={isLoading}
-                  className="font-medium"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={handleDelete}
-                  isDisabled={isLoading}
-                  className="font-medium"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <Spinner size="sm" color="current" />
-                      <span>Deleting...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Trash2 className="w-4 h-4" />
-                      <span>Delete</span>
-                    </div>
-                  )}
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        onClose={() => onOpenChange()}
+        onConfirm={handleDelete}
+        title={`Delete ${title.charAt(0).toUpperCase() + title.slice(1)}`}
+        message={`Are you sure you want to delete "${itemName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        type="danger"
+        isLoading={isLoading}
+      />
     </>
   );
 }

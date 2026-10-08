@@ -1,28 +1,37 @@
 import { tv } from "@heroui/react";
 
+/**
+ * Dashboard sidebar shell styles.
+ *
+ * Behavior contract (do not break):
+ * - Off-canvas drawer on mobile (`-translate-x-full` until `isOpen`),
+ *   always visible from `md` up.
+ * - `z-[202]` panel above the `z-[201]` overlay.
+ */
 export const SidebarWrapper = tv({
-  base: "bg-background transition-transform h-full fixed -translate-x-full w-72 shrink-0 z-[202] overflow-y-auto border-r border-divider flex-col py-6 px-3 md:ml-0 md:flex md:static md:h-screen md:translate-x-0 ",
+  base: "fixed inset-y-0 left-0 z-[202] flex w-[280px] shrink-0 -translate-x-full flex-col border-r border-divider bg-content1/85 backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none md:sticky md:top-0 md:h-screen md:translate-x-0",
 
   variants: {
     isOpen: {
-      true: "translate-x-0 ml-0 [display:inherit]",
+      true: "translate-x-0",
     },
   },
 });
+
 export const Overlay = tv({
-  base: "bg-[rgb(15_23_42/0.3)] fixed inset-0 z-[201] opacity-80 transition-opacity md:hidden md:z-auto md:opacity-100",
+  base: "fixed inset-0 z-[201] bg-black/40 backdrop-blur-[2px] transition-opacity md:hidden",
 });
 
 export const Header = tv({
-  base: "flex gap-8 items-center justify-center px-6",
+  base: "flex items-center gap-3 px-5 pb-5 pt-6",
 });
 
 export const Body = tv({
-  base: "flex flex-col gap-6 mt-9 px-2",
+  base: "custom-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-2",
 });
 
 export const Footer = tv({
-  base: "flex items-center justify-center gap-6 pt-16 pb-8 px-8 md:pt-10 md:pb-0",
+  base: "border-t border-divider/70 p-3",
 });
 
 export const Sidebar = Object.assign(SidebarWrapper, {
